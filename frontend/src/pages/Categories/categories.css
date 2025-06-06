@@ -1,0 +1,41 @@
+/* categories.css */
+
+/* Grid Layout */
+.grid-container {
+  display: grid;
+  grid-template-columns: 260px 1fr 1fr 1fr;
+  grid-template-rows: 0.2fr 3fr;
+  grid-template-areas:
+    'sidebar header header header'
+    'sidebar main main main';
+  height: 100vh;
+}
+
+/* Header Styling */
+body {
+  margin: 0 !important;
+  padding: 0;
+  background-color: #1d2634 !important;
+  color: #9e9ea4 !important;
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Responsive Breakpoints */
+
+/* Medium <= 992px */
+@media screen and (max-width: 992px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.2fr 3fr;
+    grid-template-areas:
+      'header'
+      'main';
+  }
+}
+
+/* Extra Small <= 576px */
+@media screen and (max-width: 576px) {
+  .hedaer-left {
+    display: none;
+  }
+}

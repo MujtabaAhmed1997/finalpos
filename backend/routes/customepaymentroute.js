@@ -1,0 +1,228 @@
+// // routes/customerpaymentroute.js
+
+// const express = require('express');
+// const router = express.Router();
+// const { CustomerPayment } = require('../models');
+// const { SalesOrder } = require('../models/salesorder');
+// const { Customer } = require('../models/customer');
+
+// // Create a new customer payment
+// router.post('/', async (req, res) => {
+//   try {
+//     const payment = await CustomerPayment.create(req.body);
+//     res.status(201).json(payment);
+//   } catch (err) {
+//     console.error('Error creating customer payment:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// // Get a customer payment by ID
+// router.get('/:id', async (req, res) => {
+//   try {
+//     const payment = await CustomerPayment.findByPk(req.params.id);
+//     if (payment) {
+//       res.json(payment);
+//     } else {
+//       res.status(404).json({ error: 'Customer payment not found' });
+//     }
+//   } catch (err) {
+//     console.error('Error fetching customer payment:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// // Get all customer payments
+// router.get('/', async (req, res) => {
+//   try {
+//     const payments = await CustomerPayment.findAll();
+//     res.json(payments);
+//   } catch (err) {
+//     console.error('Error fetching customer payments:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// // Update a customer payment
+// router.put('/:id', async (req, res) => {
+//   try {
+//     const payment = await CustomerPayment.findByPk(req.params.id);
+//     if (payment) {
+//       await payment.update(req.body);
+//       res.json(payment);
+//     } else {
+//       res.status(404).json({ error: 'Customer payment not found' });
+//     }
+//   } catch (err) {
+//     console.error('Error updating customer payment:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// // Delete a customer payment
+// router.delete('/:id', async (req, res) => {
+//   try {
+//     const payment = await CustomerPayment.findByPk(req.params.id);
+//     if (payment) {
+//       await payment.destroy();
+//       res.status(204).end();
+//     } else {
+//       res.status(404).json({ error: 'Customer payment not found' });
+//     }
+//   } catch (err) {
+//     console.error('Error deleting customer payment:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// module.exports = router;
+
+
+const express = require('express');
+const router = express.Router();
+const { CustomerPayment,Customer} = require('../models');
+const{SalesOrder}=require('../models/salesorder')
+
+
+router.post('/', async (req, res) => {
+  try {
+    console.log('Request body:', req.body); // Log request body
+    const payment = await CustomerPayment.create(req.body);
+    res.status(201).json(payment);
+  } catch (err) {
+    console.error('Error creating customer payment:', err);
+    res.status(500).json({ error: err.message }); // Send detailed error message
+  }
+});
+// Get a customer payment by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const payment = await CustomerPayment.findByPk(req.params.id);
+    if (payment) {
+      res.json(payment);
+    } else {
+      res.status(404).json({ error: 'Customer payment not found' });
+    }
+  } catch (err) {
+    console.error('Error fetching customer payment:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+//customerpayment by customer id
+router.get('/customer/:customerId', async (req, res) => {
+  const { page = 1, pageSize = 10 } = req.query;
+  const { customerId } = req.params;
+  const offset = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
+
+  try {
+    const { rows: payments, count } = await CustomerPayment.findAndCountAll({
+       where: { CustomerId: customerId }, // Ensure the filter is applied here
+      offset,
+      limit,
+      include: [{
+        model: Customer,
+        attributes: ['CustomerName']
+      }],
+    
+    });
+
+    const totalPages = Math.ceil(count / pageSize);
+
+    res.json({
+      customerPayments: payments,
+      totalPages
+    });
+  } catch (err) {
+    console.error('Error fetching customer payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Get all customer payments
+
+router.get('/', async (req, res) => {
+  const { page = 1, pageSize = 10 } = req.query;
+  const offset = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
+
+  try {
+    const { rows: payments, count } = await CustomerPayment.findAndCountAll({
+      offset,
+      limit,
+      include:[{
+        model:Customer,
+        attributes:["CustomerName"]
+      }],
+      order: [['PaymentDate', 'DESC']] // Sort by PaymentDate in descending order
+
+    });
+
+    const totalPages = Math.ceil(count / pageSize);
+
+    res.json({
+      customerPayments: payments,
+      totalPages
+    });
+  } catch (err) {
+    console.error('Error fetching customer payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update a customer payment
+router.put('/:id', async (req, res) => {
+  try {
+    const payment = await CustomerPayment.findByPk(req.params.id);
+    if (payment) {
+      await payment.update(req.body);
+      res.json(payment);
+    } else {
+      res.status(404).json({ error: 'Customer payment not found' });
+    }
+  } catch (err) {
+    console.error('Error updating customer payment:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete a customer payment
+router.delete('/:id', async (req, res) => {
+  try {
+    const payment = await CustomerPayment.findByPk(req.params.id);
+    if (payment) {
+      await payment.destroy();
+      res.status(204).end();
+    } else {
+      res.status(404).json({ error: 'Customer payment not found' });
+    }
+  } catch (err) {
+    console.error('Error deleting customer payment:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get total amount paid for a specific SalesOrderID
+router.get('/total/:salesOrderId', async (req, res) => {
+  try {
+    const salesOrderId = req.params.salesOrderId;
+    const totalPayments = await CustomerPayment.sum('PaymentAmount', {
+      where: {
+        SalesOrderID: salesOrderId
+      }
+    });
+    res.json({ totalPayments: totalPayments || 0 }); // Return 0 if no payments found
+  } catch (err) {
+    console.error('Error fetching total payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+module.exports = router;
