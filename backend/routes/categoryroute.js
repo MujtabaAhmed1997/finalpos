@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const ProductCategory = require('../models/productcategory');
+const { Op } = require('sequelize');
+
 
 // GET all product categories
 router.get('/', async (req, res) => {
@@ -23,6 +25,17 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'CategoryName and Description are required' });
     }
 
+    const alreadyExisting = await ProductCategory.findOne({
+      where: {
+        CategoryName: categoryName,
+        softdelete: false
+      }
+    });
+
+    if (alreadyExisting) {
+      return res.status(400).json({ message: 'Category already exists with the same name' });
+    }
+
     const newCategory = await ProductCategory.create({
       CategoryName: categoryName,
       Description: description
@@ -36,16 +49,30 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update product category
+
+
 router.put('/:id', async (req, res) => {
   const id = req.params.id;
   const { categoryName, description } = req.body;
 
   try {
     const productCategory = await ProductCategory.findOne({ where: { CategoryID: id } });
-    ;
-    console.log(productCategory)
+
     if (!productCategory) {
       return res.status(404).json({ message: 'Product category not found' });
+    }
+
+    // Check if another category exists with the same name
+    const duplicateCategory = await ProductCategory.findOne({
+      where: {
+        CategoryName: categoryName,
+        CategoryID: { [Op.ne]: id } // Not the same ID as current category
+        ,softdelete:false
+      }
+    });
+
+    if (duplicateCategory) {
+      return res.status(400).json({ message: 'Another category with the same name already exists' });
     }
 
     productCategory.CategoryName = categoryName;

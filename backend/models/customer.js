@@ -12,7 +12,7 @@ const Customer = sequelize.define('Customer', {
         type: DataTypes.STRING,
         allowNull: false
     },
-   
+
     Address: {
         type: DataTypes.STRING
     },
@@ -25,7 +25,11 @@ const Customer = sequelize.define('Customer', {
     AvailableBalance: {
         type: DataTypes.DECIMAL(10, 2), // Example of a decimal field with 10 digits total and 2 decimal places
         defaultValue: 0.0 // Default value for available balance
+    }, softDelete: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
+
 }, {
     tableName: 'customers',
     timestamps: true
