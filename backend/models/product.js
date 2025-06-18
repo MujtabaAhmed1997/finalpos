@@ -42,6 +42,8 @@
 // const { DataTypes } = require('sequelize');
 // const sequelize = require('../db/sequelize');
 
+
+//second last changes before fixes
 // const Product = sequelize.define('Product', {
 //   ProductID: {
 //     type: DataTypes.INTEGER,
@@ -129,8 +131,8 @@ const Product = sequelize.define('Product', {
 });
 
 // Associations
-Product.belongsTo(ProductCategory, { foreignKey: 'CategoryID' });
-Product.hasMany(ProductVariation, { foreignKey: 'ProductID' });
+// Product.belongsTo(ProductCategory, { foreignKey: 'CategoryID' });
+// Product.hasMany(ProductVariation, { foreignKey: 'ProductID' });
 
 module.exports = Product;
 

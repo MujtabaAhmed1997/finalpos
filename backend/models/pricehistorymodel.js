@@ -32,6 +32,6 @@ const PriceHistory = sequelize.define('PriceHistory', {
   }
 });
 
-PriceHistory.belongsTo(ProductVariation, { foreignKey: 'VariationID' });
+// PriceHistory.belongsTo(ProductVariation, { foreignKey: 'VariationID' });
 
 module.exports = PriceHistory;
