@@ -127,6 +127,10 @@ const Product = sequelize.define('Product', {
       notNull: { msg: 'CategoryID is required.' },
       isInt: { msg: 'CategoryID must be a valid integer.' }
     }
+  },
+  softdelete: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 });
 

@@ -1,0 +1,21 @@
+/* AllVariation.css */
+
+/* Table scroll on small screens */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Wrap buttons and allow stacking */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
