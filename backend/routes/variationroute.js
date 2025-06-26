@@ -101,6 +101,74 @@ router.get('/productVariations', async (req, res) => {
   }
 });
 
+
+const { Op } = require("sequelize");
+
+// GET /api/product-variations?page=1&limit=10&search=abc
+// router.get("/productVariations", async (req, res) => {
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
+//   const search = req.query.search || "";
+//   const offset = (page - 1) * limit;
+
+//   try {
+//     const { count, rows } = await ProductVariation.findAndCountAll({
+//       where: {
+//         [Op.or]: [
+//           { SKU: { [Op.like]: `%${search}%` } },
+//           { Size: { [Op.like]: `%${search}%` } },
+//         ],
+//       },
+//       limit,
+//       offset,
+//       order: [["VariationID", "DESC"]],
+//     });
+
+//     return res.json({
+//       variations: rows,
+//       totalPages: Math.ceil(count / limit),
+//     });
+//   } catch (error) {
+//     console.error("Error fetching product variations:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
+router.get("/productVariations/all", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || "";
+  const offset = (page - 1) * limit;
+
+  try {
+    const whereCondition = search
+      ? {
+        [Op.or]: [
+          { SKU: { [Op.like]: `%${search}%` } },
+          { Size: { [Op.like]: `%${search}%` } },
+        ],
+      }
+      : {}; // no filter if search is empty
+
+    const { count, rows } = await ProductVariation.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order: [["VariationID", "DESC"]],
+    });
+
+    return res.json({
+      variations: rows,
+      totalPages: Math.ceil(count / limit),
+    });
+  } catch (error) {
+    console.error("Error fetching product variations:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 // Get a ProductVariation by ID
 router.get('/productVariations/:id', async (req, res) => {
   try {

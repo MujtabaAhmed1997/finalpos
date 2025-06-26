@@ -1,87 +1,175 @@
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import debounce from "lodash.debounce";
+import { Link } from "react-router-dom";
 
 function CustomerComponent() {
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(5);
 
-  const navigate = useNavigate();
+  // Fetch customers (either all or filtered)
+  const fetchCustomers = async (page, name = "") => {
+    const endpoint = name
+      ? `http://localhost:3001/api/customers/searching?name=${name}&page=${page}&limit=${limit}`
+      : `http://localhost:3001/api/customers?page=${page}&limit=${limit}`;
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  const fetchCustomers = () => {
-    axios.get('http://localhost:3001/api/customers')
-      .then(async (res) => {
-        const customers = res.data;
-        // Fetch last balance for each customer
-        const customerDataWithBalances = await Promise.all(
-          customers.map(async (customer) => {
-            const lastBalance = await fetchLastBalance(customer.CustomerID);
-            return { ...customer, AvailableBalance: lastBalance };
-          })
-        );
-        setData(customerDataWithBalances);
-      })
-      .catch(err => console.log(err));
-  };
-
-  const fetchLastBalance = async (customerId) => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/customers/customerleisure/lastbalance/${customerId}`);
-      return res.data.lastBalance;
-    } catch (err) {
-      console.error('Error fetching last balance:', err);
-      return null;
+      const res = await axios.get(endpoint);
+      console.log("name", name);
+      const customers = res.data.data;
+      const pages = res.data.totalPages;
+
+      const customerDataWithBalances = await Promise.all(
+        customers.map(async (customer) => {
+          const lastBalance = await fetchLastBalance(customer.CustomerID);
+          return { ...customer, AvailableBalance: lastBalance };
+        })
+      );
+
+      setData(customerDataWithBalances);
+      setTotalPages(pages);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
     }
   };
 
-  const handleDelete = (CustomerID) => {
-    axios.delete(`http://localhost:3001/api/customers/${CustomerID}`)
-      .then(res => {
-        console.log('Customer deleted successfully');
-        // Refresh the data after deletion
-        fetchCustomers();
-      })
-      .catch(err => console.log(err));
+  // Debounced search
+  const debouncedSearch = useCallback(
+    debounce((value, page) => {
+      fetchCustomers(page, value);
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      debouncedSearch(searchTerm, currentPage);
+    } else {
+      fetchCustomers(currentPage);
+    }
+  }, [searchTerm, currentPage]);
+
+  const fetchLastBalance = async (customerId) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3001/api/customers/customerleisure/lastbalance/${customerId}`
+      );
+      return res.data.lastBalance;
+    } catch (err) {
+      console.error("Error fetching last balance:", err);
+      return 0;
+    }
+  };
+
+  const handleDelete = async (customerId) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/customers/${customerId}`);
+      fetchCustomers(currentPage, searchTerm);
+    } catch (err) {
+      console.error("Error deleting customer:", err);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
 
   return (
     <div
-      className='d-flex vh-100 justify-content-center align-items-center'
-      style={{ backgroundColor: '#1d2634' }}
+      className="container-fluid min-vh-100 d-flex justify-content-center align-items-start py-4"
+      style={{ backgroundColor: "#1d2634" }}
     >
-      <div className='w-100 w-md-50 bg-white rounded p-3'>
-        <h2>Customers List</h2>
-        <div>
-          <Link to={'/customers/add'} className='btn btn-success'>Add +</Link>
+      <div className="col-12 col-md-10 col-lg-8 bg-white rounded p-4 shadow-sm">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3">
+          <h2 className="mb-0">Customers List</h2>
+          <input
+            type="text"
+            className="form-control w-100 w-md-50"
+            placeholder="Search by customer name..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // reset to page 1 on search
+            }}
+          />
+          <Link to="/customers/add" className="btn btn-success">
+            Add +
+          </Link>
         </div>
-        <table className='table'>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Available Balance</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((customer, index) => (
-              <tr key={index}>
-                <td>{customer.CustomerID}</td>
-                <td>{customer.CustomerName}</td>
-                <td>{customer.Phone}</td>
-                <td>{customer.AvailableBalance !== null ? customer.AvailableBalance : 0}</td>
-                <td>
-                  <Link to={`/customers/update/${customer.CustomerID}`} className='btn btn-sm btn-primary mx-2'>Edit</Link>
-                  <button onClick={() => handleDelete(customer.CustomerID)} className='btn btn-sm btn-danger'>Delete</button>
-                </td>
+
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered">
+            <thead className="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Available Balance</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.length > 0 ? (
+                data.map((customer) => (
+                  <tr key={customer.CustomerID}>
+                    <td>{customer.CustomerID}</td>
+                    <td>{customer.CustomerName}</td>
+                    <td>{customer.Phone}</td>
+                    <td>{customer.AvailableBalance}</td>
+                    <td>
+                      <Link
+                        to={`/customers/update/${customer.CustomerID}`}
+                        className="btn btn-sm btn-primary me-2"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDelete(customer.CustomerID)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No customers found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <button
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="fw-bold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

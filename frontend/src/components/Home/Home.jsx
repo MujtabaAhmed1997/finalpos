@@ -184,24 +184,63 @@ function Home() {
       <div className="main-cards">
         <div className="card card-1">
           <div className="card-inner">
-            <h3>PRODUCTS</h3>
-            <BsFillArchiveFill className="card_icon" />
+            <h3>Product</h3>
+            <BsFillBellFill className="card_icon" />
           </div>
-          <h1>{stats.products}</h1>
+          <div className="button-container">
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/products/add")}
+            >
+              Add
+            </button>
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/products")}
+            >
+              View
+            </button>
+          </div>
         </div>
         <div className="card card-2">
           <div className="card-inner">
-            <h3>CATEGORIES</h3>
-            <BsFillGrid3X3GapFill className="card_icon" />
+            <h3>Categories</h3>
+            <BsFillBellFill className="card_icon" />
           </div>
-          <h1>{stats.categories}</h1>
+          <div className="button-container">
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/categories/add")}
+            >
+              Add
+            </button>
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/categories")}
+            >
+              View
+            </button>
+          </div>
         </div>
         <div className="card card-3">
           <div className="card-inner">
-            <h3>CUSTOMERS</h3>
-            <BsPeopleFill className="card_icon" />
+            <h3>Customer</h3>
+            <BsFillBellFill className="card_icon" />
           </div>
-          <h1>{stats.customers}</h1>
+          <div className="button-container">
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/customers/add")}
+            >
+              Add
+            </button>
+            <button
+              className="card-button"
+              onClick={() => (window.location.href = "/customers")}
+            >
+              View
+            </button>
+          </div>
         </div>
         <div className="card card-4">
           <div className="card-inner">

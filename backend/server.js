@@ -130,7 +130,11 @@ async function syncDatabase() {
     console.log('Connection has been established successfully.');
 
     // Synchronize all defined models to the DB
-    await sequelize.sync({ alter: true }); // Use 'alter' to update the schema without dropping tables
+    // await sequelize.sync({ alter: true }); // Use 'alter' to update the schema without dropping tables
+
+    //not changign model
+    await sequelize.sync(); // Avoids modifying schema and adding keys
+
     console.log('Database synchronized.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
