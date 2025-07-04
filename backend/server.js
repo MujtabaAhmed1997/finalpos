@@ -132,6 +132,8 @@ async function syncDatabase() {
     // Synchronize all defined models to the DB
     // await sequelize.sync({ alter: true }); // Use 'alter' to update the schema without dropping tables
 
+
+    // sequelize.sync({ force: true }) 
     //not changign model
     await sequelize.sync(); // Avoids modifying schema and adding keys
 

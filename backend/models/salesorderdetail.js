@@ -40,8 +40,22 @@ const SalesOrderDetail = sequelize.define('SalesOrderDetail', {
   //     this.setDataValue('BatchID', Array.isArray(value) ? value.join(',') : value);
   //   }
   // },
+
+
+  //commeted for avien
+  // BatchID: {
+  //   type: DataTypes.TEXT, // Stores multiple IDs as "1,2,3"
+  //   allowNull: true,
+  //   get() {
+  //     const value = this.getDataValue('BatchID');
+  //     return typeof value === 'string' && value.length > 0 ? value.split(',') : [];
+  //   },
+  //   set(value) {
+  //     this.setDataValue('BatchID', Array.isArray(value) ? value.join(',') : value);
+  //   }
+  // },
   BatchID: {
-    type: DataTypes.TEXT, // Stores multiple IDs as "1,2,3"
+    type: DataTypes.TEXT,
     allowNull: true,
     get() {
       const value = this.getDataValue('BatchID');
@@ -50,8 +64,10 @@ const SalesOrderDetail = sequelize.define('SalesOrderDetail', {
     set(value) {
       this.setDataValue('BatchID', Array.isArray(value) ? value.join(',') : value);
     }
-  }
-  ,
+  },
+  
+  // ❌ Do NOT define `references: { model: ..., key: ... }` for this field
+
   Quantity: {
     type: DataTypes.FLOAT,
     allowNull: false

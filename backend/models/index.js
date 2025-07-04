@@ -103,11 +103,11 @@ PriceRule.belongsTo(ProductVariation, { foreignKey: 'VariationID' });
 
 //batch changes
 Batch.hasMany(StockTransaction, { foreignKey: 'BatchID' });
-Batch.hasMany(SalesOrderDetail, { foreignKey: 'BatchID' });
+// Batch.hasMany(SalesOrderDetail, { foreignKey: 'BatchID' });   avien
 Batch.hasMany(PurchaseOrderDetail, { foreignKey: 'BatchID' });
 
 StockTransaction.belongsTo(Batch, { foreignKey: 'BatchID' });
-SalesOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' });
+// SalesOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' });   // comemted for aiven
 PurchaseOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' })
 
 
