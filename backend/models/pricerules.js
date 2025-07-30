@@ -3,11 +3,7 @@ const sequelize = require('../db/sequelize');
     const PriceRule = sequelize.define('PriceRule', {
       VariationID: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'productvariations', // Assuming your variation table is named 'Variations'
-          key: 'VariationID'
-        }
+        allowNull: false
       },
       min_quantity: {
         type: DataTypes.INTEGER,

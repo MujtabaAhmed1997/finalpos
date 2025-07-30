@@ -15,14 +15,16 @@
 // });
 // module.exports = conn;
 
-//live db conn
-const mysql = require('mysql');
 
-const conn = mysql.createConnection({
-    host: process.env.host,
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.dbname
+require('dotenv').config();
+const mysql=require('mysql');
+
+const conn=mysql.createConnection({
+    host:process.env.host,
+    port:process.env.databasename,
+    user:process.env.user,
+    password:process.env.password,
+    database:process.env.dbname
 });
 conn.connect((err) => {
     if (err) {

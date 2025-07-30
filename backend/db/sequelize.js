@@ -9,29 +9,24 @@
 
 // module.exports = sequelize;
 
-//live db
 require('dotenv').config();
 
 const { Sequelize } = require('sequelize');
 console.log(process.env.password, process.env.host);
 
-const sequelize = new Sequelize(
-  process.env.dbname,
-  process.env.user, // 'avnadmin'
-  process.env.password, // your Aiven password
-  {
-    host: process.env.host,     // Aiven MySQL host
-    port: process.env.dbport,     // 14795
-    dialect: 'mysql',
-    dialectOptions: {
-      ssl: {
-        require: true,
+// Debug: Log environment variables
+console.log('Environment variables:');
+console.log('dbname:', process.env.databasename);
+console.log('user:', process.env.user);
+console.log('password:', process.env.password ? '[HIDDEN]' : 'undefined');
+console.log('host:', process.env.host);
+console.log('dbport:', process.env.dbport);
 
-        rejectUnauthorized: false // required for Aiven SSL
-      }
-    },
-    logging: false
-  }
-);
+const sequelize = new Sequelize(process.env.databasename, process.env.user, process.env.password, {
+  host: process.env.host,
+  port: process.env.dbport,
+  dialect: 'mysql',
+  logging:false,
+});
 
 module.exports = sequelize;

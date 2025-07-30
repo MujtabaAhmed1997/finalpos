@@ -1,12 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
-// Create a Sequelize instance with your MySQL database connection details
-const sequelize = new Sequelize('stmdb', 'root', '', {
-  host: 'localhost',
-  dialect: 'mysql',
-//   logging: console.log, // Enable logging
-
-});
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db/sequelize'); // Use the main database connection
 
 // Define the User model
 const User = sequelize.define('User', {
@@ -35,13 +28,6 @@ const User = sequelize.define('User', {
   }
 });
 
-sequelize.sync({ force: false }) // Set force to true to drop existing tables and re-create them
-  .then(() => {
-    console.log('Database synchronized');
-    // Start your Express server or perform other operations
-  })
-  .catch(err => {
-    console.error('Error synchronizing database:', err);
-  });
+// Remove duplicate sync - this is handled in server.js
 // Export the User model
 module.exports = User;
