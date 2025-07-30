@@ -103,11 +103,13 @@ PriceRule.belongsTo(ProductVariation, { foreignKey: 'VariationID' });
 
 //batch changes
 Batch.hasMany(StockTransaction, { foreignKey: 'BatchID' });
-Batch.hasMany(SalesOrderDetail, { foreignKey: 'BatchID' });
+// Remove foreign key constraint for SalesOrderDetail since BatchID is TEXT
+// Batch.hasMany(SalesOrderDetail, { foreignKey: 'BatchID' });
 Batch.hasMany(PurchaseOrderDetail, { foreignKey: 'BatchID' });
 
 StockTransaction.belongsTo(Batch, { foreignKey: 'BatchID' });
-SalesOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' });
+// Remove foreign key constraint for SalesOrderDetail since BatchID is TEXT
+// SalesOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' });
 PurchaseOrderDetail.belongsTo(Batch, { foreignKey: 'BatchID' })
 
 
