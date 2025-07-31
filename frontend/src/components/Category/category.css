@@ -178,20 +178,20 @@
   cursor: pointer;
   border: none;
   border-radius: 8px;
-  background: #263043;
-  color: white;
+  background: rgba(255, 255, 255, 0.95);
+  color: #263043;
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(38, 48, 67, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px #404040;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .add-category-button button:hover {
-  background: #1a2332;
+  background: #f8f9fa;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(38, 48, 67, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px #263043;
 }
 
 /* Responsive Styling */
@@ -366,7 +366,6 @@
     /* NEW: Optimized for mobile */
     padding: 12px 15px;
     border-radius: 10px;
-    min-height: 140px; /* NEW: Adjusted minimum height */
   }
   
   .card h3 {

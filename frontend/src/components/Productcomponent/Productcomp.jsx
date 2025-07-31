@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill } from 'react-icons/bs';
 import './Productcomp.css'; // Import the CSS file for this component
 
 function Product() {
@@ -15,10 +16,39 @@ function Product() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/products');
-      setProducts(response.data);
+      const fetchedProducts = response.data;
+
+      // Shuffle the icons array
+      const availableIcons = shuffleIcons();
+
+      // Map each product with an icon
+      const productsWithIcons = fetchedProducts.map((product, index) => ({
+        ...product,
+        icon: availableIcons[index % availableIcons.length] // Assign icons in a loop
+      }));
+
+      setProducts(productsWithIcons);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
+  };
+
+  // Function to shuffle icons array
+  const shuffleIcons = () => {
+    const icons = [
+      <BsFillArchiveFill className='card_icon' />,
+      <BsFillGrid3X3GapFill className='card_icon' />,
+      <BsPeopleFill className='card_icon' />,
+      <BsFillBellFill className='card_icon' />
+    ];
+
+    // Shuffle icons array
+    for (let i = icons.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [icons[i], icons[j]] = [icons[j], icons[i]];
+    }
+
+    return icons;
   };
 
   // Function to handle delete product
@@ -56,13 +86,14 @@ function Product() {
 
       <div className='main-cards'>
         {products.map((product) => (
-          <div className= 'card'  key={product.ProductID}>
+          <div className='card' key={product.ProductID}>
             <div className='card-inner'>
               <h3>{product.Unit}</h3>
-              <button className='view-button' onClick={() => handleViewProduct(product.ProductID)}>View</button>
+              {product.icon}
             </div>
             <h1>{product.ProductName}</h1>
             <div className='card-buttons'>
+              <button className='view-button' onClick={() => handleViewProduct(product.ProductID)}>View</button>
               <button className='delete-button' onClick={() => handleDeleteProduct(product.ProductID)}>Delete</button>
               <button className='update-button' onClick={() => handleUpdateProduct(product.ProductID)}>Update</button>
             </div>
