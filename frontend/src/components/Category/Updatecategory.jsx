@@ -99,6 +99,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { FaEdit } from "react-icons/fa";
 
 function UpdateCategory() {
   const { id } = useParams();
@@ -155,12 +156,31 @@ function UpdateCategory() {
   return (
     <div
       className="d-flex vh-100 justify-content-center align-items-center"
-      style={{ backgroundColor: "#263043" }}
+      style={{
+        backgroundColor: "#263043",
+      }}
     >
-      <div className="w-50 bg-white rounded p-3">
+      <div
+        className="rounded-4 shadow-lg p-5"
+        style={{
+          minWidth: 400,
+          maxWidth: 450,
+          width: "100%",
+          border: "1px solid #404040",
+          background: "rgba(255,255,255,0.95)",
+          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <div className="text-center mb-4">
+          <FaEdit size={40} color="#263043" />
+          <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>
+            Update Category
+          </h3>
+          <p className="text-muted" style={{ fontSize: 15 }}>
+            Modify the category information below.
+          </p>
+        </div>
         <form onSubmit={handleSubmit}>
-          <h4 className="mb-3">Update Category</h4>
-
           {serverError && (
             <div className="alert alert-danger" role="alert">
               {serverError}
@@ -168,39 +188,91 @@ function UpdateCategory() {
           )}
 
           <div className="mb-3">
-            <label htmlFor="categoryName">
-              <strong>Category Name</strong>
+            <label htmlFor="categoryName" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Category Name
             </label>
             <input
-              onChange={handleInput}
               type="text"
-              placeholder="Enter category name"
-              className="form-control rounded-0"
+              className="form-control rounded-3"
               name="categoryName"
+              placeholder="Enter category name"
               value={values.categoryName}
+              onChange={handleInput}
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
             {errors.categoryName && (
-              <span className="text-danger">{errors.categoryName}</span>
+              <span className="text-danger small">{errors.categoryName}</span>
             )}
           </div>
 
-          <div className="mb-3">
-            <label htmlFor="description">
-              <strong>Description</strong>
+          <div className="mb-4">
+            <label htmlFor="description" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Description
             </label>
             <textarea
-              onChange={handleInput}
-              placeholder="Enter category description"
-              className="form-control rounded-0"
+              className="form-control rounded-3"
               name="description"
+              placeholder="Enter category description"
               value={values.description}
+              onChange={handleInput}
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                minHeight: 80,
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
             {errors.description && (
-              <span className="text-danger">{errors.description}</span>
+              <span className="text-danger small">{errors.description}</span>
             )}
           </div>
 
-          <button type="submit" className="btn btn-success w-100 rounded-0">
+          <button
+            type="submit"
+            className="btn w-100 rounded-3 fw-bold"
+            style={{
+              background: "#263043",
+              border: "none",
+              fontSize: 18,
+              letterSpacing: 1,
+              boxShadow: "0 4px 12px rgba(38, 48, 67, 0.3)",
+              transition: "all 0.3s",
+              color: "white",
+            }}
+            onMouseOver={e => {
+              e.target.style.background = "#1a2332";
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
+            }}
+            onMouseOut={e => {
+              e.target.style.background = "#263043";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
+            }}
+          >
+            <FaEdit className="me-2 mb-1" />
             Update Category
           </button>
         </form>

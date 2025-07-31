@@ -106,7 +106,7 @@ function Category() {
 
       <div className='main-cards'>
         {categories.map((category, index) => (
-          <div className={`card card-${index}`} key={category.CategoryID}>
+          <div className="card" key={category.CategoryID}>
             <div className='card-inner'>
               <h3>{category.CategoryName}</h3>
               {category.icon}
