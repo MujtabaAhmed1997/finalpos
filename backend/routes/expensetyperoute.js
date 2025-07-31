@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Expensetype = require('../models/expensetypemode'); // Adjust the path to your Expense model
+const sequelize = require('../db/sequelize');
 router.post('/addtype', async (req, res) => {
     const { TypeName } = req.body;
 

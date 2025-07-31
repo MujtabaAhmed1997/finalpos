@@ -1,78 +1,697 @@
-.container {
+/* Main Container */
+.reminder-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  /* background-color: #f4f4f4;  */
-}
-
-.card {
-  background: white;
+  min-height: 100vh;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #263043;
+  color: rgba(255, 255, 255, 0.95);
+  box-sizing: border-box;
   width: 100%;
-  max-width: 400px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Main Card */
+.reminder-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 800px;
+  overflow: visible;
+  transition: all 0.3s ease;
+  border: 1px solid #404040;
+  color: #263043;
+  margin: 0 auto;
+}
+
+.reminder-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 0 0 1px #263043;
+  border-color: #263043;
+}
+
+/* Header Section */
+.reminder-header {
+  background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
+  color: white;
+  padding: 30px;
   text-align: center;
+  position: relative;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #333;
+.reminder-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
 }
 
-.calendar-container {
-  margin-bottom: 15px;
+.reminder-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  margin-bottom: 16px;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.calendar {
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.reminder-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.input-group {
-  margin-bottom: 15px;
-  text-align: left;
+.reminder-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 20px 0;
+  font-weight: 400;
 }
 
-.label {
+/* Homepage Button */
+.homepage-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+}
+
+.homepage-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.homepage-button:active {
+  transform: translateY(0);
+}
+
+.homepage-button svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.homepage-button:hover svg {
+  transform: scale(1.1);
+}
+
+/* Content Section */
+.reminder-content {
+  padding: 30px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Section Labels */
+.section-label {
   display: block;
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #263043;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.textarea {
+/* Calendar Section */
+.calendar-section {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  resize: none;
-  font-size: 14px;
 }
 
-.textarea:focus {
+.calendar-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.reminder-calendar {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  max-width: 100% !important;
+}
+
+/* Calendar Customization */
+.reminder-calendar .react-calendar__tile {
+  padding: 12px 8px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  font-weight: 500 !important;
+  min-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.reminder-calendar .react-calendar__tile:hover {
+  background-color: #f0f8ff !important;
+  color: #263043 !important;
+}
+
+.reminder-calendar .react-calendar__tile--active {
+  background-color: #263043 !important;
+  color: white !important;
+}
+
+.reminder-calendar .react-calendar__tile--now {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+  font-weight: 600 !important;
+}
+
+.reminder-calendar .react-calendar__navigation button {
+  background: none !important;
+  border: none !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  color: #263043 !important;
+  transition: all 0.2s ease !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+
+.reminder-calendar .react-calendar__navigation button:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.reminder-calendar .react-calendar__navigation button:disabled {
+  background-color: #f5f5f5 !important;
+  color: #ccc !important;
+}
+
+.reminder-calendar .react-calendar__navigation__label {
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+/* Task Section */
+.task-section {
+  width: 100%;
+}
+
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.reminder-textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  resize: vertical;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  background: white;
+  color: #263043;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+.reminder-textarea:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border-color: #263043;
+  box-shadow: 0 0 0 3px rgba(38, 48, 67, 0.1);
+  background: white;
 }
 
-.submit-button {
+.reminder-textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 12px;
+  color: #999;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Alert Messages */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  border: 1px solid;
   width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.alert-success {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.alert svg {
+  flex-shrink: 0;
+}
+
+/* Button Section */
+.reminder-actions {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.reminder-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(38, 48, 67, 0.3);
+  min-width: 200px;
+  justify-content: center;
+  white-space: nowrap;
+  position: relative;
+  z-index: 10;
 }
 
-.submit-button:hover {
-  background-color: #0056b3;
+.reminder-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(38, 48, 67, 0.4);
+  background: linear-gradient(135deg, #1a2332 0%, #263043 100%);
+}
+
+.reminder-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.reminder-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reminder-button svg {
+  flex-shrink: 0;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design - Tablet */
+@media screen and (max-width: 1024px) {
+  .reminder-container {
+    padding: 16px;
+  }
+  
+  .reminder-card {
+    max-width: 90%;
+  }
+  
+  .reminder-content {
+    padding: 24px;
+    gap: 24px;
+  }
+  
+  .reminder-calendar .react-calendar__tile {
+    padding: 10px 6px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Responsive Design - Mobile Large */
+@media screen and (max-width: 768px) {
+  .reminder-container {
+    padding: 12px;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .reminder-card {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 12px;
+    overflow: visible;
+  }
+  
+  .reminder-header {
+    padding: 20px 16px;
+  }
+  
+  .reminder-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+  }
+  
+  .reminder-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  
+  .reminder-subtitle {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .homepage-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .reminder-content {
+    padding: 20px 16px;
+    overflow: visible;
+    gap: 20px;
+  }
+  
+  .calendar-wrapper {
+    padding: 12px;
+  }
+  
+  .reminder-calendar .react-calendar__tile {
+    padding: 8px 4px !important;
+    font-size: 13px !important;
+    min-height: 35px !important;
+  }
+  
+  .reminder-calendar .react-calendar__navigation button {
+    padding: 6px 8px !important;
+    min-width: 35px !important;
+    min-height: 35px !important;
+    font-size: 14px !important;
+  }
+  
+  .reminder-calendar .react-calendar__navigation__label {
+    font-size: 14px !important;
+  }
+  
+  .reminder-textarea {
+    padding: 12px;
+    font-size: 15px;
+    min-height: 100px;
+  }
+  
+  .section-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .reminder-actions {
+    padding-bottom: 15px;
+    margin-top: 15px;
+  }
+  
+  .reminder-button {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 15px;
+    min-width: auto;
+    max-width: 100%;
+  }
+  
+  .alert {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* Responsive Design - Mobile Small */
+@media screen and (max-width: 480px) {
+  .reminder-container {
+    padding: 8px;
+  }
+  
+  .reminder-card {
+    border-radius: 8px;
+    overflow: visible;
+  }
+  
+  .reminder-header {
+    padding: 16px 12px;
+  }
+  
+  .reminder-icon {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 10px;
+  }
+  
+  .reminder-title {
+    font-size: 20px;
+  }
+  
+  .reminder-subtitle {
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  
+  .homepage-button {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  
+  .reminder-content {
+    padding: 16px 12px;
+    overflow: visible;
+    gap: 16px;
+  }
+  
+  .calendar-wrapper {
+    padding: 8px;
+  }
+  
+  .reminder-calendar .react-calendar__tile {
+    padding: 6px 2px !important;
+    font-size: 12px !important;
+    min-height: 30px !important;
+  }
+  
+  .reminder-calendar .react-calendar__navigation button {
+    padding: 4px 6px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 12px !important;
+  }
+  
+  .reminder-calendar .react-calendar__navigation__label {
+    font-size: 13px !important;
+  }
+  
+  .reminder-textarea {
+    padding: 10px;
+    font-size: 14px;
+    min-height: 80px;
+  }
+  
+  .section-label {
+    font-size: 13px;
+  }
+  
+  .reminder-actions {
+    padding-bottom: 20px;
+    margin-top: 10px;
+  }
+  
+  .reminder-button {
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .char-count {
+    font-size: 11px;
+    bottom: 6px;
+    right: 8px;
+  }
+}
+
+/* Responsive Design - Extra Small Mobile */
+@media screen and (max-width: 360px) {
+  .reminder-container {
+    padding: 4px;
+  }
+  
+  .reminder-card {
+    overflow: visible;
+  }
+  
+  .reminder-header {
+    padding: 12px 8px;
+  }
+  
+  .reminder-title {
+    font-size: 18px;
+  }
+  
+  .reminder-subtitle {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .homepage-button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .reminder-content {
+    padding: 12px 8px;
+    overflow: visible;
+    gap: 12px;
+  }
+  
+  .reminder-calendar .react-calendar__tile {
+    padding: 4px 1px !important;
+    font-size: 11px !important;
+    min-height: 25px !important;
+  }
+  
+  .reminder-calendar .react-calendar__navigation button {
+    padding: 3px 4px !important;
+    min-width: 25px !important;
+    min-height: 25px !important;
+    font-size: 11px !important;
+  }
+  
+  .reminder-textarea {
+    padding: 8px;
+    font-size: 13px;
+  }
+  
+  .reminder-actions {
+    padding-bottom: 25px;
+    margin-top: 8px;
+  }
+  
+  .reminder-button {
+    padding: 10px 12px;
+    font-size: 13px;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+  .reminder-container {
+    padding: 8px;
+    align-items: flex-start;
+  }
+  
+  .reminder-card {
+    max-width: 90%;
+    overflow: visible;
+  }
+  
+  .reminder-header {
+    padding: 16px 20px;
+  }
+  
+  .reminder-content {
+    padding: 16px 20px;
+    overflow: visible;
+    gap: 16px;
+  }
+  
+  .reminder-textarea {
+    min-height: 60px;
+  }
+  
+  .reminder-actions {
+    padding-bottom: 15px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .reminder-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Focus states for accessibility */
+.reminder-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(38, 48, 67, 0.3);
+}
+
+.homepage-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.reminder-textarea:focus {
+  outline: none;
+  border-color: #263043;
+  box-shadow: 0 0 0 3px rgba(38, 48, 67, 0.1);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: all 0.2s ease;
 }

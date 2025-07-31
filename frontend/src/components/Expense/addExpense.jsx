@@ -1,145 +1,7 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-// import "bootstrap/dist/css/bootstrap.min.css";
-
-// const AddExpense = () => {
-//   const currentDate = new Date().toISOString().split("T")[0];
-
-//   const [expense, setExpense] = useState({
-//     ExpenseType: "",
-//     Amount: "",
-//     Date: currentDate,
-//   });
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-//   const [success, setSuccess] = useState("");
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setExpense((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     console.log("expense", expense);
-//     if (!expense.ExpenseType || !expense.Amount || !expense.Date) {
-//       setError("Please fill out all fields.");
-//       return;
-//     }
-
-//     setLoading(true);
-//     setError("");
-//     setSuccess("");
-
-//     try {
-//       const response = await axios.post(
-//         "http://localhost:3001/api/expense/addExpense",
-//         {
-//           ExpenseType: expense.ExpenseType,
-//           Amount: expense.Amount,
-//           Date: expense.Date,
-//         }
-//       );
-//       console.log("response", response);
-//       setSuccess("Expense added successfully!");
-//       setExpense({ ExpenseType: "", Amount: "", Date: "" }); // Reset form
-//     } catch (err) {
-//       setError(
-//         err.response?.data?.message ||
-//           "Failed to add expense. Please try again."
-//       );
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <div className="card">
-//         <div className="card-header bg-primary text-white">
-//           <h4 className="text-center">Add Expense</h4>
-//         </div>
-//         <div className="card-body">
-//           {error && <div className="alert alert-danger">{error}</div>}
-//           {success && <div className="alert alert-success">{success}</div>}
-//           <form onSubmit={handleSubmit}>
-//             {/* Expense Type */}
-//             <div className="mb-3">
-//               <label htmlFor="ExpenseType" className="form-label">
-//                 Expense Type
-//               </label>
-//               <select
-//                 id="ExpenseType"
-//                 name="ExpenseType"
-//                 value={expense.ExpenseType}
-//                 onChange={handleChange}
-//                 className="form-select"
-//               >
-//                 <option value="">Select an expense type</option>
-//                 <option value="Lunch">Lunch</option>
-//                 <option value="Tea">Tea</option>
-//                 <option value="Transport">Transport</option>
-//                 <option value="Labour">Labour</option>
-//                 <option value="Electricity Bill">Electricity Bill</option>
-//               </select>
-//             </div>
-
-//             {/* Amount */}
-//             <div className="mb-3">
-//               <label htmlFor="Amount" className="form-label">
-//                 Amount
-//               </label>
-//               <input
-//                 type="float"
-//                 id="Amount"
-//                 name="Amount"
-//                 value={expense.Amount}
-//                 onChange={handleChange}
-//                 className="form-control"
-//                 placeholder="Enter amount"
-//               />
-//             </div>
-
-//             {/* Date */}
-//             <div className="mb-3">
-//               <label htmlFor="Date" className="form-label">
-//                 Date
-//               </label>
-//               <input
-//                 type="date"
-//                 id="Date"
-//                 name="Date"
-//                 value={expense.Date}
-//                 onChange={handleChange}
-//                 className="form-control"
-//               />
-//             </div>
-
-//             {/* Submit Button */}
-//             <div className="d-grid">
-//               <button
-//                 type="submit"
-//                 className="btn btn-success"
-//                 disabled={loading}
-//               >
-//                 {loading ? "Adding..." : "Add Expense"}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AddExpense;
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CreatableSelect from "react-select/creatable";
+import { FaPlusCircle } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddExpense = () => {
@@ -244,74 +106,177 @@ const AddExpense = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <div className="card">
-        <div className="card-header bg-primary text-white">
-          <h4 className="text-center">Add Expense</h4>
+    <div
+      className="d-flex vh-100 justify-content-center align-items-center"
+      style={{
+        backgroundColor: "#263043",
+      }}
+    >
+      <div
+        className="rounded-4 shadow-lg p-5"
+        style={{
+          minWidth: 400,
+          maxWidth: 450,
+          width: "100%",
+          border: "1px solid #404040",
+          background: "rgba(255,255,255,0.95)",
+          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <div className="text-center mb-4">
+          <FaPlusCircle size={40} color="#263043" />
+          <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>
+            Add New Expense
+          </h3>
+          <p className="text-muted" style={{ fontSize: 15 }}>
+            Record a new expense for your business.
+          </p>
         </div>
-        <div className="card-body">
-          {error && <div className="alert alert-danger">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
-          <form onSubmit={handleSubmit}>
-            {/* Expense Type */}
-            <div className="mb-3">
-              <label className="form-label">Expense Type</label>
-              <CreatableSelect
-                isClearable
-                onChange={handleTypeChange}
-                options={expenseTypes}
-                value={
-                  expense.ExpenseType
-                    ? { label: expense.ExpenseType, value: expense.ExpenseType }
-                    : null
-                }
-                placeholder="Select or create an expense type"
-              />
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
             </div>
+          )}
+          {success && (
+            <div className="alert alert-success" role="alert">
+              {success}
+            </div>
+          )}
 
-            {/* Amount */}
-            <div className="mb-3">
-              <label htmlFor="Amount" className="form-label">
-                Amount
-              </label>
-              <input
-                type="number"
-                id="Amount"
-                name="Amount"
-                value={expense.Amount}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="Enter amount"
-              />
-            </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Expense Type
+            </label>
+            <CreatableSelect
+              isClearable
+              onChange={handleTypeChange}
+              options={expenseTypes}
+              value={
+                expense.ExpenseType
+                  ? { label: expense.ExpenseType, value: expense.ExpenseType }
+                  : null
+              }
+              placeholder="Select or create an expense type"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  background: "#f8f9fa",
+                  border: state.isFocused ? "1px solid #263043" : "1px solid #dee2e6",
+                  borderRadius: "12px",
+                  boxShadow: state.isFocused 
+                    ? "0 0 0 0.2rem rgba(38, 48, 67, 0.25)" 
+                    : "0 1px 3px rgba(0,0,0,0.1)",
+                  transition: "all 0.2s",
+                  minHeight: "45px",
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected ? "#263043" : state.isFocused ? "#f8f9fa" : "white",
+                  color: state.isSelected ? "white" : "#263043",
+                  cursor: "pointer",
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                }),
+              }}
+            />
+          </div>
 
-            {/* Date */}
-            <div className="mb-3">
-              <label htmlFor="Date" className="form-label">
-                Date
-              </label>
-              <input
-                type="date"
-                id="Date"
-                name="Date"
-                value={expense.Date}
-                onChange={handleChange}
-                className="form-control"
-              />
-            </div>
+          <div className="mb-3">
+            <label htmlFor="Amount" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Amount
+            </label>
+            <input
+              type="number"
+              id="Amount"
+              name="Amount"
+              value={expense.Amount}
+              onChange={handleChange}
+              className="form-control rounded-3"
+              placeholder="Enter amount"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                minHeight: "45px",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
+            />
+          </div>
 
-            {/* Submit Button */}
-            <div className="d-grid">
-              <button
-                type="submit"
-                className="btn btn-success"
-                disabled={loading}
-              >
-                {loading ? "Adding..." : "Add Expense"}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="mb-4">
+            <label htmlFor="Date" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Date
+            </label>
+            <input
+              type="date"
+              id="Date"
+              name="Date"
+              value={expense.Date}
+              onChange={handleChange}
+              className="form-control rounded-3"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                minHeight: "45px",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn w-100 rounded-3 fw-bold"
+            disabled={loading}
+            style={{
+              background: "#263043",
+              border: "none",
+              fontSize: 18,
+              letterSpacing: 1,
+              boxShadow: "0 4px 12px rgba(38, 48, 67, 0.3)",
+              transition: "all 0.3s",
+              color: "white",
+              minHeight: "50px",
+            }}
+            onMouseOver={e => {
+              if (!loading) {
+                e.target.style.background = "#1a2332";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
+              }
+            }}
+            onMouseOut={e => {
+              if (!loading) {
+                e.target.style.background = "#263043";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
+              }
+            }}
+          >
+            <FaPlusCircle className="me-2 mb-1" />
+            {loading ? "Adding..." : "Add Expense"}
+          </button>
+        </form>
       </div>
     </div>
   );

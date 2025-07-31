@@ -1,0 +1,222 @@
+/* Expense Component Theme Styles */
+.expense-list-container {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+.expense-list-container h3 {
+  color: #263043;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.expense-table {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.expense-table thead th {
+  background: #263043;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.expense-table tbody td {
+  background: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.expense-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.expense-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.theme-btn {
+  background: #263043;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin: 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-btn:hover {
+  background: #1a2332;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-btn-danger {
+  background: #c52626;
+}
+
+.theme-btn-danger:hover {
+  background: #a02020;
+}
+
+.theme-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.alert {
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+/* Pagination Styling */
+.pagination {
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.page-item .page-link {
+  color: #263043;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  padding: 8px 12px;
+  margin: 0 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.page-item .page-link:hover {
+  background: #263043;
+  color: #ffffff;
+  border-color: #263043;
+}
+
+.page-item.active .page-link {
+  background: #263043;
+  border-color: #263043;
+  color: #ffffff;
+}
+
+/* Modal Styling */
+.modal-header {
+  background: #263043;
+  color: #ffffff;
+  border-bottom: none;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+.modal-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.form-label {
+  color: #263043;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 12px;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #263043;
+  box-shadow: 0 0 0 0.2rem rgba(38, 48, 67, 0.25);
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+/* Loading State */
+.loading-row {
+  background: #f8f9fa;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Empty State */
+.empty-state {
+  color: #6c757d;
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .expense-list-container {
+    margin: 10px;
+    padding: 1rem;
+  }
+  
+  .expense-table {
+    font-size: 14px;
+  }
+  
+  .theme-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin: 2px;
+  }
+  
+  .expense-table thead th,
+  .expense-table tbody td {
+    padding: 8px 4px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .expense-table {
+    font-size: 12px;
+  }
+  
+  .theme-btn {
+    display: block;
+    width: 100%;
+    margin: 4px 0;
+  }
+} 

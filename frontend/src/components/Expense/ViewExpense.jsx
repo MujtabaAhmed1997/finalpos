@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Button, Modal, Form, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./expense.css";
 
 const ViewAllExpenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -113,14 +114,14 @@ const ViewAllExpenses = () => {
   const handlePageChange = (page) => setCurrentPage(page);
 
   return (
-    <div className="container mt-4">
-      <h3 className="text-center mb-4">View All Expenses</h3>
+    <div className="expense-list-container">
+      <h3>View All Expenses</h3>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
-      <Table responsive className="table table-bordered text-center">
-        <thead className="table-dark">
+      <Table responsive className="expense-table">
+        <thead>
           <tr>
             <th>#</th>
             <th>Expense Type</th>
@@ -132,7 +133,7 @@ const ViewAllExpenses = () => {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="5" className="text-center">
+              <td colSpan="5" className="loading-row text-center">
                 Loading...
               </td>
             </tr>
@@ -145,16 +146,13 @@ const ViewAllExpenses = () => {
                 <td>{new Date(expense.Date).toLocaleDateString()}</td>
                 <td>
                   <Button
-                    variant="primary"
-                    size="sm"
-                    className="me-2"
+                    className="theme-btn"
                     onClick={() => handleUpdate(expense)}
                   >
                     Update
                   </Button>
                   <Button
-                    variant="danger"
-                    size="sm"
+                    className="theme-btn theme-btn-danger"
                     onClick={() => deleteExpense(expense.id)}
                   >
                     Delete
@@ -164,7 +162,7 @@ const ViewAllExpenses = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center">
+              <td colSpan="5" className="empty-state">
                 No expenses found.
               </td>
             </tr>
@@ -174,7 +172,7 @@ const ViewAllExpenses = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination>
+        <Pagination className="justify-content-center">
           {[...Array(totalPages)].map((_, index) => (
             <Pagination.Item
               key={index + 1}
@@ -228,11 +226,11 @@ const ViewAllExpenses = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalClose}>
+          <Button className="theme-btn" variant="secondary" onClick={handleModalClose}>
             Cancel
           </Button>
           <Button
-            variant="primary"
+            className="theme-btn"
             onClick={handleModalSave}
             disabled={loading}
           >
