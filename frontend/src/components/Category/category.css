@@ -23,106 +23,208 @@
 }
 
 /* Individual Card Styles */
+/* NEW: Enhanced card styling with gradients and modern effects */
 .card {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  padding: 8px 15px;
-  border-radius: 5px;
-  background-color: #2962ff; /* Default card background color */
+  justify-content: space-between; /* NEW: Changed from space-around to space-between */
+  /* PREVIOUS: padding: 8px 15px; */
+  /* NEW: Increased padding for better spacing */
+  padding: 20px 25px;
+  /* PREVIOUS: border-radius: 5px; */
+  /* NEW: More rounded corners for modern look */
+  border-radius: 15px;
+  /* PREVIOUS: background-color: #2962ff; */
+  /* NEW: Default gradient background */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* NEW: Enhanced shadow and border effects */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* NEW: Smooth transitions for hover effects */
+  transition: all 0.3s ease;
+  /* NEW: Subtle border for enhanced definition */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* NEW: Minimum height to ensure consistent card size */
+  min-height: 200px;
+}
+
+/* NEW: Hover effect for cards */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .card-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.card h3 {
-  font-size: 18px;
+  /* NEW: Ensure proper spacing */
   margin-bottom: 10px;
 }
 
+.card h3 {
+  /* PREVIOUS: font-size: 18px; margin-bottom: 10px; */
+  /* NEW: Enhanced typography */
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  /* NEW: Prevent text overflow */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 .card h1 {
-  font-size: 32px;
+  /* PREVIOUS: font-size: 32px; text-align: center; */
+  /* NEW: Enhanced number display */
+  font-size: 36px;
   text-align: center;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 10px 0;
+  /* NEW: Ensure number stays centered */
+  flex-shrink: 0;
 }
 
 .card_icon {
-  font-size: 48px;
+  /* PREVIOUS: font-size: 48px; */
+  /* NEW: Enhanced icon styling */
+  font-size: 52px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  opacity: 0.9;
+  /* NEW: Prevent icon from shrinking */
+  flex-shrink: 0;
 }
 
- .card-buttons {
+/* NEW: Enhanced button container with better layout */
+.card-buttons {
   display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
+  justify-content: space-between; /* NEW: Changed from space-around to space-between */
+  align-items: center;
+  margin-top: auto; /* NEW: Push buttons to bottom */
+  gap: 8px; /* NEW: Consistent gap */
+  /* NEW: Ensure buttons stay at bottom */
+  flex-shrink: 0;
 }
-/*
+
+/* NEW: Enhanced button styling for card buttons */
 .card-buttons button {
-  padding: 8px 16px;
-  cursor: pointer;
+  /* PREVIOUS: padding: 8px 16px; border-radius: 4px; font-size: 14px; */
+  /* NEW: Better sizing and modern styling */
+  padding: 10px 18px;
   border: none;
-  border-radius: 4px;
-  background-color:black;
-  color: white;
+  border-radius: 8px;
   font-size: 14px;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  /* PREVIOUS: transition: background-color 0.3s ease; */
+  /* NEW: Enhanced transitions */
+  transition: all 0.3s ease;
+  /* NEW: Subtle shadow for depth */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  /* NEW: Uppercase text for consistency */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  /* NEW: Flexible width for better responsiveness */
+  flex: 1;
+  min-width: 0; /* NEW: Allow buttons to shrink */
+  white-space: nowrap; /* NEW: Prevent text wrapping */
+  overflow: hidden; /* NEW: Hide overflow */
+  text-overflow: ellipsis; /* NEW: Show ellipsis for long text */
 }
 
 .card-buttons button:hover {
-  background-color: #c51162;
-} */
-/* category.css */
-.card-buttons button {
-  padding: 8px 16px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.card-buttons button:hover {
-  background-color: #c51162; /* Hover color for all buttons */
+  /* PREVIOUS: background-color: #c51162; */
+  /* NEW: Enhanced hover effects */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .card-buttons button.delete-button {
-  background-color: red;
+  /* PREVIOUS: background-color: red; */
+  /* NEW: Attractive red gradient */
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-buttons button.delete-button:hover {
+  background: linear-gradient(135deg, #ff5252, #d32f2f);
 }
 
 .card-buttons button.update-button {
-  background-color: blue; /* Orange color */
-  color: black; /* Text color for the update button */
+  /* PREVIOUS: background-color: blue; color: black; */
+  /* NEW: Attractive blue gradient */
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Additional Card Styles */
+.card-buttons button.update-button:hover {
+  background: linear-gradient(135deg, #0984e3, #0652dd);
+}
+
+/* Additional Card Styles - NEW: Enhanced gradient backgrounds */
 .card.card-1 {
-  background-color: #ff6d00;
+  /* PREVIOUS: background-color: #ff6d00; */
+  /* NEW: Orange gradient */
+  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
 }
 
 .card.card-2 {
-  background-color: #2e7d32;
+  /* PREVIOUS: background-color: #2e7d32; */
+  /* NEW: Green gradient */
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
 }
 
 .card.card-3 {
-  background-color: #d50000;
-}
-.card.card-6 {
-  background-color: #ff6d00;
-}
-
-.card.card-5 {
-  background-color: #2e7d32;
+  /* PREVIOUS: background-color: #d50000; */
+  /* NEW: Red gradient */
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
 }
 
 .card.card-4 {
-  background-color: #d50000;
-}
-.card.card-7 {
-  background-color: burlywood;
+  /* PREVIOUS: background-color: #d50000; */
+  /* NEW: Purple gradient */
+  background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
 }
 
+.card.card-5 {
+  /* PREVIOUS: background-color: #2e7d32; */
+  /* NEW: Teal gradient */
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.card.card-6 {
+  /* PREVIOUS: background-color: #ff6d00; */
+  /* NEW: Pink gradient */
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+}
+
+.card.card-7 {
+  /* PREVIOUS: background-color: burlywood; */
+  /* NEW: Gold gradient */
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* NEW: Additional card variations for more variety */
+.card.card-8 {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.card.card-9 {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.card.card-10 {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.card.card-11 {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.card.card-12 {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
 
 
 /* Add Category Button */
@@ -148,81 +250,489 @@
 }
 
 /* Responsive Styling */
-@media screen and (max-width: 768px) {
+/* NEW: Enhanced responsive design with multiple breakpoints */
+
+/* Large tablets and small desktops (1024px and below) */
+@media screen and (max-width: 1024px) {
   .main-cards {
+    /* PREVIOUS: grid-template-columns: 1fr 1fr 1fr; */
+    /* NEW: Keep 4 columns at 1024px, only reduce to 3 at smaller sizes */
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 15px;
+    margin: 12px 0;
+  }
+  
+  .card {
+    padding: 18px 20px;
+    min-height: 180px; /* NEW: Adjusted minimum height */
+  }
+  
+  .card h3 {
+    font-size: 18px;
+  }
+  
+  .card h1 {
+    font-size: 32px;
+  }
+  
+  .card_icon {
+    font-size: 48px;
+  }
+  
+  /* NEW: Ensure buttons stay responsive */
+  .card-buttons button {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Medium tablets (900px and below) - NEW: Added intermediate breakpoint */
+@media screen and (max-width: 900px) {
+  .main-cards {
+    /* NEW: 3 columns for medium tablets */
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin: 11px 0;
+  }
+  
+  .card {
+    padding: 16px 18px;
+    min-height: 170px; /* NEW: Adjusted minimum height */
+  }
+  
+  .card h3 {
+    font-size: 17px;
+  }
+  
+  .card h1 {
+    font-size: 30px;
+  }
+  
+  .card_icon {
+    font-size: 46px;
+  }
+  
+  /* NEW: Ensure buttons stay responsive */
+  .card-buttons button {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Tablets and medium screens (768px and below) */
+@media screen and (max-width: 768px) {
+  .main-container {
+    padding: 15px 15px;
+  }
+  
+  .main-title h3 {
+    font-size: 24px;
+  }
+  
+  .main-cards {
+    /* PREVIOUS: grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; */
+    /* NEW: Two columns for tablet */
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 10px 0;
+  }
+  
+  .card {
+    /* NEW: Adjusted padding for tablet */
+    padding: 15px 18px;
+    border-radius: 12px;
+    min-height: 160px; /* NEW: Adjusted minimum height */
+  }
+  
+  .card h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .card h1 {
+    font-size: 28px;
+    margin: 8px 0;
+  }
+  
+  .card_icon {
+    font-size: 42px;
+  }
+  
+  .card-buttons {
+    margin-top: 12px;
+    gap: 8px;
+  }
+  
+  .card-buttons button {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    /* NEW: Ensure buttons don't overflow */
+    min-width: 60px;
+  }
+  
+  .add-category-button {
+    margin-top: 15px;
+  }
+  
+  .add-category-button button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  /* NEW: Adjusted popup for tablets */
+  .popup-content {
+    padding: 25px;
+    max-width: 380px;
+  }
+  
+  .popup-content h3 {
+    font-size: 20px;
+  }
+  
+  .popup-content p {
+    font-size: 15px;
+  }
+  
+  .popup-buttons button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Mobile phones (480px and below) */
+@media screen and (max-width: 480px) {
+  .main-container {
+    padding: 10px 10px;
+  }
+  
+  .main-title h3 {
+    font-size: 20px;
+  }
+  
+  .main-cards {
+    /* NEW: Single column for mobile */
     grid-template-columns: 1fr;
     gap: 10px;
-    margin-bottom: 0;
+    margin: 8px 0;
   }
-} 
+  
+  .card {
+    /* NEW: Optimized for mobile */
+    padding: 12px 15px;
+    border-radius: 10px;
+    min-height: 140px; /* NEW: Adjusted minimum height */
+  }
+  
+  .card h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .card h1 {
+    font-size: 24px;
+    margin: 6px 0;
+  }
+  
+  .card_icon {
+    font-size: 36px;
+  }
+  
+  .card-buttons {
+    margin-top: 10px;
+    gap: 6px;
+  }
+  
+  .card-buttons button {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 5px;
+    letter-spacing: 0.3px;
+    /* NEW: Ensure buttons fit properly on mobile */
+    min-width: 50px;
+    flex: 1;
+  }
+  
+  .add-category-button {
+    margin-top: 12px;
+  }
+  
+  .add-category-button button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  /* NEW: Mobile-optimized popup */
+  .popup-content {
+    padding: 20px;
+    max-width: 320px;
+    width: 95%;
+  }
+  
+  .popup-content h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .popup-content p {
+    font-size: 14px;
+    margin-bottom: 25px;
+  }
+  
+  .popup-buttons {
+    gap: 12px;
+  }
+  
+  .popup-buttons button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Small mobile phones (320px and below) */
+@media screen and (max-width: 320px) {
+  .main-container {
+    padding: 8px 8px;
+  }
+  
+  .main-title h3 {
+    font-size: 18px;
+  }
+  
+  .card {
+    padding: 10px 12px;
+    border-radius: 8px;
+    min-height: 120px; /* NEW: Adjusted minimum height */
+  }
+  
+  .card h3 {
+    font-size: 13px;
+  }
+  
+  .card h1 {
+    font-size: 20px;
+  }
+  
+  .card_icon {
+    font-size: 32px;
+  }
+  
+  .card-buttons button {
+    padding: 5px 10px;
+    font-size: 10px;
+    /* NEW: Ensure buttons work on very small screens */
+    min-width: 40px;
+  }
+  
+  .add-category-button button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  /* NEW: Extra small popup */
+  .popup-content {
+    padding: 15px;
+    max-width: 280px;
+  }
+  
+  .popup-content h3 {
+    font-size: 16px;
+  }
+  
+  .popup-content p {
+    font-size: 13px;
+  }
+  
+  .popup-buttons button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Landscape orientation for mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .main-cards {
+    /* NEW: Three columns for landscape tablets */
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .card {
+    padding: 10px 12px;
+  }
+  
+  .card h3 {
+    font-size: 14px;
+  }
+  
+  .card h1 {
+    font-size: 20px;
+  }
+  
+  .card_icon {
+    font-size: 28px;
+  }
+}
+
+/* High DPI displays */
+@media screen and (-webkit-min-device-pixel-ratio: 2), 
+       screen and (min-resolution: 192dpi) {
+  .card {
+    /* NEW: Enhanced shadows for high DPI */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+  }
+  
+  .popup-content {
+    /* NEW: Crisper borders for high DPI */
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+  }
+}
 
 /* Popup Overlay Styles */
+/* NEW: Enhanced popup overlay with gradient background and blur effect */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* PREVIOUS: background-color: rgba(0, 0, 0, 0.5); */
+  /* NEW: Gradient background with blur effect for modern glass-morphism look */
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
+/* NEW: Enhanced popup content with gradient background and animations */
 .popup-content {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  /* PREVIOUS: background-color: white; */
+  /* NEW: Gradient background for more attractive appearance */
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  /* PREVIOUS: padding: 30px; */
+  /* NEW: Increased padding for better spacing */
+  padding: 35px;
+  /* PREVIOUS: border-radius: 8px; */
+  /* NEW: More rounded corners for modern look */
+  border-radius: 15px;
+  /* PREVIOUS: box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); */
+  /* NEW: Enhanced shadow with multiple layers and border */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
   text-align: center;
-  max-width: 400px;
+  /* PREVIOUS: max-width: 400px; */
+  /* NEW: Slightly wider for better content display */
+  max-width: 420px;
   width: 90%;
+  /* NEW: Added subtle border for enhanced definition */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* NEW: Smooth entrance animation */
+  animation: popupSlideIn 0.3s ease-out;
 }
 
+/* NEW: Entrance animation for popup */
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* NEW: Enhanced typography styling */
 .popup-content h3 {
-  color: #333;
-  margin-bottom: 15px;
-  font-size: 20px;
+  /* PREVIOUS: color: #333; margin-bottom: 15px; font-size: 20px; */
+  /* NEW: Better color, spacing, and typography */
+  color: #2c3e50;
+  margin-bottom: 18px;
+  font-size: 22px;
+  font-weight: 600;
+  /* NEW: Subtle text shadow for better contrast */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .popup-content p {
-  color: #666;
-  margin-bottom: 25px;
+  /* PREVIOUS: color: #666; margin-bottom: 25px; font-size: 16px; line-height: 1.5; */
+  /* NEW: Enhanced readability and spacing */
+  color: #5a6c7d;
+  margin-bottom: 30px;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-weight: 400;
 }
 
 .popup-buttons {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  /* PREVIOUS: gap: 15px; */
+  /* NEW: Increased gap for better button separation */
+  gap: 18px;
 }
 
+/* NEW: Enhanced button styling with gradients and animations */
 .popup-buttons button {
-  padding: 10px 20px;
+  /* PREVIOUS: padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; */
+  /* NEW: Better sizing, typography, and modern styling */
+  padding: 12px 24px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
+  font-size: 15px;
+  font-weight: 600;
+  /* PREVIOUS: transition: background-color 0.3s ease; */
+  /* NEW: Enhanced transitions for all properties */
+  transition: all 0.3s ease;
+  /* NEW: Uppercase text with letter spacing for premium look */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  /* NEW: Subtle shadow for depth */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* NEW: Gradient styling for confirm button */
 .popup-buttons .confirm-button {
-  background-color: #d32f2f;
+  /* PREVIOUS: background-color: #d32f2f; */
+  /* NEW: Attractive red gradient */
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
   color: white;
+  /* NEW: Subtle border for enhanced definition */
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* NEW: Enhanced hover effects for confirm button */
 .popup-buttons .confirm-button:hover {
-  background-color: #b71c1c;
+  /* PREVIOUS: background-color: #b71c1c; */
+  /* NEW: Darker gradient on hover with lift animation */
+  background: linear-gradient(135deg, #ff5252, #d32f2f);
+  transform: translateY(-2px);
+  /* NEW: Glowing shadow effect */
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
+/* NEW: Gradient styling for cancel button */
 .popup-buttons .cancel-button {
-  background-color: #757575;
+  /* PREVIOUS: background-color: #757575; */
+  /* NEW: Attractive blue gradient */
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
   color: white;
+  /* NEW: Subtle border for enhanced definition */
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* NEW: Enhanced hover effects for cancel button */
 .popup-buttons .cancel-button:hover {
-  background-color: #616161;
+  /* PREVIOUS: background-color: #616161; */
+  /* NEW: Darker gradient on hover with lift animation */
+  background: linear-gradient(135deg, #0984e3, #0652dd);
+  transform: translateY(-2px);
+  /* NEW: Glowing shadow effect */
+  box-shadow: 0 6px 20px rgba(116, 185, 255, 0.4);
 } 
