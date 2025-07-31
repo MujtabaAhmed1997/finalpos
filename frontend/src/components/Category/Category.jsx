@@ -6,6 +6,8 @@ import './category.css'; // Import the CSS file for this component
 
 function Category() {
   const [categories, setCategories] = useState([]);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +63,27 @@ function Category() {
     }
   };
 
+  // Function to show delete confirmation popup
+  const showDeleteConfirmation = (categoryId, categoryName) => {
+    setCategoryToDelete({ id: categoryId, name: categoryName });
+    setShowDeletePopup(true);
+  };
+
+  // Function to confirm delete
+  const confirmDelete = async () => {
+    if (categoryToDelete) {
+      await handleDeleteCategory(categoryToDelete.id);
+      setShowDeletePopup(false);
+      setCategoryToDelete(null);
+    }
+  };
+
+  // Function to cancel delete
+  const cancelDelete = () => {
+    setShowDeletePopup(false);
+    setCategoryToDelete(null);
+  };
+
   // Function to handle update category (example, you can implement a modal or form for update)
   const handleUpdateCategory = async (categoryId) => {
     // Example: Implement an update function
@@ -91,7 +114,7 @@ function Category() {
             {/* <h1>{category.Products.length}</h1> */}
             <h1>{category.CategoryID}</h1>
             <div className='card-buttons'>
-              <button className='delete-button' onClick={() => handleDeleteCategory(category.CategoryID)}>Delete</button>
+              <button className='delete-button' onClick={() => showDeleteConfirmation(category.CategoryID, category.CategoryName)}>Delete</button>
               <button className='update-button' onClick={() => handleUpdateCategory(category.CategoryID)}>Update</button>
             </div>
           </div>
@@ -101,6 +124,20 @@ function Category() {
       <div className='add-category-button'>
         <button onClick={handleAddCategory}>Add Category</button>
       </div>
+
+      {/* Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete category "{categoryToDelete?.name}"?</p>
+            <div className="popup-buttons">
+              <button className="confirm-button" onClick={confirmDelete}>Yes, Delete</button>
+              <button className="cancel-button" onClick={cancelDelete}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
