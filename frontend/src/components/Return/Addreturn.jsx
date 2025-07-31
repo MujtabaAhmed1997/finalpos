@@ -123,37 +123,90 @@ function ReturnOrderForm() {
   };
 
   return (
-    <div className='d-flex vh-100 justify-content-center align-items-center' style={{ backgroundColor: '#263043' }}>
-      <div className='w-50 bg-white rounded p-3'>
-        <h2>Return Order</h2>
+    <div
+      className="container-fluid min-vh-100 d-flex justify-content-center align-items-center px-2"
+      style={{ backgroundColor: "#263043" }}
+    >
+      <div
+        className="rounded-4 shadow-lg p-4 p-md-5 w-100"
+        style={{
+          maxWidth: 500,
+          width: "100%",
+          border: "1px solid #404040",
+          background: "rgba(255,255,255,0.95)",
+          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <div className="text-center mb-4">
+          <h3 className="fw-bold mt-2" style={{ color: "#263043", fontSize: "1.5rem" }}>
+            Create Return Order
+          </h3>
+          <p className="text-muted mb-0" style={{ fontSize: 15 }}>
+            Add a new return order to your system.
+          </p>
+        </div>
         <form onSubmit={handleSubmit}>
           {/* Order Type Dropdown */}
-          <div className='mb-3'>
-            <label htmlFor='OrderType'><strong>Order Type</strong></label>
+          <div className="mb-3">
+            <label htmlFor="OrderType" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Order Type
+            </label>
             <select
-              name='OrderType'
-              className='form-control'
+              name="OrderType"
+              className="form-select rounded-3"
               value={values.OrderType}
               onChange={handleInput}
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                fontSize: "1rem",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             >
-              <option value=''>Select Order Type</option>
-              <option value='Customer'>Customer</option>
-              <option value='Supplier'>Supplier</option>
+              <option value="">Select Order Type</option>
+              <option value="Customer">Customer</option>
+              <option value="Supplier">Supplier</option>
             </select>
-            {errors.OrderType && <span className='text-danger'>{errors.OrderType}</span>}
+            {errors.OrderType && <span className="text-danger small">{errors.OrderType}</span>}
           </div>
 
           {/* Order ID Dropdown */}
-          <div className='mb-3'>
-            <label htmlFor='OrderID'><strong>Order ID</strong></label>
+          <div className="mb-3">
+            <label htmlFor="OrderID" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Order ID
+            </label>
             <select
-              name='OrderID'
-              className='form-control'
+              name="OrderID"
+              className="form-select rounded-3"
               value={values.OrderID}
               onChange={handleInput}
               disabled={orderOptions.length === 0}
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                fontSize: "1rem",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             >
-              <option value=''>Select {values.OrderType} ID</option>
+              <option value="">Select {values.OrderType} ID</option>
               {orderOptions.map((option) => (
                 <option
                   key={values.OrderType === 'Customer' ? option.CustomerID : option.SupplierID}
@@ -165,46 +218,127 @@ function ReturnOrderForm() {
                 </option>
               ))}
             </select>
-            {errors.OrderID && <span className='text-danger'>{errors.OrderID}</span>}
+            {errors.OrderID && <span className="text-danger small">{errors.OrderID}</span>}
           </div>
 
-          <div className='mb-3'>
-            <label htmlFor='ReturnDate'><strong>Return Date</strong></label>
+          <div className="mb-3">
+            <label htmlFor="ReturnDate" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Return Date
+            </label>
             <input
               onChange={handleInput}
-              type='date'
-              className='form-control'
-              name='ReturnDate'
+              type="date"
+              className="form-control rounded-3"
+              name="ReturnDate"
               value={values.ReturnDate}
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                fontSize: "1rem",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
-            {errors.ReturnDate && <span className='text-danger'>{errors.ReturnDate}</span>}
+            {errors.ReturnDate && <span className="text-danger small">{errors.ReturnDate}</span>}
           </div>
 
-          <div className='mb-3'>
-            <label htmlFor='TotalAmount'><strong>Total Amount</strong></label>
+          <div className="mb-3">
+            <label htmlFor="TotalAmount" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Total Amount
+            </label>
             <input
-              type='number'
-              name='TotalAmount'
-              className='form-control'
+              type="number"
+              name="TotalAmount"
+              className="form-control rounded-3"
               value={values.TotalAmount}
               onChange={handleInput}
+              placeholder="Enter total amount"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                fontSize: "1rem",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
-            {errors.TotalAmount && <span className='text-danger'>{errors.TotalAmount}</span>}
+            {errors.TotalAmount && <span className="text-danger small">{errors.TotalAmount}</span>}
           </div>
 
-          <div className='mb-3'>
-            <label htmlFor='Reason'><strong>Reason</strong></label>
+          <div className="mb-3">
+            <label htmlFor="Reason" className="form-label fw-semibold" style={{ color: "#263043" }}>
+              Reason
+            </label>
             <textarea
-              name='Reason'
-              className='form-control'
+              name="Reason"
+              className="form-control rounded-3"
               value={values.Reason}
               onChange={handleInput}
+              placeholder="Enter return reason"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                fontSize: "1rem",
+                minHeight: 80,
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#263043";
+                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#dee2e6";
+                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
-            {errors.Reason && <span className='text-danger'>{errors.Reason}</span>}
+            {errors.Reason && <span className="text-danger small">{errors.Reason}</span>}
           </div>
 
-          <button type='submit' className='btn btn-success w-100 rounded-0' disabled={isSubmitting}>
-            {isSubmitting ? 'Adding...' : 'Create Return Order'}
+          <button
+            type="submit"
+            className="btn w-100 rounded-3 fw-bold"
+            disabled={isSubmitting}
+            style={{
+              background: "#263043",
+              border: "none",
+              fontSize: 18,
+              letterSpacing: 1,
+              boxShadow: "0 4px 12px rgba(38, 48, 67, 0.3)",
+              transition: "all 0.3s",
+              color: "white",
+            }}
+            onMouseOver={e => {
+              if (!isSubmitting) {
+                e.target.style.background = "#1a2332";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
+              }
+            }}
+            onMouseOut={e => {
+              if (!isSubmitting) {
+                e.target.style.background = "#263043";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
+              }
+            }}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Return Order'}
           </button>
         </form>
       </div>
