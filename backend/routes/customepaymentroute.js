@@ -80,8 +80,9 @@
 
 const express = require('express');
 const router = express.Router();
-const { CustomerPayment,Customer} = require('../models');
-const{SalesOrder}=require('../models/salesorder')
+const { CustomerPayment, Customer } = require('../models');
+const { SalesOrder } = require('../models/salesorder');
+const { Op } = require('sequelize');
 
 
 router.post('/', async (req, res) => {
@@ -94,26 +95,12 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: err.message }); // Send detailed error message
   }
 });
-// Get a customer payment by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const payment = await CustomerPayment.findByPk(req.params.id);
-    if (payment) {
-      res.json(payment);
-    } else {
-      res.status(404).json({ error: 'Customer payment not found' });
-    }
-  } catch (err) {
-    console.error('Error fetching customer payment:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 
 
 //customerpayment by customer id
 router.get('/customer/:customerId', async (req, res) => {
-  const { page = 1, pageSize = 10 } = req.query;
+  const { page = 1, pageSize = 10,search } = req.query;
   const { customerId } = req.params;
   const offset = (page - 1) * pageSize;
   const limit = parseInt(pageSize);
@@ -143,33 +130,70 @@ router.get('/customer/:customerId', async (req, res) => {
 });
 
 
-// Get all customer payments
-
+// Get all customer payments with search functionality
 router.get('/', async (req, res) => {
-  const { page = 1, pageSize = 10 } = req.query;
+  const { page = 1, pageSize = 10, search } = req.query;
   const offset = (page - 1) * pageSize;
   const limit = parseInt(pageSize);
 
+  console.log('Query parameters:', req.query);
+  console.log('Search term:', search);
+
   try {
-    const { rows: payments, count } = await CustomerPayment.findAndCountAll({
+    let whereClause = {};
+    let customerWhereClause = {};
+
+    // Add search functionality by customer name
+    if (search && search.trim()) {
+      customerWhereClause = {
+        CustomerName: {
+          [Op.like]: `%${search.trim()}%`
+        }
+      };
+      console.log('Customer where clause:', customerWhereClause);
+    }
+
+    const queryOptions = {
+      where: whereClause,
       offset,
       limit,
-      include:[{
-        model:Customer,
-        attributes:["CustomerName"]
+      include: [{
+        model: Customer,
+        attributes: ["CustomerName"],
+        where: customerWhereClause
       }],
       order: [['PaymentDate', 'DESC']] // Sort by PaymentDate in descending order
+    };
 
-    });
+    console.log('Query options:', JSON.stringify(queryOptions, null, 2));
+
+    const { rows: payments, count } = await CustomerPayment.findAndCountAll(queryOptions);
 
     const totalPages = Math.ceil(count / pageSize);
 
     res.json({
       customerPayments: payments,
-      totalPages
+      totalPages,
+      currentPage: parseInt(page),
+      totalCount: count
     });
   } catch (err) {
     console.error('Error fetching customer payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get a customer payment by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const payment = await CustomerPayment.findByPk(req.params.id);
+    if (payment) {
+      res.json(payment);
+    } else {
+      res.status(404).json({ error: 'Customer payment not found' });
+    }
+  } catch (err) {
+    console.error('Error fetching customer payment:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
