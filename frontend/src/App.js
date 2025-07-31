@@ -115,7 +115,7 @@ function App() {
             <Route path='/orderdetail/:id' element={<PurchaseOrderDetailList />} />
 
 
-            <Route path='/supplierpayment/add/' element={<AddPayment />} />
+            <Route path='/supplierpayment/add' element={<AddPayment />} />
             <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} />
 
             <Route path='/customerpayment/add/:id' element={<AddCustomerPayment />} />

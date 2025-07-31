@@ -4,6 +4,7 @@ const router = express.Router();
 const SupplierPayment = require('../models/supplierpaymentmodel');
 const PurchaseOrder = require('../models/purchaseorder');
 const Supplier = require('../models/supplier');
+const { Op } = require('sequelize');
 
 // Create a new SupplierPayment
 router.post('/', async (req, res) => {
@@ -15,32 +16,56 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all SupplierPayments with pagination
+// Get all SupplierPayments with pagination and search functionality
 router.get('/', async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, pageSize = 10, search } = req.query;
+  const offset = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
+
+  console.log('Query parameters:', req.query);
+  console.log('Search term:', search);
 
   try {
-    const offset = (page - 1) * limit;
-    const { count, rows } = await SupplierPayment.findAndCountAll({
+    let whereClause = {};
+    let supplierWhereClause = {};
+
+    // Add search functionality by supplier name
+    if (search && search.trim()) {
+      supplierWhereClause = {
+        SupplierName: {
+          [Op.like]: `%${search.trim()}%`
+        }
+      };
+      console.log('Supplier where clause:', supplierWhereClause);
+    }
+
+    const queryOptions = {
+      where: whereClause,
+      offset,
+      limit,
       include: [{
-        model: PurchaseOrder, // Adjust as per your model associations
-        attributes: ['PurchaseOrderID', 'OrderDate', 'TotalAmount'], // Include necessary attributes
-      },{
-        model:Supplier,
-        attributes:['SupplierName']
-
+        model: Supplier,
+        attributes: ["SupplierName"],
+        where: supplierWhereClause
       }],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-    });
+      order: [['PaymentDate', 'DESC']] // Sort by PaymentDate in descending order
+    };
 
-    const totalPages = Math.ceil(count / limit);
-    res.status(200).json({
-      supplierPayments: rows,
+    console.log('Query options:', JSON.stringify(queryOptions, null, 2));
+
+    const { rows: payments, count } = await SupplierPayment.findAndCountAll(queryOptions);
+
+    const totalPages = Math.ceil(count / pageSize);
+
+    res.json({
+      supplierPayments: payments,
       totalPages,
+      currentPage: parseInt(page),
+      totalCount: count
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Error fetching supplier payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
