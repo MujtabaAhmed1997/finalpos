@@ -117,8 +117,8 @@ function App() {
 
             <Route path='/supplierpayment/add' element={<AddPayment />} />
             <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} />
-
-            <Route path='/customerpayment/add/:id' element={<AddCustomerPayment />} />
+//:id was changed to :customerId
+            <Route path='/customerpayment/add/:customerId' element={<AddCustomerPayment />} />
             <Route path='/customerpayment/list' element={<CustomerPaymentsList />} />
             <Route path='/customerpayment/add' element={<AddHomeCustomerPayment />} />
 
