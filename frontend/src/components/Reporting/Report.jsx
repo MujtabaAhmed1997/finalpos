@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
-import { FaChartBar, FaArrowLeft, FaCalendarAlt, FaDollarSign, FaBox, FaChartLine, FaFileAlt, FaSearch, FaDownload, FaPrint } from 'react-icons/fa';
+import { FaChartBar, FaArrowLeft, FaCalendarAlt, FaDollarSign, FaBox, FaChartLine, FaFileAlt, FaSearch, FaDownload, FaPrint, FaFileCsv, FaFileExcel, FaFilePdf, FaCog } from 'react-icons/fa';
 import './Report.css';
 
 const ReportComponent = () => {
@@ -18,6 +18,8 @@ const ReportComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tableOverflow, setTableOverflow] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,9 +95,220 @@ const ReportComponent = () => {
     window.print();
   };
 
+  // Export functionality
+  const exportToCSV = (data, filename) => {
+    const csvContent = "data:text/csv;charset=utf-8," + data;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportSalesDataToCSV = () => {
+    setExporting(true);
+    
+    try {
+      // Create CSV header
+      const headers = [
+        "Product Name",
+        "Variation/SKU", 
+        "Total Quantity",
+        "Loose Quantity",
+        "Total Amount",
+        "Average Selling Price"
+      ].join(",");
+
+      // Create CSV rows
+      const rows = reportData.map(item => [
+        `"${item.Product?.ProductName || 'N/A'}"`,
+        `"${item.ProductVariation?.SKU || 'N/A'}"`,
+        item.totalQuantity || 0,
+        item.totalLooseQuantity || 0,
+        item.totalAmount || 0,
+        item.averageSellingPrice || 0
+      ].join(","));
+
+      const csvData = [headers, ...rows].join("\n");
+      const filename = `sales_report_${startDate}_to_${endDate}.csv`;
+      
+      exportToCSV(csvData, filename);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      alert("Failed to export CSV file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportPaymentsDataToCSV = () => {
+    setExporting(true);
+    
+    try {
+      // Create CSV header
+      const headers = [
+        "Date",
+        "Total Payments"
+      ].join(",");
+
+      // Create CSV rows
+      const rows = dailyPayments.map(payment => [
+        payment.date,
+        payment.totalPayments || 0
+      ].join(","));
+
+      const csvData = [headers, ...rows].join("\n");
+      const filename = `payments_report_${startDate}_to_${endDate}.csv`;
+      
+      exportToCSV(csvData, filename);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      alert("Failed to export CSV file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportSummaryToCSV = () => {
+    setExporting(true);
+    
+    try {
+      // Create CSV header
+      const headers = [
+        "Metric",
+        "Value"
+      ].join(",");
+
+      // Create CSV rows
+      const rows = [
+        ["Total Sales", totalSales],
+        ["Total Quantity", totalQuantity],
+        ["Loose Quantity", totalLooseQuantity],
+        ["Total Payments", totalPayments],
+        ["Average Selling Price", averageSellingPrice],
+        ["Products Sold", reportData.length],
+        ["Report Period", `${startDate} to ${endDate}`]
+      ].map(row => row.join(","));
+
+      const csvData = [headers, ...rows].join("\n");
+      const filename = `summary_report_${startDate}_to_${endDate}.csv`;
+      
+      exportToCSV(csvData, filename);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      alert("Failed to export CSV file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportToExcel = () => {
+    setExporting(true);
+    
+    try {
+      // Create Excel-like CSV with multiple sheets
+      let excelData = "";
+      
+      // Summary Sheet
+      excelData += "SUMMARY REPORT\n";
+      excelData += `Report Period: ${startDate} to ${endDate}\n\n`;
+      excelData += "Metric,Value\n";
+      excelData += `Total Sales,${totalSales}\n`;
+      excelData += `Total Quantity,${totalQuantity}\n`;
+      excelData += `Loose Quantity,${totalLooseQuantity}\n`;
+      excelData += `Total Payments,${totalPayments}\n`;
+      excelData += `Average Selling Price,${averageSellingPrice}\n`;
+      excelData += `Products Sold,${reportData.length}\n\n`;
+      
+      // Sales Data Sheet
+      excelData += "SALES DATA\n";
+      excelData += "Product Name,Variation/SKU,Total Quantity,Loose Quantity,Total Amount,Average Selling Price\n";
+      reportData.forEach(item => {
+        excelData += `"${item.Product?.ProductName || 'N/A'}","${item.ProductVariation?.SKU || 'N/A'}",${item.totalQuantity || 0},${item.totalLooseQuantity || 0},${item.totalAmount || 0},${item.averageSellingPrice || 0}\n`;
+      });
+      excelData += "\n";
+      
+      // Payments Data Sheet
+      excelData += "DAILY PAYMENTS\n";
+      excelData += "Date,Total Payments\n";
+      dailyPayments.forEach(payment => {
+        excelData += `${payment.date},${payment.totalPayments || 0}\n`;
+      });
+
+      const filename = `complete_report_${startDate}_to_${endDate}.csv`;
+      exportToCSV(excelData, filename);
+    } catch (error) {
+      console.error("Error exporting Excel:", error);
+      alert("Failed to export Excel file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportToPDF = () => {
+    setExporting(true);
+    
+    try {
+      // Create a formatted text report for PDF
+      let pdfContent = "";
+      
+      // Header
+      pdfContent += "SALES REPORT\n";
+      pdfContent += "=".repeat(50) + "\n\n";
+      pdfContent += `Report Period: ${startDate} to ${endDate}\n`;
+      pdfContent += `Generated: ${new Date().toLocaleString()}\n\n`;
+      
+      // Summary
+      pdfContent += "SUMMARY STATISTICS\n";
+      pdfContent += "-".repeat(30) + "\n";
+      pdfContent += `Total Sales: ${formatCurrency(totalSales)}\n`;
+      pdfContent += `Total Quantity: ${formatNumber(totalQuantity)}\n`;
+      pdfContent += `Loose Quantity: ${formatNumber(totalLooseQuantity)}\n`;
+      pdfContent += `Total Payments: ${formatCurrency(totalPayments)}\n`;
+      pdfContent += `Average Selling Price: ${formatCurrency(averageSellingPrice)}\n`;
+      pdfContent += `Products Sold: ${reportData.length}\n\n`;
+      
+      // Sales Data
+      pdfContent += "SALES DATA\n";
+      pdfContent += "-".repeat(30) + "\n";
+      reportData.forEach((item, index) => {
+        pdfContent += `${index + 1}. ${item.Product?.ProductName || 'N/A'}\n`;
+        pdfContent += `   SKU: ${item.ProductVariation?.SKU || 'N/A'}\n`;
+        pdfContent += `   Total Quantity: ${formatNumber(item.totalQuantity)}\n`;
+        pdfContent += `   Loose Quantity: ${formatNumber(item.totalLooseQuantity)}\n`;
+        pdfContent += `   Total Amount: ${formatCurrency(item.totalAmount)}\n`;
+        pdfContent += `   Average Price: ${formatCurrency(item.averageSellingPrice)}\n\n`;
+      });
+      
+      // Payments Data
+      pdfContent += "DAILY PAYMENTS\n";
+      pdfContent += "-".repeat(30) + "\n";
+      dailyPayments.forEach(payment => {
+        pdfContent += `${payment.date}: ${formatCurrency(payment.totalPayments)}\n`;
+      });
+
+      // Create and download text file (simulating PDF)
+      const blob = new Blob([pdfContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `sales_report_${startDate}_to_${endDate}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      alert("Failed to export PDF file. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleExport = () => {
-    // Export functionality can be implemented here
-    console.log('Exporting report data...');
+    setShowExportOptions(!showExportOptions);
   };
 
   if (loading) {
@@ -335,14 +548,62 @@ const ReportComponent = () => {
             <FaPrint />
             Print Report
           </button>
-          <button className="action-button" onClick={handleExport} style={{
-            background: '#17a2b8',
-            color: 'white',
-            boxShadow: '0 4px 15px rgba(23, 162, 184, 0.4)'
-          }}>
-            <FaDownload />
-            Export Data
-          </button>
+          
+          {/* Export Button with Dropdown */}
+          <div className="export-container" style={{ position: 'relative' }}>
+            <button 
+              className="action-button" 
+              onClick={handleExport} 
+              style={{
+                background: '#17a2b8',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(23, 162, 184, 0.4)'
+              }}
+            >
+              {exporting ? <FaCog className="fa-spin" /> : <FaDownload />}
+              {exporting ? 'Exporting...' : 'Export Data'}
+            </button>
+            
+            {showExportOptions && (
+              <div className="export-dropdown">
+                <button 
+                  className="export-option" 
+                  onClick={exportSummaryToCSV}
+                  disabled={exporting}
+                >
+                  <FaFileCsv /> Export Summary (CSV)
+                </button>
+                <button 
+                  className="export-option" 
+                  onClick={exportSalesDataToCSV}
+                  disabled={exporting}
+                >
+                  <FaFileCsv /> Export Sales Data (CSV)
+                </button>
+                <button 
+                  className="export-option" 
+                  onClick={exportPaymentsDataToCSV}
+                  disabled={exporting}
+                >
+                  <FaFileCsv /> Export Payments (CSV)
+                </button>
+                <button 
+                  className="export-option" 
+                  onClick={exportToExcel}
+                  disabled={exporting}
+                >
+                  <FaFileExcel /> Export Complete Report (Excel)
+                </button>
+                <button 
+                  className="export-option" 
+                  onClick={exportToPDF}
+                  disabled={exporting}
+                >
+                  <FaFilePdf /> Export as Text Report
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
