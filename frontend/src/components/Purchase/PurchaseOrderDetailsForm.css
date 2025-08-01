@@ -1,0 +1,747 @@
+/* Purchase Order Details Form - Responsive Design */
+.purchase-order-details-form-container {
+  min-height: 100vh;
+  background-color: #263043;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.purchase-order-details-form-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid #404040;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  min-width: 320px;
+  backdrop-filter: blur(10px);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-icon {
+  font-size: 2.5rem;
+  color: #263043;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #263043;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.form-subtitle {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.4;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #263043;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(38, 48, 67, 0.3);
+}
+
+.back-button:hover {
+  background: #1a2332;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(38, 48, 67, 0.4);
+}
+
+.back-icon {
+  font-size: 1rem;
+}
+
+.order-summary {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+  color: #263043;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #263043;
+}
+
+.purchase-order-details-form {
+  width: 100%;
+}
+
+.entries-container {
+  margin-bottom: 2rem;
+}
+
+.entry-card {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.entry-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.entry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.entry-icon {
+  font-size: 1.25rem;
+  color: #263043;
+  margin-right: 0.5rem;
+}
+
+.entry-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #263043;
+}
+
+.remove-entry-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.remove-entry-button:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+.remove-icon {
+  font-size: 1rem;
+}
+
+.entry-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #263043;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.label-icon {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  color: #263043;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #263043;
+  box-shadow: 0 0 0 0.2rem rgba(38, 48, 67, 0.25);
+  background: #ffffff;
+}
+
+.form-control:hover {
+  border-color: #adb5bd;
+}
+
+.form-control:read-only {
+  background: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.react-select-container {
+  width: 100%;
+}
+
+.react-select__control {
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  background: #f8f9fa !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  min-height: 48px !important;
+}
+
+.react-select__control:hover {
+  border-color: #adb5bd !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #263043 !important;
+  box-shadow: 0 0 0 0.2rem rgba(38, 48, 67, 0.25) !important;
+  background: #ffffff !important;
+}
+
+.react-select__control--is-disabled {
+  background: #e9ecef !important;
+  cursor: not-allowed !important;
+}
+
+.react-select__menu {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.react-select__option {
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+}
+
+.react-select__option--is-focused {
+  background: #f8f9fa !important;
+  color: #263043 !important;
+}
+
+.react-select__option--is-selected {
+  background: #263043 !important;
+  color: white !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.add-entry-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.add-entry-button:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.button-icon {
+  font-size: 1rem;
+}
+
+.total-section {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.total-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  background: #263043;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(38, 48, 67, 0.3);
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #1a2332;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(38, 48, 67, 0.4);
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design - Large Desktop (1200px and up) */
+@media (min-width: 1200px) {
+  .purchase-order-details-form-card {
+    padding: 2.5rem;
+  }
+  
+  .form-title {
+    font-size: 2rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .entry-fields {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Responsive Design - Desktop (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .purchase-order-details-form-card {
+    max-width: 1000px;
+  }
+  
+  .entry-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive Design - Tablet (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .purchase-order-details-form-container {
+    padding: 15px;
+  }
+  
+  .purchase-order-details-form-card {
+    padding: 1.75rem;
+  }
+  
+  .form-title {
+    font-size: 1.6rem;
+  }
+  
+  .header-icon {
+    font-size: 2.25rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .entry-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive Design - Large Mobile (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .purchase-order-details-form-container {
+    padding: 10px;
+  }
+  
+  .purchase-order-details-form-card {
+    padding: 1.5rem;
+  }
+  
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-content {
+    width: 100%;
+  }
+  
+  .back-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .entry-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive Design - Mobile (up to 575px) */
+@media (max-width: 575px) {
+  .purchase-order-details-form-container {
+    padding: 10px;
+    align-items: flex-start;
+  }
+  
+  .purchase-order-details-form-card {
+    max-width: 100%;
+    min-width: auto;
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+  
+  .form-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.4rem;
+  }
+  
+  .form-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .header-icon {
+    font-size: 1.75rem;
+  }
+  
+  .order-summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .summary-item {
+    padding: 0.75rem;
+  }
+  
+  .summary-icon {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+  }
+  
+  .summary-label {
+    font-size: 0.8rem;
+  }
+  
+  .summary-value {
+    font-size: 1rem;
+  }
+  
+  .entry-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .entry-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .entry-fields {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-actions {
+    gap: 1rem;
+    padding-top: 1.5rem;
+  }
+  
+  .add-entry-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .total-section {
+    padding: 1rem;
+  }
+  
+  .total-label {
+    font-size: 1rem;
+  }
+  
+  .total-amount {
+    font-size: 1.25rem;
+  }
+  
+  .submit-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Responsive Design - Small Mobile (up to 375px) */
+@media (max-width: 375px) {
+  .purchase-order-details-form-container {
+    padding: 8px;
+  }
+  
+  .purchase-order-details-form-card {
+    padding: 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.3rem;
+  }
+  
+  .header-icon {
+    font-size: 1.5rem;
+  }
+  
+  .entry-card {
+    padding: 0.875rem;
+  }
+  
+  .form-control {
+    padding: 0.65rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .add-entry-button,
+  .submit-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Responsive Design - Extra Small Mobile (up to 320px) */
+@media (max-width: 320px) {
+  .purchase-order-details-form-container {
+    padding: 5px;
+  }
+  
+  .purchase-order-details-form-card {
+    padding: 0.875rem;
+  }
+  
+  .form-title {
+    font-size: 1.2rem;
+  }
+  
+  .header-icon {
+    font-size: 1.4rem;
+  }
+  
+  .form-control {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  .add-entry-button,
+  .submit-button {
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape orientation adjustments for mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .purchase-order-details-form-container {
+    padding: 10px;
+    align-items: center;
+  }
+  
+  .purchase-order-details-form-card {
+    max-width: 800px;
+    padding: 1.5rem;
+  }
+  
+  .form-header {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-title {
+    font-size: 1.3rem;
+  }
+  
+  .header-icon {
+    font-size: 1.75rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .form-control,
+  .react-select__control {
+    border-width: 0.5px;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .back-button,
+  .entry-card,
+  .add-entry-button,
+  .submit-button {
+    transition: none;
+  }
+  
+  .back-button:hover,
+  .entry-card:hover,
+  .add-entry-button:hover,
+  .submit-button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .purchase-order-details-form-card {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .form-control {
+    background: #ffffff;
+    color: #000000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .purchase-order-details-form-container {
+    background: white;
+    padding: 0;
+  }
+  
+  .purchase-order-details-form-card {
+    box-shadow: none;
+    border: 1px solid #000;
+    background: white;
+  }
+  
+  .back-button,
+  .remove-entry-button,
+  .add-entry-button,
+  .submit-button {
+    display: none;
+  }
+  
+  .order-summary {
+    background: #f8f9fa;
+  }
+} 

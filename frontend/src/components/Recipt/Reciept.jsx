@@ -2,37 +2,54 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt } from 'react-icons/fa';
+import './recipt.css';
 
 const GenericReceipt = ({ orderType }) => {
   const [data, setData] = useState(null);
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tableOverflow, setTableOverflow] = useState(false);
 
   const { id: OrderID } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // console.log("Fetching order and order details for ID:", OrderID);
     fetchOrder(OrderID);
     fetchOrderDetails(OrderID);
   }, [OrderID]);
 
+  useEffect(() => {
+    const checkTableOverflow = () => {
+      const tableContainer = document.querySelector('.receipt-table-container');
+      if (tableContainer) {
+        const hasOverflow = tableContainer.scrollWidth > tableContainer.clientWidth;
+        setTableOverflow(hasOverflow);
+      }
+    };
+
+    // Check on mount and window resize
+    checkTableOverflow();
+    window.addEventListener('resize', checkTableOverflow);
+    
+    return () => window.removeEventListener('resize', checkTableOverflow);
+  }, [detail]); // Re-check when detail data changes
+
   const fetchOrder = async (id) => {
     try {
-      //console.log(`Fetching ${orderType} order with ID:`, id);
       const res = await axios.get(
         `http://localhost:3001/api/${orderType}-orders/${id}`
       );
       setData(res.data);
-      // console.log("Order data fetched:", res.data);
     } catch (err) {
       console.error(`Error fetching ${orderType} order:`, err);
+      setError('Failed to load order data');
     }
   };
 
   const fetchOrderDetails = async (id) => {
     try {
-      //console.log(`Fetching ${orderType} order details for order ID:`, id);
       const res = await axios.get(
         `http://localhost:3001/api/${orderType}ordersdetails/${orderType}Order/${id}/details`
       );
@@ -40,6 +57,7 @@ const GenericReceipt = ({ orderType }) => {
       console.log("Order details fetched:", res.data);
     } catch (err) {
       console.error(`Error fetching ${orderType} order details:`, err);
+      setError('Failed to load order details');
     } finally {
       setLoading(false);
     }
@@ -57,384 +75,218 @@ const GenericReceipt = ({ orderType }) => {
     }
   };
 
-  const textStyle = {
-    textAlign: "center",
-    verticalAlign: "middle",
-    color: "black",
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount || 0);
   };
-  const headerStyle = {
-    textAlign: "center",
-    verticalAlign: "middle",
-    fontWeight: "bold",
-    color: "black",
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
-  const rightAlignTextStyle = {
-    textAlign: "right",
-    verticalAlign: "middle",
-    color: "black",
+
+  const formatTime = () => {
+    return new Date().toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
+  const getPaymentStatusClass = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'paid':
+        return 'paid';
+      case 'pending':
+        return 'pending';
+      case 'partial':
+        return 'partial';
+      case 'advance':
+        return 'advance';
+      default:
+        return 'pending';
+    }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="text-center">
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading receipt...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <div>
+          <div className="error-message">{error}</div>
+          <button className="action-button back-button" onClick={handleNavigate}>
+            <FaArrowLeft /> Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!data || !detail) {
-    console.log("Data or detail not available yet.");
-    return <div>No data available</div>;
+    return (
+      <div className="error-container">
+        <div>
+          <div className="error-message">No data available</div>
+          <button className="action-button back-button" onClick={handleNavigate}>
+            <FaArrowLeft /> Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
-  // console.log("Rendering receipt with data:", data);
-  console.log("Rendering receipt with details:", detail);
-
-  // return (
-  //   <div
-  //     className="d-flex  justify-content-center align-items-center flex-column"
-  //     style={{ height: "100vh" }}
-  //   >
-  //     <div
-  //       className="container"
-  //       style={{
-  //         backgroundColor: "white",
-  //         padding: "20px",
-  //         borderRadius: "8px",
-  //         boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-  //       }}
-  //     >
-  //       <div className="row mb-3">
-  //         <div className="col-4" style={textStyle}>
-  //           {new Date(data.OrderDate).toLocaleDateString()}
-  //         </div>
-  //         <div className="col-4" style={textStyle}>
-  //           {data.Supplier?.SupplierName ||
-  //             data.Customer?.CustomerName ||
-  //             "Unknown"}
-  //         </div>
-  //         <div className="col-4" style={textStyle}>
-  //           {new Date().toLocaleTimeString()}
-  //         </div>
-  //       </div>
-  //       <div className="row">
-  //         <div className="col-12">
-  //           <table className="table table-bordered">
-  //             <thead>
-  //               <tr>
-  //                 <th style={headerStyle}>Product</th>
-  //                 <th style={headerStyle}>Variation</th>
-  //                 <th style={headerStyle}>Quantity</th>
-  //                 <th style={headerStyle}>Unit Price</th>
-  //                 {orderType === "sales" && (
-  //                   <>
-  //                     <th style={headerStyle}>Loose Quantity</th>
-  //                     <th style={headerStyle}>Discount</th>
-  //                   </>
-  //                 )}
-  //                 <th style={headerStyle}>Total</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody>
-  //               {detail.OrderDetails && detail.OrderDetails.length > 0 ? (
-  //                 detail.OrderDetails.map((item, index) => (
-  //                   <tr key={index}>
-  //                     <td style={textStyle}>{item.Product.ProductName}</td>
-  //                     <td style={textStyle}>{item.ProductVariation.Size}</td>
-  //                     <td style={textStyle}>{item.Quantity}</td>
-  //                     <td style={textStyle}>{item.UnitPrice}</td>
-  //                     {orderType === "sales" && (
-  //                       <>
-  //                         <td style={textStyle}>{item.LooseQuantity}</td>
-  //                         <td style={textStyle}>{item.Discount}</td>
-  //                       </>
-  //                     )}
-  //                     <td style={textStyle}>{item.total}</td>
-  //                   </tr>
-  //                 ))
-  //               ) : (
-  //                 <tr>
-  //                   <td
-  //                     colSpan={orderType === "sales" ? "7" : "5"}
-  //                     style={textStyle}
-  //                   >
-  //                     No items available
-  //                   </td>
-  //                 </tr>
-  //               )}
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       </div>
-  //       <div className="row mt-3">
-  //         <div className="col-12 d-flex justify-content-end">
-  //           <table className="table table-bordered" style={{ width: "auto" }}>
-  //             <tbody>
-  //               <tr>
-  //                 <th style={headerStyle}>Total Amount</th>
-  //                 <td style={rightAlignTextStyle}>{data.TotalAmount}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Amount Paid</th>
-  //                 <td style={rightAlignTextStyle}>{data.AmountPaid}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Remaining Amount</th>
-  //                 <td style={rightAlignTextStyle}>{data.RemainingAmount}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Payment Status</th>
-  //                 <td style={rightAlignTextStyle}>{data.PaymentStatus}</td>
-  //               </tr>
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       </div>
-  //       <div className="row mt-3">
-  //         <div className="col-12 d-flex justify-content-end">
-  //           <button className="btn btn-primary me-2" onClick={handlePrint}>
-  //             Print
-  //           </button>
-  //           <button className="btn btn-secondary" onClick={handleNavigate}>
-  //             Back to Order
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
-
-  // <div className="d-flex justify-content-center align-items-center min-vh-100 flex-column p-3">
-  //   <div className="container bg-white p-4 rounded shadow-sm flex-column gap-3  overflow-x-auto">
-  //     <div className="row mb-3 text-center">
-  //       <div className="col-12 col-md-4 mb-2" style={textStyle}>
-  //         {new Date(data.OrderDate).toLocaleDateString()}
-  //       </div>
-  //       <div className="col-12 col-md-4 mb-2" style={textStyle}>
-  //         {data.Supplier?.SupplierName ||
-  //           data.Customer?.CustomerName ||
-  //           "Unknown"}
-  //       </div>
-  //       <div className="col-12 col-md-4" style={textStyle}>
-  //         {new Date().toLocaleTimeString()}
-  //       </div>
-  //     </div>
-
-  //     <div className="row mb-3">
-  //       <div className="col-12">
-  //         <div className="table-responsive">
-  //           <table className="table table-bordered table-sm text-nowrap">
-  //             <thead className="table-light">
-  //               <tr>
-  //                 <th style={headerStyle}>Product</th>
-  //                 <th style={headerStyle}>Variation</th>
-  //                 <th style={headerStyle}>Quantity</th>
-  //                 <th style={headerStyle}>Unit Price</th>
-  //                 {orderType === "sales" && (
-  //                   <>
-  //                     <th style={headerStyle}>Loose Quantity</th>
-  //                     <th style={headerStyle}>Discount</th>
-  //                   </>
-  //                 )}
-  //                 <th style={headerStyle}>Total</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody>
-  //               {detail.OrderDetails?.length > 0 ? (
-  //                 detail.OrderDetails.map((item, index) => (
-  //                   <tr key={index}>
-  //                     <td style={textStyle}>{item.Product?.ProductName}</td>
-  //                     <td style={textStyle}>
-  //                       {item.ProductVariation?.Size || "-"}
-  //                     </td>
-  //                     <td style={textStyle}>{item.Quantity}</td>
-  //                     <td style={textStyle}>{item.UnitPrice}</td>
-  //                     {orderType === "sales" && (
-  //                       <>
-  //                         <td style={textStyle}>{item.LooseQuantity}</td>
-  //                         <td style={textStyle}>{item.Discount}</td>
-  //                       </>
-  //                     )}
-  //                     <td style={textStyle}>{item.total}</td>
-  //                   </tr>
-  //                 ))
-  //               ) : (
-  //                 <tr>
-  //                   <td
-  //                     colSpan={orderType === "sales" ? 7 : 5}
-  //                     style={textStyle}
-  //                     className="text-center"
-  //                   >
-  //                     No items available
-  //                   </td>
-  //                 </tr>
-  //               )}
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     <div className="row mb-3">
-  //       <div className="col-12 d-flex justify-content-md-end justify-content-center">
-  //         <div className="table-responsive">
-  //           <table className="table table-bordered w-auto">
-  //             <tbody>
-  //               <tr>
-  //                 <th style={headerStyle}>Total Amount</th>
-  //                 <td style={rightAlignTextStyle}>{data.TotalAmount}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Amount Paid</th>
-  //                 <td style={rightAlignTextStyle}>{data.AmountPaid}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Remaining Amount</th>
-  //                 <td style={rightAlignTextStyle}>{data.RemainingAmount}</td>
-  //               </tr>
-  //               <tr>
-  //                 <th style={headerStyle}>Payment Status</th>
-  //                 <td style={rightAlignTextStyle}>{data.PaymentStatus}</td>
-  //               </tr>
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       </div>
-  //     </div>
-
-  //     <div className="row">
-  //       <div className="col-12 d-flex justify-content-md-end justify-content-center flex-wrap gap-2">
-  //         <button className="btn btn-primary" onClick={handlePrint}>
-  //           Print
-  //         </button>
-  //         <button className="btn btn-secondary" onClick={handleNavigate}>
-  //           Back to Order
-  //         </button>
-  //       </div>
-  //     </div>
-  //   </div>
-  // </div>
-
   return (
-    <div className="m-3">
-      <div
-        style={{
-          maxWidth: "1200px",
-          marginInline: "auto",
-          backgroundColor: "white",
-          padding: "20px",
-          borderRadius: "8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "1.5rem",
-          minHeight: "100dvh",
-        }}
-      >
-        <div className="mb-3 text-center d-flex gap-4 justify-content-center">
-          <div className="" style={textStyle}>
-            {new Date(data.OrderDate).toLocaleDateString()}
-          </div>
-          <div className="" style={textStyle}>
-            {data.Supplier?.SupplierName ||
-              data.Customer?.CustomerName ||
-              "Unknown"}
-          </div>
-          <div className="" style={textStyle}>
-            {new Date().toLocaleTimeString()}
-          </div>
+    <div className="receipt-container">
+      <div className="receipt-card">
+        {/* Header */}
+        <div className="receipt-header">
+          <FaReceipt size={50} color="#263043" style={{ marginBottom: '1rem' }} />
+          <h1 className="receipt-title">
+            {orderType === 'sales' ? 'Sales Receipt' : 'Purchase Receipt'}
+          </h1>
+          <p className="receipt-subtitle">
+            Order #{OrderID} • {formatDate(data.OrderDate)}
+          </p>
         </div>
 
-        <div className="row mb-3">
-          <div className="col-12">
-            <div className="table-responsive">
-              <table className="table table-bordered table-sm text-nowrap">
-                <thead className="table-light">
-                  <tr>
-                    <th style={headerStyle}>Product</th>
-                    <th style={headerStyle}>Variation</th>
-                    <th style={headerStyle}>Quantity</th>
-                    <th style={headerStyle}>Unit Price</th>
-                    {orderType === "sales" && (
-                      <>
-                        <th style={headerStyle}>Loose Quantity</th>
-                        <th style={headerStyle}>Discount</th>
-                      </>
-                    )}
-                    <th style={headerStyle}>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.OrderDetails?.length > 0 ? (
-                    detail.OrderDetails.map((item, index) => (
-                      <tr key={index}>
-                        <td style={textStyle}>{item.Product?.ProductName}</td>
-                        <td style={textStyle}>
-                          {item.ProductVariation?.Size || "-"}
-                        </td>
-                        <td style={textStyle}>{item.Quantity}</td>
-                        <td style={textStyle}>{item.UnitPrice}</td>
-                        {orderType === "sales" && (
-                          <>
-                            <td style={textStyle}>{item.LooseQuantity}</td>
-                            <td style={textStyle}>{item.Discount}</td>
-                          </>
-                        )}
-                        <td style={textStyle}>{item.total}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={orderType === "sales" ? 7 : 5}
-                        style={textStyle}
-                        className="text-center"
-                      >
-                        No items available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        {/* Order Information Grid */}
+        <div className="receipt-info-grid">
+          <div className="info-item">
+            <div className="info-label">
+              <FaCalendarAlt className="me-2" />
+              Order Date
+            </div>
+            <div className="info-value">{formatDate(data.OrderDate)}</div>
+          </div>
+          
+          <div className="info-item">
+            <div className="info-label">
+              <FaUser className="me-2" />
+              {orderType === 'sales' ? 'Customer' : 'Supplier'}
+            </div>
+            <div className="info-value">
+              {data.Supplier?.SupplierName || data.Customer?.CustomerName || "Unknown"}
             </div>
           </div>
+          
+          <div className="info-item">
+            <div className="info-label">
+              <FaClock className="me-2" />
+              Generated At
+            </div>
+            <div className="info-value">{formatTime()}</div>
+          </div>
         </div>
 
-        <div className="table-responsive w-100">
-          <table className="table table-bordered">
+        {/* Items Table */}
+        <div className={`receipt-table-container ${tableOverflow ? 'has-overflow' : ''}`}>
+          <table className="receipt-table">
+            <thead>
+              <tr>
+                <th><FaBox className="me-2" />Product</th>
+                <th><FaTag className="me-2" />Variation</th>
+                <th><FaHashtag className="me-2" />Quantity</th>
+                <th><FaDollarSign className="me-2" />Unit Price</th>
+                {orderType === "sales" && (
+                  <>
+                    <th><FaListAlt className="me-2" />Loose Qty</th>
+                    <th><FaDollarSign className="me-2" />Discount</th>
+                  </>
+                )}
+                <th><FaDollarSign className="me-2" />Total</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr>
-                <th scope="row" style={{ width: "50%" }}>
-                  Total Amount
-                </th>
-                <td style={{ width: "50%" }}>{data.TotalAmount}</td>
-              </tr>
-              <tr>
-                <th scope="row" style={{ width: "50%" }}>
-                  Amount Paid
-                </th>
-                <td style={{ width: "50%" }}>{data.AmountPaid}</td>
-              </tr>
-              <tr>
-                <th scope="row" style={{ width: "50%" }}>
-                  Remaining Amount
-                </th>
-                <td style={{ width: "50%" }}>{data.RemainingAmount}</td>
-              </tr>
-              <tr>
-                <th scope="row" style={{ width: "50%" }}>
-                  Payment Status
-                </th>
-                <td style={{ width: "50%" }}>{data.PaymentStatus}</td>
-              </tr>
+              {detail.OrderDetails?.length > 0 ? (
+                detail.OrderDetails.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.Product?.ProductName || 'N/A'}</td>
+                    <td>{item.ProductVariation?.Size || '-'}</td>
+                    <td>{item.Quantity}</td>
+                    <td>{formatCurrency(item.UnitPrice)}</td>
+                    {orderType === "sales" && (
+                      <>
+                        <td>{item.LooseQuantity || 0}</td>
+                        <td>{formatCurrency(item.Discount || 0)}</td>
+                      </>
+                    )}
+                    <td>{formatCurrency(item.total)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={orderType === "sales" ? 7 : 5}
+                    className="text-center"
+                  >
+                    No items available
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        <div className="">
-          <div className=" d-flex justify-content-md-end justify-content-center flex-wrap gap-2">
-            <button className="btn btn-primary" onClick={handlePrint}>
-              Print
-            </button>
-            <button className="btn btn-secondary" onClick={handleNavigate}>
-              Back to Order
-            </button>
+        {/* Summary */}
+        <div className="summary-container">
+          <div className="summary-card">
+            <h3 className="summary-title">
+              <FaDollarSign className="me-2" />
+              Order Summary
+            </h3>
+            <table className="summary-table">
+              <tbody>
+                <tr>
+                  <th>Total Amount</th>
+                  <td>{formatCurrency(data.TotalAmount)}</td>
+                </tr>
+                <tr>
+                  <th>Amount Paid</th>
+                  <td>{formatCurrency(data.AmountPaid)}</td>
+                </tr>
+                <tr>
+                  <th>Remaining Amount</th>
+                  <td>{formatCurrency(data.RemainingAmount)}</td>
+                </tr>
+                <tr>
+                  <th>Payment Status</th>
+                  <td>
+                    <span className={`payment-status ${getPaymentStatusClass(data.PaymentStatus)}`}>
+                      {data.PaymentStatus || 'Pending'}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+        </div>
+
+        {/* Actions */}
+        <div className="receipt-actions">
+          <button className="action-button print-button" onClick={handlePrint}>
+            <FaPrint />
+            Print Receipt
+          </button>
+          <button className="action-button back-button" onClick={handleNavigate}>
+            <FaArrowLeft />
+            Back to {orderType === 'sales' ? 'Sales' : 'Purchase'} Orders
+          </button>
         </div>
       </div>
     </div>

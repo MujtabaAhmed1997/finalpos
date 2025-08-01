@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { validatePurchaseOrder } from '../../controllers/Purchaseordervalidator'; // Adjust the import path as needed
+import { validatePurchaseOrder } from '../../controllers/Purchaseordervalidator';
+import { FaShoppingCart, FaCalendarAlt, FaBuilding } from 'react-icons/fa';
+import './PurchaseOrderForm.css';
 
 function PurchaseOrderForm() {
   const [values, setValues] = useState({
@@ -21,10 +23,11 @@ function PurchaseOrderForm() {
   useEffect(() => {
     axios.get('http://localhost:3001/api/suppliers')
       .then(res => {
-        setSuppliers(res.data);
+        setSuppliers(res.data.suppliers || []);
       })
       .catch(err => {
         console.error('Error fetching suppliers:', err);
+        setSuppliers([]);
       });
   }, []);
 
@@ -53,64 +56,99 @@ function PurchaseOrderForm() {
     }
   }, [values, isSubmitting]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrors({}); // Clear previous errors
+    
     const validationErrors = validatePurchaseOrder(values);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-      axios.post('http://localhost:3001/api/purchase-orders', values)
-        .then(res => {
-          const purchaseOrderId = res.data.PurchaseOrderID; // Capture the PurchaseOrderID from the response
-          navigate(`/purchaseorderdetail/${purchaseOrderId}`);
-          console.log(res);
-        })
-        .catch(err => {
-          console.error('Error creating purchase order:', err);
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-        });
+      try {
+        const res = await axios.post('http://localhost:3001/api/purchase-orders', values);
+        const purchaseOrderId = res.data.PurchaseOrderID;
+        navigate(`/purchaseorderdetail/${purchaseOrderId}`);
+        console.log(res);
+      } catch (err) {
+        console.error('Error creating purchase order:', err);
+        if (err.response && err.response.data && err.response.data.message) {
+          setErrors({ apiError: err.response.data.message });
+        } else {
+          setErrors({ apiError: "An unexpected error occurred. Please try again." });
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   return (
-    <div className='d-flex vh-100 justify-content-center align-items-center' style={{ backgroundColor: '#263043' }}>
-      <div className='w-50 bg-white rounded p-3'>
-        <h2>Purchase Order</h2>
-        <form onSubmit={handleSubmit}>
-          <div className='mb-3'>
-            <label htmlFor='SupplierID'><strong>Supplier</strong></label>
+    <div className="purchase-order-form-container">
+      <div className="purchase-order-form-card">
+        <div className="form-header">
+          <FaShoppingCart className="header-icon" />
+          <h3 className="form-title">Create Purchase Order</h3>
+          <p className="form-subtitle">
+            Create a new purchase order for your inventory management.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="purchase-order-form">
+          {errors.apiError && (
+            <div className="alert alert-danger" role="alert">
+              {errors.apiError}
+            </div>
+          )}
+
+          <div className="form-group">
+            <label htmlFor="SupplierID" className="form-label">
+              <FaBuilding className="label-icon" />
+              Supplier
+            </label>
             <select
               onChange={handleInput}
-              className='form-control rounded-0'
-              name='SupplierID'
+              className="form-control"
+              name="SupplierID"
               value={values.SupplierID}
             >
               <option value="">Select a Supplier</option>
-              {suppliers.map(supplier => (
+              {Array.isArray(suppliers) && suppliers.map(supplier => (
                 <option key={supplier.SupplierID} value={supplier.SupplierID}>
                   {supplier.SupplierName}
                 </option>
               ))}
             </select>
-            {errors.SupplierID && <span className='text-danger'>{errors.SupplierID}</span>}
+            {errors.SupplierID && (
+              <span className="error-message">{errors.SupplierID}</span>
+            )}
           </div>
-          <div className='mb-3'>
-            <label htmlFor='OrderDate'><strong>Order Date</strong></label>
+
+          <div className="form-group">
+            <label htmlFor="OrderDate" className="form-label">
+              <FaCalendarAlt className="label-icon" />
+              Order Date
+            </label>
             <input
               onChange={handleInput}
-              type='date'
-              className='form-control rounded-0'
-              name='OrderDate'
+              type="date"
+              className="form-control"
+              name="OrderDate"
               value={values.OrderDate}
             />
-            {errors.OrderDate && <span className='text-danger'>{errors.OrderDate}</span>}
+            {errors.OrderDate && (
+              <span className="error-message">{errors.OrderDate}</span>
+            )}
           </div>
-          <button type='submit' className='btn btn-success w-100 rounded-0' disabled={isSubmitting}>
-            {isSubmitting ? 'Adding...' : 'Create Purchase Order'}
-          </button> 
+
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            <FaShoppingCart className="button-icon" />
+            {isSubmitting ? 'Creating...' : 'Create Purchase Order'}
+          </button>
         </form>
       </div>
     </div>
