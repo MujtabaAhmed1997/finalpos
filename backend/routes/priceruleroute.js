@@ -80,6 +80,68 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Search route for price rules by SKU
+router.get('/search', async (req, res) => {
+  try {
+    let { sku, page, limit } = req.query;
+
+    // Convert query parameters to integers and set defaults
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Build the where clause for search
+    const whereClause = {};
+    if (sku && sku.trim()) {
+      whereClause.SKU = {
+        [Op.like]: `%${sku.trim()}%`
+      };
+    }
+
+    // Fetch price rules with search and pagination
+    const { rows: priceRules, count: totalItems } = await PriceRule.findAndCountAll({
+      include: [{
+        model: ProductVariation,
+        attributes: ['SKU'],
+        where: whereClause
+      }],
+      limit,
+      offset
+    });
+
+    res.json({
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      pageSize: limit,
+      data: priceRules
+    });
+
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Route to get a single price rule by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const priceRule = await PriceRule.findByPk(req.params.id, {
+      include: [{
+        model: ProductVariation,
+        attributes: ['SKU', 'VariationID']
+      }]
+    });
+    
+    if (!priceRule) {
+      return res.status(404).json({ error: 'Price rule not found' });
+    }
+    
+    res.json(priceRule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Route to delete a price rule
 router.delete('/:id', async (req, res) => {

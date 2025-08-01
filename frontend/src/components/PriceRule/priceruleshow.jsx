@@ -1,237 +1,184 @@
-// // PriceRuleList.jsx
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { Table, Button } from 'react-bootstrap';
-// import { useNavigate } from 'react-router-dom';
-
-// const PriceRuleList = () => {
-//   const [priceRules, setPriceRules] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const fetchPriceRules = async () => {
-//       try {
-//         const response = await axios.get('http://localhost:3001/api/pricerule');
-//         // Assuming your API returns an array of price rules with each having a 'variation' object
-//         setPriceRules(response.data);
-//       } catch (err) {
-//         setError('Failed to fetch price rules');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchPriceRules();
-//   }, []);
-
-//   const handleDelete = async (id) => {
-//     if (window.confirm('Are you sure you want to delete this price rule?')) {
-//       try {
-//         await axios.delete(`http://localhost:3001/api/pricerule/${id}`);
-//         setPriceRules(priceRules.filter((rule) => rule.id !== id));
-//       } catch (err) {
-//         setError('Failed to delete price rule');
-//       }
-//     }
-//   };
-
-//   const handleEdit = (id) => {
-//     navigate(`/pricerule/edit/${id}`);
-//   };
-
-//   // Add Price Rule Handler
-//   const handleAdd = () => {
-//     navigate('/pricerule/add');
-//   };
-
-//   if (loading) return <p>Loading...</p>;
-//   if (error) return <p>{error}</p>;
-
-//   return (
-//     <div>
-//       <h2>Price Rules</h2>
-//       <Button variant="success" onClick={handleAdd} style={{ marginBottom: '10px' }}>
-//         Add Price Rule
-//       </Button>
-//       <Table striped bordered hover>
-//         <thead>
-//           <tr>
-//             <th>ID</th>
-//             <th>Variation SKU</th>
-//             <th>Min Quantity (kg)</th>
-//             <th>Max Quantity (kg)</th>
-//             <th>Price per kg</th>
-//             <th>Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {priceRules.map((rule) => (
-//             <tr key={rule.id}>
-//               <td>{rule.id}</td>
-//               <td>{rule.ProductVariation.SKU}</td> {/* Displaying variation SKU instead of VariationID */}
-//               <td>{rule.min_quantity}</td>
-//               <td>{rule.max_quantity}</td>
-//               <td>{rule.price_per_kg}</td>
-//               <td>
-//                 <Button variant="primary" onClick={() => handleEdit(rule.id)}>Edit</Button>{' '}
-//                 <Button variant="danger" onClick={() => handleDelete(rule.id)}>Delete</Button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </Table>
-//     </div>
-//   );
-// };
-
-// export default PriceRuleList;
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Table, Button, Pagination, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce";
+import { Link } from "react-router-dom";
 
-const PriceRuleList = () => {
-  const [priceRules, setPriceRules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function PriceRuleList() {
+  const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(10); // Default items per page
-  const navigate = useNavigate();
+  const [limit] = useState(5);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch price rules (either all or filtered)
+  const fetchPriceRules = async (page, search = "") => {
+    try {
+      setLoading(true);
+      const endpoint = search
+        ? `http://localhost:3001/api/pricerule/search?sku=${search}&page=${page}&limit=${limit}`
+        : `http://localhost:3001/api/pricerule?page=${page}&limit=${limit}`;
+
+      const response = await axios.get(endpoint);
+      const priceRules = response.data.data || response.data;
+      const pages = response.data.totalPages || 1;
+
+      setData(priceRules);
+      setTotalPages(pages);
+      setError(null);
+    } catch (error) {
+      console.error("Error fetching price rules:", error);
+      setError("Failed to fetch price rules");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Debounced search
+  const debouncedSearch = useCallback(
+    debounce((value, page) => {
+      fetchPriceRules(page, value);
+    }, 300),
+    []
+  );
 
   useEffect(() => {
-    const fetchPriceRules = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3001/api/pricerule?page=${currentPage}&limit=${limit}`
-        );
-        setPriceRules(response.data.data);
-        setTotalPages(response.data.totalPages);
-      } catch (err) {
-        setError("Failed to fetch price rules");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (searchTerm.trim()) {
+      debouncedSearch(searchTerm, currentPage);
+    } else {
+      fetchPriceRules(currentPage);
+    }
+  }, [searchTerm, currentPage]);
 
-    fetchPriceRules();
-  }, [currentPage, limit]); // Refetch data when page or limit changes
-
-  const handleDelete = async (id) => {
+  const handleDelete = async (priceRuleId) => {
     if (window.confirm("Are you sure you want to delete this price rule?")) {
       try {
-        await axios.delete(`http://localhost:3001/api/pricerule/${id}`);
-        setPriceRules(priceRules.filter((rule) => rule.id !== id));
-      } catch (err) {
+        await axios.delete(`http://localhost:3001/api/pricerule/${priceRuleId}`);
+        fetchPriceRules(currentPage, searchTerm);
+      } catch (error) {
+        console.error("Error deleting price rule:", error);
         setError("Failed to delete price rule");
       }
     }
   };
 
-  const handleEdit = (id) => {
-    navigate(`/pricerule/edit/${id}`);
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
 
-  const handleAdd = () => {
-    navigate("/pricerule/add");
-  };
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', backgroundColor: '#1d2634' }}>
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleLimitChange = (e) => {
-    setLimit(parseInt(e.target.value));
-    setCurrentPage(1); // Reset to first page when limit changes
-  };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', backgroundColor: '#1d2634' }}>
+        <div className="text-white">{error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2>Price Rules</h2>
-      <Button
-        variant="success"
-        onClick={handleAdd}
-        style={{ marginBottom: "10px" }}
-      >
-        Add Price Rule
-      </Button>
+    <div
+      className="container-fluid min-vh-100 d-flex justify-content-center align-items-start py-4"
+      style={{ backgroundColor: "#1d2634" }}
+    >
+      <div className="col-12 col-md-10 col-lg-8 bg-white rounded p-4 shadow-sm">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3">
+          <h2 className="mb-0">Price Rules List</h2>
+          <input
+            type="text"
+            className="form-control w-100 w-md-50"
+            placeholder="Search by SKU..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // reset to page 1 on search
+            }}
+          />
+          <Link to="/pricerule/add" className="btn btn-success">
+            Add +
+          </Link>
+        </div>
 
-      {/* Dropdown to change items per page */}
-      <Form.Group controlId="itemsPerPage">
-        <Form.Label>Items per page:</Form.Label>
-        <Form.Control
-          as="select"
-          value={limit}
-          onChange={handleLimitChange}
-          style={{ width: "120px", marginBottom: "10px" }}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-        </Form.Control>
-      </Form.Group>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered">
+            <thead className="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Variation SKU</th>
+                <th>Min Quantity (kg)</th>
+                <th>Max Quantity (kg)</th>
+                <th>Price per kg</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.length > 0 ? (
+                data.map((rule) => (
+                  <tr key={rule.id}>
+                    <td>{rule.id}</td>
+                    <td>{rule.ProductVariation?.SKU || 'N/A'}</td>
+                    <td>{rule.min_quantity}</td>
+                    <td>{rule.max_quantity}</td>
+                    <td>${rule.price_per_kg}</td>
+                    <td>
+                      <Link
+                        to={`/pricerule/edit/${rule.id}`}
+                        className="btn btn-sm btn-primary me-2"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDelete(rule.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    No price rules found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Variation SKU</th>
-            <th>Min Quantity (kg)</th>
-            <th>Max Quantity (kg)</th>
-            <th>Price per kg</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {priceRules.map((rule) => (
-            <tr key={rule.id}>
-              <td>{rule.id}</td>
-              <td>{rule.ProductVariation?.SKU || "N/A"}</td>{" "}
-              {/* Handle potential null values */}
-              <td>{rule.min_quantity}</td>
-              <td>{rule.max_quantity}</td>
-              <td>{rule.price_per_kg}</td>
-              <td>
-                <Button variant="primary" onClick={() => handleEdit(rule.id)}>
-                  Edit
-                </Button>{" "}
-                <Button variant="danger" onClick={() => handleDelete(rule.id)}>
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      {/* Pagination Controls */}
-      <Pagination>
-        <Pagination.Prev
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        />
-        {[...Array(totalPages)].map((_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
+        {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <button
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          disabled={currentPage === totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-        />
-      </Pagination>
+            Previous
+          </button>
+          <span className="fw-bold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default PriceRuleList;
