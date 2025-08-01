@@ -39,4 +39,58 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET: Get All Reminders
+router.get('/all', async (req, res) => {
+    try {
+        const reminders = await Reminder.findAll({
+            order: [['Date', 'ASC'], ['createdAt', 'DESC']]
+        });
+        res.json({ reminders });
+    } catch (error) {
+        console.error('Error fetching all reminders:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+// PUT: Update Reminder
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { TaskDescription, Date } = req.body;
+
+    if (!TaskDescription || !Date) {
+        return res.status(400).json({ message: 'TaskDescription and Date are required.' });
+    }
+
+    try {
+        const reminder = await Reminder.findByPk(id);
+        if (!reminder) {
+            return res.status(404).json({ message: 'Reminder not found.' });
+        }
+
+        await reminder.update({ TaskDescription, Date });
+        res.json({ message: 'Reminder updated successfully', reminder });
+    } catch (error) {
+        console.error('Error updating reminder:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+// DELETE: Delete Reminder
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const reminder = await Reminder.findByPk(id);
+        if (!reminder) {
+            return res.status(404).json({ message: 'Reminder not found.' });
+        }
+
+        await reminder.destroy();
+        res.json({ message: 'Reminder deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting reminder:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
 module.exports = router;

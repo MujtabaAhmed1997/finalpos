@@ -61,6 +61,7 @@ import ProfitLossScreen from './components/ProfitLoss/profitlossreport'
 import AddHomeCustomerPayment from './components/Customerpayment/addcustomerpayment'
 import AddReminder from './pages/Reminder/AddReminder'
 import DisplayReminderComponent from './components/Reminder/DisplayReminderComponent'
+import ViewReminders from './components/Reminder/ViewReminders'
 import NotificationsPage from './components/NotificationBell'
 import ProductVariationList from './components/Variation/AllVariation'
 import AllVariation from './components/Variation/AllVariation'
@@ -175,6 +176,7 @@ function App() {
 
             <Route path='/reminder/add' element={<AddReminder />} />
             <Route path='/reminder/display' element={<DisplayReminderComponent />} />
+            <Route path='/reminder/view' element={<ViewReminders />} />
 
 
 

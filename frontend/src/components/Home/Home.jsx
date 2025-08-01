@@ -22,6 +22,7 @@ import {
   BsFillCalculatorFill
 } from "react-icons/bs";
 import DashboardCard from "./DashboardCard";
+import ReminderWidget from "../Reminder/ReminderWidget";
 import "./home.css";
 
 function Home() {
@@ -165,7 +166,7 @@ function Home() {
       icon: BsFillAlarmFill,
       buttons: [
         { label: "Add", url: "/reminder/add" },
-        { label: "View", url: "/reminder/add" }
+        { label: "View", url: "/reminder/view" }
       ]
     }
   ];
@@ -182,18 +183,24 @@ function Home() {
         <h3>DASHBOARD</h3>
       </div>
 
-      <div className="main-cards">
-        {dashboardCards.map((card, index) => (
-          <DashboardCard
-            key={index}
-            title={card.title}
-            icon={card.icon}
-            value={card.value}
-            buttons={card.buttons}
-            cardIndex={index + 1}
-            onClick={handleCardAction}
-          />
-        ))}
+      <div className="dashboard-layout">
+        <div className="main-cards">
+          {dashboardCards.map((card, index) => (
+            <DashboardCard
+              key={index}
+              title={card.title}
+              icon={card.icon}
+              value={card.value}
+              buttons={card.buttons}
+              cardIndex={index + 1}
+              onClick={handleCardAction}
+            />
+          ))}
+        </div>
+        
+        <div className="widgets-section">
+          <ReminderWidget />
+        </div>
       </div>
     </main>
   );

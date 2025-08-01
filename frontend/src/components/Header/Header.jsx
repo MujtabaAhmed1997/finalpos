@@ -85,16 +85,12 @@ function Header({ OpenSidebar }) {
   const checkTodayOverduePayments = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/customerpayment/overdue"
+        "http://localhost:3001/api/overdue"
       );
-      const today = new Date().toISOString().split("T")[0];
-
-      const todayOverdues = response.data.overduePayments.filter((payment) => {
-        const dueDate = new Date(payment.dueDate).toISOString().split("T")[0];
-        return dueDate === today;
-      });
-
-      setHasOverdue(todayOverdues.length > 0);
+      
+      // The overdue service returns customers whose latest payment is older than 5 days
+      // We'll show the notification if there are any overdue customers
+      setHasOverdue(response.data.length > 0);
     } catch (error) {
       console.error("Error checking today's overdue payments:", error);
     }
