@@ -63,6 +63,7 @@ import AddReminder from './pages/Reminder/AddReminder'
 import DisplayReminderComponent from './components/Reminder/DisplayReminderComponent'
 import NotificationsPage from './components/NotificationBell'
 import ProductVariationList from './components/Variation/AllVariation'
+import AllVariation from './components/Variation/AllVariation'
 //import Home from './pages/Home'
 
 
@@ -94,7 +95,9 @@ function App() {
             <Route path='customers/update/:id' element={<UpdateCustomer />}></Route>
 
             <Route path='/variations/:id' element={<Variations />} />
-            <Route path='/variations/all' element={<ProductVariationList />} />
+            {/* <Route path='/variations/all' element={<ProductVariationList />} /> */}
+            <Route path='/variations/all' element={<AllVariation />} />
+
 
             <Route path='/variations/add' element={<AddVariation />}></Route>
             <Route path='/variations/update/:id' element={<UpdateVariations />}></Route>

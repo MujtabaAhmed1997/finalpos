@@ -68,7 +68,11 @@ function Home() {
     {
       title: "Variations",
       icon: BsFillLayersFill,
-      value: stats.variations
+      value: stats.variations,
+      buttons: [
+        { label: "Add", url: "/variations/add" },
+        { label: "View", url: "/variations/all" }
+      ]
     },
     {
       title: "Create Bill",
