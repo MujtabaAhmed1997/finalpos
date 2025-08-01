@@ -1,48 +1,3 @@
-// import React from 'react';
-// import { BsFillBellFill, BsFillEnvelopeFill, BsPersonCircle, BsSearch, BsJustify } from 'react-icons/bs';
-// import { useNavigate } from 'react-router-dom';
-// import '../Header/Header.css';
-
-// function Header({ OpenSidebar }) {
-//   const navigate = useNavigate();
-
-//   const handleBellClick = () => {
-//     navigate('/customerpayment/overdue');
-//   };
-
-//   const handleEnvelopeClick = () => {
-//     alert('Messages clicked!');
-//   };
-
-//   const handlePersonClick = () => {
-//     alert('Profile clicked!');
-//   };
-
-//   return (
-//     <header className='header'>
-//       <div className='menu-icon'>
-//         <BsJustify className='icon' onClick={OpenSidebar} />
-//       </div>
-//       <div className='header-left'>
-//         <BsSearch className='icon' />
-//       </div>
-//       <div className='header-right'>
-//         <div className='icon-container' onClick={handleBellClick}>
-//           <BsFillBellFill className='icon' />
-//         </div>
-//         <div className='icon-container' onClick={handleEnvelopeClick}>
-//           <BsFillEnvelopeFill className='icon' />
-//         </div>
-//         <div className='icon-container' onClick={handlePersonClick}>
-//           <BsPersonCircle className='icon' />
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
-
-// export default Header;
-
 import React, { useEffect, useState } from "react";
 import {
   BsFillBellFill,
@@ -59,6 +14,7 @@ function Header({ OpenSidebar }) {
   const navigate = useNavigate();
   const [hasReminder, setHasReminder] = useState(false);
   const [hasOverdue, setHasOverdue] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Check today's reminders only
   const checkTodayReminders = async () => {
@@ -122,6 +78,11 @@ function Header({ OpenSidebar }) {
 
   const handleEnvelopeClick = () => alert("Messages clicked!");
   const handlePersonClick = () => alert("Profile clicked!");
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log("Searching for:", searchQuery);
+  };
 
   const shouldShowDot = hasReminder || hasOverdue;
 
@@ -130,32 +91,48 @@ function Header({ OpenSidebar }) {
       <div className="menu-icon">
         <BsJustify className="icon" onClick={OpenSidebar} />
       </div>
+      
       <div className="header-left">
-        <BsSearch className="icon" />
+        <form onSubmit={handleSearch} className="search-container">
+          <BsSearch className="icon" />
+          <input
+            type="text"
+            placeholder="Search products, customers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </form>
       </div>
+      
       <div className="header-right">
-        <div className="icon-container relative" onClick={handleBellClick}>
+        <div 
+          className="icon-container relative" 
+          onClick={handleBellClick}
+          data-tooltip="Notifications"
+        >
           <BsFillBellFill className="icon" />
           {shouldShowDot && (
-            <span
-              style={{
-                position: "absolute",
-                top: "-2px",
-                right: "-2px",
-                height: "10px",
-                width: "10px",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                border: "1px solid white",
-              }}
-            ></span>
+            <span className="notification-dot"></span>
           )}
         </div>
-        <div className="icon-container" onClick={handleEnvelopeClick}>
+        
+        <div 
+          className="icon-container" 
+          onClick={handleEnvelopeClick}
+          data-tooltip="Messages"
+        >
           <BsFillEnvelopeFill className="icon" />
         </div>
-        <div className="icon-container" onClick={handlePersonClick}>
+        
+        <div 
+          className="profile-section" 
+          onClick={handlePersonClick}
+        >
           <BsPersonCircle className="icon" />
+          <div className="profile-info">
+            <div className="profile-name">Admin User</div>
+            <div className="profile-role">Administrator</div>
+          </div>
         </div>
       </div>
     </header>

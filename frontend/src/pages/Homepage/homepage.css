@@ -1,20 +1,38 @@
-/* homepage.css */
+/* ===== MODERN HOMEPAGE LAYOUT ===== */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  --sidebar-width: 280px;
+  --header-height: 70px;
+  --primary-bg: #1d2634;
+  --text-color: #9e9ea4;
+  --font-family: "Montserrat", sans-serif;
+}
+
+/* ===== MAIN GRID CONTAINER ===== */
 .grid-container {
   display: grid;
-  grid-template-columns: 260px 1fr 1fr 1fr;
-  grid-template-rows: 0.2fr 3fr;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
   grid-template-areas:
-    "sidebar header header header"
-    "sidebar main main main";
+    "sidebar header"
+    "sidebar main";
   height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
+
+/* ===== BODY STYLES ===== */
 body {
   margin: 0 !important;
   padding: 0;
-  background-color: #1d2634 !important;
-  color: #9e9ea4 !important;
-  font-family: "Montserrat", sans-serif !important;
+  background-color: var(--primary-bg) !important;
+  color: var(--text-color) !important;
+  font-family: var(--font-family) !important;
+  overflow-x: hidden;
 }
+
+/* ===== BUTTON CONTAINER ===== */
 .button-container {
   display: flex;
   gap: 10px;
@@ -37,22 +55,182 @@ body {
   background-color: lightgray;
 }
 
-/* Responsive Breakpoints */
+/* ===== RESPONSIVE BREAKPOINTS ===== */
 
-/* Medium <= 992px */
-@media screen and (max-width: 992px) {
+/* Large Desktop (1400px and up) */
+@media screen and (min-width: 1400px) {
+  .grid-container {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media screen and (max-width: 1399px) and (min-width: 1200px) {
+  .grid-container {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+/* Tablet Landscape (992px - 1199px) */
+@media screen and (max-width: 1199px) and (min-width: 992px) {
+  .grid-container {
+    grid-template-columns: 260px 1fr;
+  }
+}
+
+/* Tablet Portrait (768px - 991px) */
+@media screen and (max-width: 991px) and (min-width: 768px) {
   .grid-container {
     grid-template-columns: 1fr;
-    grid-template-rows: 0.2fr 3fr;
+    grid-template-rows: var(--header-height) 1fr;
     grid-template-areas:
       "header"
       "main";
   }
-}
-
-/* Extra Small <= 576px */
-@media screen and (max-width: 576px) {
-  .hedaer-left {
+  
+  /* Hide sidebar on tablet when not responsive */
+  #sidebar:not(.sidebar-responsive) {
     display: none;
   }
+}
+
+/* Mobile Large (576px - 767px) */
+@media screen and (max-width: 767px) and (min-width: 576px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+  
+  /* Hide sidebar on mobile when not responsive */
+  #sidebar:not(.sidebar-responsive) {
+    display: none;
+  }
+  
+  /* Adjust header height for mobile */
+  .header {
+    height: 60px !important;
+  }
+}
+
+/* Mobile Small (below 576px) */
+@media screen and (max-width: 575px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+  
+  /* Hide sidebar on small mobile when not responsive */
+  #sidebar:not(.sidebar-responsive) {
+    display: none;
+  }
+  
+  /* Adjust header height for small mobile */
+  .header {
+    height: 60px !important;
+  }
+  
+  /* Hide header left section on very small screens */
+  .header-left {
+    display: none;
+  }
+}
+
+/* ===== SIDEBAR RESPONSIVE OVERLAY ===== */
+@media screen and (max-width: 991px) {
+  /* When sidebar is responsive (mobile menu open) */
+  .sidebar-responsive {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: 280px !important;
+    z-index: 1000 !important;
+    grid-area: unset !important;
+  }
+  
+  /* Add overlay when sidebar is open */
+  .sidebar-responsive::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 280px;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+main {
+  grid-area: main;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--primary-bg);
+  position: relative;
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+@media (prefers-reduced-motion: reduce) {
+  .grid-container,
+  .card-button {
+    transition: none;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+  
+  #sidebar {
+    display: none;
+  }
+  
+  .header {
+    height: auto !important;
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-bg: #0f1419;
+    --text-color: #e1e5e9;
+  }
+}
+
+/* ===== FOCUS MANAGEMENT ===== */
+.grid-container:focus-within {
+  outline: none;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+main::-webkit-scrollbar {
+  width: 8px;
+}
+
+main::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
