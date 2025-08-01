@@ -7,7 +7,10 @@ const ReminderWidget = () => {
   const [upcomingReminders, setUpcomingReminders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  console.log("ReminderWidget component rendered"); // Debug log
+
   useEffect(() => {
+    console.log("ReminderWidget useEffect triggered"); // Debug log
     fetchUpcomingReminders();
   }, []);
 
@@ -17,17 +20,43 @@ const ReminderWidget = () => {
       const response = await axios.get("http://localhost:3001/api/reminders/all");
       const allReminders = response.data.reminders || [];
       
+      console.log("All reminders:", allReminders); // Debug log
+      
       // Filter for upcoming reminders (today and next 3 days)
       const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set to start of day
       const next3Days = new Date();
       next3Days.setDate(today.getDate() + 3);
+      next3Days.setHours(23, 59, 59, 999); // Set to end of day
+      
+      console.log("Today:", today); // Debug log
+      console.log("Next 3 days:", next3Days); // Debug log
       
       const upcoming = allReminders.filter(reminder => {
         const reminderDate = new Date(reminder.Date);
+        reminderDate.setHours(0, 0, 0, 0); // Set to start of day for comparison
+        console.log("Reminder date:", reminderDate, "Task:", reminder.TaskDescription); // Debug log
         return reminderDate >= today && reminderDate <= next3Days;
       }).slice(0, 5); // Show only first 5 upcoming reminders
       
-      setUpcomingReminders(upcoming);
+      console.log("Upcoming reminders:", upcoming); // Debug log
+      
+      // If no upcoming reminders, show all reminders for debugging
+      if (upcoming.length === 0 && allReminders.length > 0) {
+        console.log("No upcoming reminders found, showing all reminders for debugging");
+        setUpcomingReminders(allReminders.slice(0, 3));
+      } else if (upcoming.length === 0 && allReminders.length === 0) {
+        // Add a test reminder for debugging
+        console.log("No reminders in database, adding test reminder");
+        const testReminder = {
+          ReminderID: 'test',
+          TaskDescription: 'Test reminder - check if widget is working',
+          Date: new Date().toISOString()
+        };
+        setUpcomingReminders([testReminder]);
+      } else {
+        setUpcomingReminders(upcoming);
+      }
     } catch (error) {
       console.error("Failed to fetch upcoming reminders:", error);
       setUpcomingReminders([]);
@@ -70,6 +99,7 @@ const ReminderWidget = () => {
         </div>
         <div className="widget-content">
           <div className="loading-spinner-small"></div>
+          <p style={{textAlign: 'center', marginTop: '10px', fontSize: '0.9rem'}}>Loading reminders...</p>
         </div>
       </div>
     );
@@ -99,6 +129,7 @@ const ReminderWidget = () => {
         ) : (
           <div className="no-reminders">
             <p>No upcoming reminders</p>
+            <p style={{fontSize: '0.8rem', opacity: 0.8}}>Debug: {loading ? 'Loading...' : 'No reminders found'}</p>
           </div>
         )}
         

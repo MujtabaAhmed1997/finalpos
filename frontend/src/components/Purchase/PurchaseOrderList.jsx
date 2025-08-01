@@ -483,10 +483,11 @@ function PurchaseOrderlist() {
   const fetchSuppliers = () => {
     axios.get('http://localhost:3001/api/suppliers')
       .then(res => {
-        setSuppliers(res.data);
+        setSuppliers(res.data.suppliers || []);
       })
       .catch(err => {
         console.log(err);
+        setSuppliers([]);
       });
   };
 
@@ -533,7 +534,7 @@ function PurchaseOrderlist() {
               onChange={handleSupplierChange}
             >
               <option value=''>Select Supplier</option>
-              {suppliers.map(supplier => (
+              {Array.isArray(suppliers) && suppliers.map(supplier => (
                 <option key={supplier.SupplierID} value={supplier.SupplierID}>
                   {supplier.SupplierName}
                 </option>
