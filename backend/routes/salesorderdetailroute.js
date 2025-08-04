@@ -136,7 +136,7 @@ router.get('/salesOrder/:id/details', async (req, res) => {
         },
         {
           model: ProductVariation,
-          attributes: ['Size', 'UnitsPerPackage'] // Adjust the attributes according to your ProductVariation model
+          attributes: ['Size', 'UnitsPerPackage', 'SKU', 'Color', 'SellingPrice', 'Barcode'] // Include more variation details
         }
       ]
     });
