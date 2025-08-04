@@ -391,16 +391,23 @@ function CustomerLeisureShow() {
     axios
       .get("http://localhost:3001/api/customers")
       .then((res) => {
-        setCustomers(res.data || []);
-        setFilteredCustomers(res.data || []);
+        const customersData = res.data?.data || [];
+        setCustomers(customersData);
+        setFilteredCustomers(customersData);
       })
       .catch((err) => {
         console.error("Failed to fetch customers:", err);
+        setCustomers([]);
+        setFilteredCustomers([]);
       });
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+    if (!Array.isArray(customers)) {
+      setFilteredCustomers([]);
+      return;
+    }
     const filtered = customers.filter((customer) =>
       customer.CustomerName.toLowerCase().includes(e.target.value.toLowerCase())
     );
@@ -409,6 +416,11 @@ function CustomerLeisureShow() {
 
   const handleCustomerSelect = (customerId) => {
     setSelectedCustomer(customerId);
+    if (!Array.isArray(customers)) {
+      setSearchTerm("");
+      setDropdownVisible(false);
+      return;
+    }
     const selectedCustomerObj = customers.find(
       (customer) => customer.CustomerID === parseInt(customerId)
     );
