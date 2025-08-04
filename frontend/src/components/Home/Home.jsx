@@ -137,14 +137,14 @@ function Home() {
         { label: "Stock", url: "/stocks" }
       ]
     },
-    {
-      title: "Product Management",
-      icon: BsFillArchiveFill,
-      buttons: [
-        { label: "Product List", url: "/products" },
-        { label: "Add Product", url: "/products/add" }
-      ]
-    },
+    // {
+    //   title: "Product Management",
+    //   icon: BsFillArchiveFill,
+    //   buttons: [
+    //     { label: "Product List", url: "/products" },
+    //     { label: "Add Product", url: "/products/add" }
+    //   ]
+    // },
     {
       title: "Pricing Rules",
       icon: BsFillTagFill,
