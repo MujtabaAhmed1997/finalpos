@@ -4,6 +4,7 @@ import axios from "axios";
 import CreatableSelect from "react-select/creatable";
 import { validateSalesOrder } from "../../controllers/salesvalidator";
 import { FaShoppingCart, FaUser, FaCalendar, FaPlusCircle } from "react-icons/fa";
+import "./Salesorder.css";
 
 function SalesOrderForm() {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -19,6 +20,8 @@ function SalesOrderForm() {
 
   const [customers, setCustomers] = useState([]);
   const [errors, setErrors] = useState({});
+  const [customerErrors, setCustomerErrors] = useState({});
+  const [customerSuccess, setCustomerSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
     CustomerName: "",
@@ -99,6 +102,14 @@ function SalesOrderForm() {
       ...prev,
       [name]: value,
     }));
+    
+    // Clear error for this field when user starts typing
+    if (customerErrors[name]) {
+      setCustomerErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
   };
 
   useEffect(() => {
@@ -108,7 +119,26 @@ function SalesOrderForm() {
   }, [values, isSubmitting]);
 
   const handleCreateCustomer = () => {
+    console.log('Creating customer with data:', newCustomer);
+    
+    // Client-side validation
+    const validationErrors = {};
+    if (!newCustomer.CustomerName || newCustomer.CustomerName.trim() === '') {
+      validationErrors.CustomerName = 'Customer name is required';
+    }
+    if (!newCustomer.Phone || newCustomer.Phone.trim() === '') {
+      validationErrors.Phone = 'Phone number is required';
+    }
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setCustomerErrors(validationErrors);
+      return;
+    }
+    
     setIsCreatingCustomer(true);
+    setCustomerErrors({}); // Clear previous errors
+    setCustomerSuccess(""); // Clear previous success message
+    
     axios
       .post("http://localhost:3001/api/customers", newCustomer)
       .then((res) => {
@@ -126,15 +156,36 @@ function SalesOrderForm() {
         }));
         setIsNewCustomer(false);
         setIsCreatingCustomer(false);
+        setCustomerErrors({}); // Clear errors on success
+        setCustomerSuccess(`Customer "${newCustomerData.CustomerName}" created successfully!`);
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setCustomerSuccess("");
+        }, 3000);
       })
       .catch((err) => {
         console.error("Error creating new customer:", err);
+        if (err.response && err.response.data) {
+          console.error("Error response:", err.response.data);
+          if (err.response.data.errors) {
+            // Set validation errors
+            setCustomerErrors(err.response.data.errors);
+          } else {
+            // Set general error message
+            setCustomerErrors({ general: err.response.data.message || 'Unknown error occurred' });
+          }
+        } else {
+          setCustomerErrors({ general: 'Network error. Please check your connection.' });
+        }
         setIsCreatingCustomer(false);
       });
   };
 
   const handleCancelCreateCustomer = () => {
     setIsNewCustomer(false);
+    setCustomerErrors({}); // Clear errors when canceling
+    setCustomerSuccess(""); // Clear success message when canceling
     setNewCustomer({
       CustomerName: "",
       Address: "",
@@ -287,80 +338,116 @@ function SalesOrderForm() {
              )}
            </div>
 
-                     {isNewCustomer && (
-             <div 
-               className="mb-4 p-3 rounded-3"
-               style={{
-                 background: "#f8f9fa",
-                 border: "1px solid #e9ecef",
-               }}
-             >
-               <div className="d-flex align-items-center mb-3">
-                 <FaPlusCircle size={windowWidth < 768 ? 16 : 20} color="#263043" className="me-2" />
-                 <h6 className="mb-0 fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
-                   New Customer Details
-                 </h6>
-               </div>
+                                           {isNewCustomer && (
+              <div 
+                className="mb-4 p-3 rounded-3"
+                style={{
+                  background: "#f8f9fa",
+                  border: "1px solid #e9ecef",
+                }}
+              >
+                {/* General Error Display */}
+                {customerErrors.general && (
+                  <div className="alert alert-danger mb-3" role="alert">
+                    <i className="fas fa-exclamation-triangle me-2"></i>
+                    {customerErrors.general}
+                  </div>
+                )}
+                
+                {/* Success Message Display */}
+                {customerSuccess && (
+                  <div className="alert alert-success mb-3" role="alert">
+                    <i className="fas fa-check-circle me-2"></i>
+                    {customerSuccess}
+                  </div>
+                )}
+                               <div className="d-flex align-items-center mb-3">
+                  <FaPlusCircle size={windowWidth < 768 ? 16 : 20} color="#263043" className="me-2" />
+                  <h6 className="mb-0 fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
+                    New Customer Details
+                  </h6>
+                </div>
+                
+                <div className="mb-3">
+                  <small className="text-muted">
+                    <i className="fas fa-info-circle me-1"></i>
+                    Fields marked with <span className="text-danger">*</span> are required
+                  </small>
+                </div>
 
                <div className="row">
                  <div className="col-12 col-md-6 mb-3">
-                   <label htmlFor="CustomerName" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
-                     Customer Name
-                   </label>
-                   <input
-                     type="text"
-                     name="CustomerName"
-                     className="form-control rounded-3"
-                     value={newCustomer.CustomerName}
-                     onChange={handleNewCustomerInput}
-                     placeholder="Enter customer name"
-                     style={{
-                       background: "#f8f9fa",
-                       border: "1px solid #dee2e6",
-                       transition: "all 0.2s",
-                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                       fontSize: windowWidth < 768 ? "14px" : "16px",
-                       padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                     }}
-                     onFocus={e => {
-                       e.target.style.borderColor = "#263043";
-                       e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                     }}
-                     onBlur={e => {
-                       e.target.style.borderColor = "#dee2e6";
-                       e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                     }}
-                   />
+                                       <label htmlFor="CustomerName" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
+                      Customer Name <span className="text-danger">*</span>
+                    </label>
+                                       <input
+                      type="text"
+                      name="CustomerName"
+                      className={`form-control rounded-3 ${customerErrors.CustomerName ? 'is-invalid' : ''}`}
+                      value={newCustomer.CustomerName}
+                      onChange={handleNewCustomerInput}
+                      placeholder="Enter customer name (required)"
+                      required
+                      style={{
+                        background: "#f8f9fa",
+                        border: customerErrors.CustomerName ? "1px solid #dc3545" : "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = customerErrors.CustomerName ? "#dc3545" : "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = customerErrors.CustomerName ? "#dc3545" : "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                    {customerErrors.CustomerName && (
+                      <div className="invalid-feedback d-block">
+                        <i className="fas fa-exclamation-circle me-1"></i>
+                        {customerErrors.CustomerName}
+                      </div>
+                    )}
                  </div>
 
                  <div className="col-12 col-md-6 mb-3">
-                   <label htmlFor="Phone" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
-                     Phone
-                   </label>
-                   <input
-                     type="text"
-                     name="Phone"
-                     className="form-control rounded-3"
-                     value={newCustomer.Phone}
-                     onChange={handleNewCustomerInput}
-                     placeholder="Enter phone number"
-                     style={{
-                       background: "#f8f9fa",
-                       border: "1px solid #dee2e6",
-                       transition: "all 0.2s",
-                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                       fontSize: windowWidth < 768 ? "14px" : "16px",
-                       padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                     }}
-                     onFocus={e => {
-                       e.target.style.borderColor = "#263043";
-                       e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                     }}
-                     onBlur={e => {
-                       e.target.style.borderColor = "#dee2e6";
-                       e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                     }}
-                   />
+                                       <label htmlFor="Phone" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
+                      Phone <span className="text-danger">*</span>
+                    </label>
+                                       <input
+                      type="text"
+                      name="Phone"
+                      className={`form-control rounded-3 ${customerErrors.Phone ? 'is-invalid' : ''}`}
+                      value={newCustomer.Phone}
+                      onChange={handleNewCustomerInput}
+                      placeholder="Enter phone number (required)"
+                      required
+                      style={{
+                        background: "#f8f9fa",
+                        border: customerErrors.Phone ? "1px solid #dc3545" : "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = customerErrors.Phone ? "#dc3545" : "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = customerErrors.Phone ? "#dc3545" : "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                    {customerErrors.Phone && (
+                      <div className="invalid-feedback d-block">
+                        <i className="fas fa-exclamation-circle me-1"></i>
+                        {customerErrors.Phone}
+                      </div>
+                    )}
                  </div>
                </div>
 
@@ -368,30 +455,36 @@ function SalesOrderForm() {
                  <label htmlFor="Address" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
                    Address
                  </label>
-                 <input
-                   type="text"
-                   name="Address"
-                   className="form-control rounded-3"
-                   value={newCustomer.Address}
-                   onChange={handleNewCustomerInput}
-                   placeholder="Enter address"
-                   style={{
-                     background: "#f8f9fa",
-                     border: "1px solid #dee2e6",
-                     transition: "all 0.2s",
-                     boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                     fontSize: windowWidth < 768 ? "14px" : "16px",
-                     padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                   }}
-                   onFocus={e => {
-                     e.target.style.borderColor = "#263043";
-                     e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                   }}
-                   onBlur={e => {
-                     e.target.style.borderColor = "#dee2e6";
-                     e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                   }}
-                 />
+                                   <input
+                    type="text"
+                    name="Address"
+                    className={`form-control rounded-3 ${customerErrors.Address ? 'is-invalid' : ''}`}
+                    value={newCustomer.Address}
+                    onChange={handleNewCustomerInput}
+                    placeholder="Enter address"
+                    style={{
+                      background: "#f8f9fa",
+                      border: customerErrors.Address ? "1px solid #dc3545" : "1px solid #dee2e6",
+                      transition: "all 0.2s",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                      fontSize: windowWidth < 768 ? "14px" : "16px",
+                      padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = customerErrors.Address ? "#dc3545" : "#263043";
+                      e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = customerErrors.Address ? "#dc3545" : "#dee2e6";
+                      e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                    }}
+                  />
+                  {customerErrors.Address && (
+                    <div className="invalid-feedback d-block">
+                      <i className="fas fa-exclamation-circle me-1"></i>
+                      {customerErrors.Address}
+                    </div>
+                  )}
                </div>
 
                <div className="row">
@@ -399,61 +492,73 @@ function SalesOrderForm() {
                    <label htmlFor="Email" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
                      Email
                    </label>
-                   <input
-                     type="email"
-                     name="Email"
-                     className="form-control rounded-3"
-                     value={newCustomer.Email}
-                     onChange={handleNewCustomerInput}
-                     placeholder="Enter email address"
-                     style={{
-                       background: "#f8f9fa",
-                       border: "1px solid #dee2e6",
-                       transition: "all 0.2s",
-                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                       fontSize: windowWidth < 768 ? "14px" : "16px",
-                       padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                     }}
-                     onFocus={e => {
-                       e.target.style.borderColor = "#263043";
-                       e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                     }}
-                     onBlur={e => {
-                       e.target.style.borderColor = "#dee2e6";
-                       e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                     }}
-                   />
+                                       <input
+                      type="email"
+                      name="Email"
+                      className={`form-control rounded-3 ${customerErrors.Email ? 'is-invalid' : ''}`}
+                      value={newCustomer.Email}
+                      onChange={handleNewCustomerInput}
+                      placeholder="Enter email address"
+                      style={{
+                        background: "#f8f9fa",
+                        border: customerErrors.Email ? "1px solid #dc3545" : "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = customerErrors.Email ? "#dc3545" : "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = customerErrors.Email ? "#dc3545" : "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                    {customerErrors.Email && (
+                      <div className="invalid-feedback d-block">
+                        <i className="fas fa-exclamation-circle me-1"></i>
+                        {customerErrors.Email}
+                      </div>
+                    )}
                  </div>
 
                  <div className="col-12 col-md-6 mb-3">
                    <label htmlFor="AvailableBalance" className="form-label fw-semibold" style={{ color: "#263043", fontSize: windowWidth < 768 ? "0.875rem" : "1rem" }}>
                      Available Balance
                    </label>
-                   <input
-                     type="number"
-                     step="0.01"
-                     name="AvailableBalance"
-                     className="form-control rounded-3"
-                     value={newCustomer.AvailableBalance}
-                     onChange={handleNewCustomerInput}
-                     placeholder="0.00"
-                     style={{
-                       background: "#f8f9fa",
-                       border: "1px solid #dee2e6",
-                       transition: "all 0.2s",
-                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                       fontSize: windowWidth < 768 ? "14px" : "16px",
-                       padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                     }}
-                     onFocus={e => {
-                       e.target.style.borderColor = "#263043";
-                       e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                     }}
-                     onBlur={e => {
-                       e.target.style.borderColor = "#dee2e6";
-                       e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                     }}
-                   />
+                                       <input
+                      type="number"
+                      step="0.01"
+                      name="AvailableBalance"
+                      className={`form-control rounded-3 ${customerErrors.AvailableBalance ? 'is-invalid' : ''}`}
+                      value={newCustomer.AvailableBalance}
+                      onChange={handleNewCustomerInput}
+                      placeholder="0.00"
+                      style={{
+                        background: "#f8f9fa",
+                        border: customerErrors.AvailableBalance ? "1px solid #dc3545" : "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = customerErrors.AvailableBalance ? "#dc3545" : "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = customerErrors.AvailableBalance ? "#dc3545" : "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                    {customerErrors.AvailableBalance && (
+                      <div className="invalid-feedback d-block">
+                        <i className="fas fa-exclamation-circle me-1"></i>
+                        {customerErrors.AvailableBalance}
+                      </div>
+                    )}
                  </div>
                </div>
 
@@ -488,9 +593,16 @@ function SalesOrderForm() {
                        e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
                      }
                    }}
-                 >
-                   {isCreatingCustomer ? "Creating..." : "Create Customer"}
-                 </button>
+                                   >
+                    {isCreatingCustomer ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Creating...
+                      </>
+                    ) : (
+                      "Create Customer"
+                    )}
+                  </button>
                  <button
                    type="button"
                    className="btn rounded-3 fw-bold"

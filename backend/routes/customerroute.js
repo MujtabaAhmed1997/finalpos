@@ -64,6 +64,7 @@ const { Op } = require('sequelize');
 
 
 router.post('/', async (req, res) => {
+    console.log('Received customer creation request:', req.body);
     const { CustomerName, Address, Phone, Email, AvailableBalance } = req.body;
 
     // === Basic validation ===
@@ -71,18 +72,38 @@ router.post('/', async (req, res) => {
 
     if (!CustomerName || CustomerName.trim() === '') {
         errors.CustomerName = 'Customer name is required';
+    } else if (CustomerName.trim().length > 255) {
+        errors.CustomerName = 'Customer name must be less than 255 characters';
     }
 
-    if (Phone && !/^\d{10,15}$/.test(Phone)) {
+    // Phone is mandatory
+    if (!Phone || Phone.trim() === '') {
+        errors.Phone = 'Phone number is required';
+    } else if (!/^\d{10,15}$/.test(Phone.trim())) {
         errors.Phone = 'Phone must be a valid number with 10 to 15 digits';
+    } else if (Phone.trim().length > 255) {
+        errors.Phone = 'Phone number must be less than 255 characters';
     }
 
-    if (Email && Email.trim() !== '' && !/^\S+@\S+\.\S+$/.test(Email)) {
-        errors.Email = 'Email must be valid';
+    if (Email && Email.trim() !== '') {
+        if (!/^\S+@\S+\.\S+$/.test(Email)) {
+            errors.Email = 'Email must be valid';
+        } else if (Email.trim().length > 255) {
+            errors.Email = 'Email must be less than 255 characters';
+        }
     }
 
-    if (AvailableBalance !== undefined && AvailableBalance !== null && isNaN(AvailableBalance)) {
-        errors.AvailableBalance = 'Available balance must be a number';
+    if (Address && Address.trim() !== '' && Address.trim().length > 255) {
+        errors.Address = 'Address must be less than 255 characters';
+    }
+
+    // Convert AvailableBalance to number if it's a string
+    let availableBalanceValue = AvailableBalance;
+    if (AvailableBalance !== undefined && AvailableBalance !== null) {
+        availableBalanceValue = parseFloat(AvailableBalance);
+        if (isNaN(availableBalanceValue)) {
+            errors.AvailableBalance = 'Available balance must be a valid number';
+        }
     }
 
     if (Object.keys(errors).length > 0) {
@@ -91,23 +112,31 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const alreadyCustomer = await Customer.findOne({ where: { CustomerName } });
+        const alreadyCustomer = await Customer.findOne({ 
+            where: { 
+                CustomerName: CustomerName.trim(),
+                softDelete: false 
+            } 
+        });
         if (alreadyCustomer) {
             return res.status(400).json({ message: 'Customer with same name already exists' });
         }
 
         const newCustomer = await Customer.create({
-            CustomerName,
-            Address,
-            Phone,
-            Email: Email?.trim() || null,  // Store null if empty or undefined
-            AvailableBalance,
+            CustomerName: CustomerName.trim(),
+            Address: Address?.trim() || null,
+            Phone: Phone?.trim() || null,
+            Email: Email?.trim() || null,
+            AvailableBalance: availableBalanceValue || 0.0,
         });
 
         res.status(201).json(newCustomer);
     } catch (error) {
         console.error('Database error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ 
+            message: 'Internal server error', 
+            error: error.message 
+        });
     }
 });
 

@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { SalesOrderDetailvalidator } from "../../controllers/Sorderdeatil"; // Adjust the import path as needed
+import { SalesOrderDetailvalidator } from "../../controllers/Sorderdeatil";
 import conversionService from "../../service/Conversionservice";
+import "./Salesorderdetail.css";
 
 const { sellQuantity } = conversionService;
 
 function AddSalesOrderDetail() {
-  const { id: SalesOrderID } = useParams(); // Get SalesOrderID from URL
+  const { id: SalesOrderID } = useParams();
   const [entries, setEntries] = useState([
     {
-      SalesOrderID: SalesOrderID || "", // Pre-fill SalesOrderID
+      SalesOrderID: SalesOrderID || "",
       ProductID: "",
       VariationID: "",
-      Barcode: "", // Add Barcode field
+      Barcode: "",
       Quantity: "",
-      LooseQuantity: "", // Add LooseQuantity
+      LooseQuantity: "",
       UnitPrice: 0,
       LooseQuantityPrice: 0,
       Discount: 0,
-      UnitPerPackage: 1, // Add UnitPerPackaging with default value 1
+      UnitPerPackage: 1,
       LooseStock: 0,
-      ContainerStock: 0, // Add ContainerStock field
+      ContainerStock: 0,
       UnitType: "",
     },
   ]);
@@ -148,101 +149,6 @@ function AddSalesOrderDetail() {
     setEntries(entries.filter((_, i) => i !== index));
   };
 
-  // const calculateTotal = async (
-  //   quantity,
-  //   unitPrice,
-  //   discount,
-  //   looseQuantity,
-  //   unitPerPackage,
-  //   unitType,
-  //   variationID
-  // ) => {
-  //   const discountedPrice = unitPrice - discount;
-
-  //   if (unitType === "Container") {
-  //     const singlePiecePrice = discountedPrice / unitPerPackage;
-  //     const looseQuantityPrice = looseQuantity * singlePiecePrice;
-
-  //     return {
-  //       total: quantity * discountedPrice + looseQuantityPrice,
-  //       looseQuantityPrice: singlePiecePrice,
-  //     };
-  //   } else if (unitType === "Sack") {
-  //     try {
-  //       const response = await axios.get(
-  //         "http://localhost:3001/api/pricerule/rate",
-  //         {
-  //           params: {
-  //             variationID: variationID,
-  //             looseQuantity: looseQuantity,
-  //           },
-  //         }
-  //       );
-
-  //       const looseQuantityP = response.data.looseQuantityPrice;
-  //       const looseQuantityPrice = response.data.price;
-  //       return {
-  //         total: quantity * discountedPrice + looseQuantityP,
-  //         looseQuantityPrice: looseQuantityPrice,
-  //       };
-  //     } catch (error) {
-  //       console.error("Error fetching price for Sack:", error);
-
-  //       // Return a default value in case of an error
-  //       return {
-  //         total: quantity * discountedPrice,
-  //         looseQuantityPrice: 0,
-  //       };
-  //     }
-  //   }
-
-  //   // Return default value for unsupported unitType
-  //   return {
-  //     total: quantity * discountedPrice,
-  //     looseQuantityPrice: 0,
-  //   };
-  // };
-
-  // const calculateSumOfAllEntries = async () => {
-  //   let sum = 0;
-
-  //   for (let entry of entries) {
-  //     const {
-  //       Quantity,
-  //       UnitPrice,
-  //       Discount,
-  //       LooseQuantity,
-  //       UnitPerPackage,
-  //       UnitType,
-  //       VariationID,
-  //     } = entry;
-
-  //     // Safely handle the result from calculateTotal
-  //     const result = await calculateTotal(
-  //       Quantity,
-  //       UnitPrice,
-  //       Discount,
-  //       LooseQuantity,
-  //       UnitPerPackage,
-  //       UnitType,
-  //       VariationID
-  //     );
-
-  //     if (result && typeof result.total === "number") {
-  //       // Update entry with looseQuantityPrice
-  //       entry.LooseQuantityPrice = result.looseQuantityPrice;
-
-  //       // Accumulate the total
-  //       sum += result.total;
-  //     } else {
-  //       console.error("Invalid result from calculateTotal:", result);
-  //     }
-  //   }
-
-  //   // Update the total sum in the state
-  //   setTotal(sum);
-  // };
-
   const calculateTotal = async (
     quantity,
     unitPrice,
@@ -286,7 +192,6 @@ function AddSalesOrderDetail() {
       } catch (error) {
         console.error("Error fetching price for Sack:", error);
 
-        // Return a default value in case of an error
         return {
           total: quantity * discountedPrice,
           looseQuantityPrice: 0,
@@ -294,7 +199,6 @@ function AddSalesOrderDetail() {
       }
     }
 
-    // Return default value for unsupported unitType
     return {
       total: quantity * discountedPrice,
       looseQuantityPrice: 0,
@@ -315,7 +219,6 @@ function AddSalesOrderDetail() {
         VariationID,
       } = entry;
 
-      // Safely handle the result from calculateTotal
       const result = await calculateTotal(
         Quantity,
         UnitPrice,
@@ -327,17 +230,13 @@ function AddSalesOrderDetail() {
       );
 
       if (result && typeof result.total === "number") {
-        // Update entry with looseQuantityPrice
         entry.LooseQuantityPrice = result.looseQuantityPrice;
-
-        // Accumulate the total
         sum += result.total;
       } else {
         console.error("Invalid result from calculateTotal:", result);
       }
     }
 
-    // Update the total sum in the state
     setTotal(sum);
   };
 
@@ -345,196 +244,64 @@ function AddSalesOrderDetail() {
     calculateSumOfAllEntries();
   }, [entries]);
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-  //   const validationErrors = entries.map((entry) =>
-  //     SalesOrderDetailvalidator(entry)
-  //   );
-  //   const stockErrors = entries.map((entry) => {
-  //     if (entry.Quantity > entry.StockAvailable) {
-  //       return { Quantity: "Not enough stock available" };
-  //     }
-  //     return {};
-  //   });
+  const getStockStatus = (stock) => {
+    if (stock > 10) return "available";
+    if (stock > 0) return "low";
+    return "out";
+  };
 
-  //   const combinedErrors = validationErrors.map((error, index) => ({
-  //     ...error,
-  //     ...stockErrors[index],
-  //   }));
-  //   const hasErrors = combinedErrors.some(
-  //     (error) => Object.keys(error).length > 0
-  //   );
-  //   setErrors(combinedErrors);
+  const getStockText = (stock) => {
+    if (stock > 10) return "In Stock";
+    if (stock > 0) return "Low Stock";
+    return "Out of Stock";
+  };
 
-  //   if (!hasErrors) {
-  //     setIsSubmitting(true);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2
+    }).format(amount);
+  };
 
-  //     try {
-  //       const salesOrderDetailsResponse = await axios.post(
-  //         "http://localhost:3001/api/salesordersdetails",
-  //         { entries }
-  //       );
-  //       console.log("Sales Order Details Response:", salesOrderDetailsResponse);
+  const validateEntry = (entry) => {
+    const errors = {};
+    
+    if (!entry.ProductID) {
+      errors.ProductID = "Product is required";
+    }
+    
+    if (!entry.VariationID) {
+      errors.VariationID = "Variation is required";
+    }
+    
+    if (!entry.Quantity && !entry.LooseQuantity) {
+      errors.Quantity = "At least one quantity is required";
+    }
+    
+    if (entry.Quantity && entry.Quantity > entry.ContainerStock) {
+      errors.Quantity = `Only ${entry.ContainerStock} containers available`;
+    }
+    
+    if (entry.LooseQuantity && entry.LooseQuantity > entry.LooseStock) {
+      errors.LooseQuantity = `Only ${entry.LooseStock} loose items available`;
+    }
+    
+    return errors;
+  };
 
-  //       // Ensure that the response includes IDs
-  //       const savedEntries = salesOrderDetailsResponse.data;
-
-  //       // // Step 2: Perform stock transactions and collect responses
-  //       // const stockTransactionResponses = await Promise.all(
-  //       //   entries.map(async (entry) => {
-  //       //     const looseQuantity = entry.LooseQuantity || 0;
-  //       //     const containerQuantity = entry.Quantity || 0;
-  //       //     const unitType = entry.UnitType || "L";
-
-  //       //     // Call sellQuantity and return the response for this entry
-  //       //     const response = await sellQuantity(
-  //       //       entry.VariationID,
-  //       //       containerQuantity,
-  //       //       looseQuantity,
-  //       //       unitType
-  //       //     );
-
-  //       //     return {
-  //       //       ...response, // Include BatchID from the response
-  //       //       EntryID: entry.EntryID, // Track the corresponding entry for later use
-  //       //     };
-  //       //   })
-  //       // );
-
-  //       // // Step 3: Update the sales order details with BatchID
-  //       // await Promise.all(
-  //       //   entries.map(async (entry) => {
-  //       //     // Find the matching stock transaction response
-  //       //     const matchingResponse = stockTransactionResponses.find(
-  //       //       (resp) => resp.EntryID === entry.EntryID
-  //       //     );
-
-  //       //     // Perform the PUT request for each sales order detail
-  //       //     if (matchingResponse?.BatchID) {
-  //       //       await axios.put(
-  //       //         `http://localhost:3001/api/salesordersdetails/${entry.EntryID}`,
-  //       //         {
-  //       //           BatchID: matchingResponse.BatchID,
-  //       //         }
-  //       //       );
-  //       //     }
-  //       //   })
-  //       // );
-  //       const stockTransactionResponses = await Promise.all(
-  //         entries.map(async (entry) => {
-  //           try {
-  //             const looseQuantity = entry.LooseQuantity || 0;
-  //             const containerQuantity = entry.Quantity || 0;
-  //             const unitType = entry.UnitType || "L";
-
-  //             // Call sellQuantity and return the response for this entry
-  //             const response = await sellQuantity(
-  //               entry.VariationID,
-  //               containerQuantity,
-  //               looseQuantity,
-  //               unitType
-  //             );
-
-  //             console.log("response from sell quantity", response);
-  //             // Ensure the response has stockTransactions and containerStockTransactions and handle accordingly
-  //             if (
-  //               !response ||
-  //               (!response.stockTransactions &&
-  //                 !response.containerStockTransactions)
-  //             ) {
-  //               console.error(
-  //                 "sellQuantity did not return stockTransactions or containerStockTransactions",
-  //                 response
-  //               );
-  //               return { EntryID: response.Co, BatchIDs: [] }; // Handle missing data safely
-  //             }
-
-  //             // Extract BatchIDs from both stockTransactions and containerStockTransactions
-  //             const batchIDs = [
-  //               ...response.stockTransactions.map((tx) => tx.BatchID), // Extract from stockTransactions for loose quantity
-  //               ...response.containerStockTransactions.map((tx) => tx.BatchID), // Extract from containerStockTransactions for container quantity
-  //             ];
-
-  //             const variationIDs = [
-  //               ...(response.stockTransactions || []).map(
-  //                 (tx) => tx.VariationID
-  //               ),
-  //               ...(response.containerStockTransactions || []).map(
-  //                 (tx) => tx.VariationID
-  //               ),
-  //             ];
-
-  //             console.log("entryid step 2", entry.EntryID);
-  //             console.log("variationIDs", variationIDs);
-
-  //             return {
-  //               EntryID: entry.EntryID,
-  //               VariationIDs: variationIDs,
-  //               BatchIDs: batchIDs,
-  //             };
-  //           } catch (error) {
-  //             console.error(
-  //               `Error in sellQuantity for EntryID ${entry.EntryID}:`,
-  //               error
-  //             );
-  //             return { EntryID: entry.EntryID, VariationIDs: [], BatchIDs: [] }; // Return an empty array on failure
-  //           }
-  //         })
-  //       );
-
-  //       console.log(
-  //         "stock transaction response step 2",
-  //         stockTransactionResponses
-  //       );
-
-  //       await Promise.all(
-  //         stockTransactionResponses.map(async (resp) => {
-  //           if (resp.VariationIDs.length > 0 && resp.BatchIDs.length > 0) {
-  //             try {
-  //               const batchIDsString = resp.BatchIDs.join(",");
-  //               console.log("VariationIDs:", resp.VariationIDs);
-
-  //               // Find matching sales order detail based on any VariationID
-  //               const matchingEntry = savedEntries.find((entry) =>
-  //                 resp.VariationIDs.includes(entry.VariationID)
-  //               );
-
-  //               console.log("Matching Entry:", matchingEntry);
-
-  //               if (matchingEntry) {
-  //                 const updatedSalesOrderDetail = await axios.put(
-  //                   `http://localhost:3001/api/salesordersdetails/update/${matchingEntry.ID}`,
-  //                   {
-  //                     BatchID: batchIDsString,
-  //                   }
-  //                 );
-  //                 console.log(
-  //                   "Updated Sales Order Detail:",
-  //                   updatedSalesOrderDetail
-  //                 );
-  //               }
-  //             } catch (error) {
-  //               console.error(
-  //                 `Error updating sales order detail for EntryID ${resp.EntryID}:`,
-  //                 error
-  //               );
-  //             }
-  //           }
-  //         })
-  //       );
-
-  //       // Step 4: Navigate to the sales order update page
-  //       navigate(`/salesorder/update/${SalesOrderID}`);
-  //     } catch (error) {
-  //       console.error(
-  //         "Error handling stock transactions or updating sales order details:",
-  //         error
-  //       );
-  //     }
-  //   }
-  // };
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    // Validate all entries
+    const validationErrors = entries.map(validateEntry);
+    const hasErrors = validationErrors.some(error => Object.keys(error).length > 0);
+    
+    if (hasErrors) {
+      setErrors(validationErrors);
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -545,7 +312,7 @@ function AddSalesOrderDetail() {
             SalesOrderID,
             ProductID: entry.ProductID,
             VariationID: entry.VariationID,
-            containerQuantity: entry.Quantity, // Ensure you have this in your form
+            containerQuantity: entry.Quantity,
             looseQuantity: entry.LooseQuantity,
             unitType: entry.UnitType,
             UnitPrice: entry.UnitPrice,
@@ -570,215 +337,266 @@ function AddSalesOrderDetail() {
   };
 
   return (
-    <div
-      className="d-flex vh-100 justify-content-center align-items-center"
-      style={{ backgroundColor: "#263043" }}
-    >
-      <div
-        className="w-75 bg-white rounded p-3 overflow-auto"
-        style={{ maxHeight: "90vh" }}
-      >
+    <div className="sales-order-container">
+      <div className="sales-order-card">
+        <div className="form-header">
+          <h2>Sales Order Details</h2>
+          <p>Add products and quantities to your sales order</p>
+        </div>
+
         <form onSubmit={handleSubmit}>
           {entries.map((entry, index) => (
-            <div className="row" key={index}>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`Barcode-${index}`}>
-                  <strong>Barcode</strong>
-                </label>
-                <input
-                  onChange={(event) => handleInput(index, event)}
-                  type="text"
-                  placeholder="Enter Barcode"
-                  className="form-control rounded-0"
-                  name="Barcode"
-                  value={entry.Barcode}
-                  id={`Barcode-${index}`}
-                />
-                {errors[index]?.Barcode && (
-                  <div className="text-danger">{errors[index].Barcode}</div>
+            <div className="entry-row" key={index}>
+              <div className="entry-header">
+                <span className="entry-number">Entry #{index + 1}</span>
+                {entries.length > 1 && (
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => removeEntry(index)}
+                  >
+                    <i className="fas fa-trash"></i>
+                    Remove
+                  </button>
                 )}
               </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`ProductID-${index}`}>
-                  <strong>Product</strong>
-                </label>
-                <select
-                  className="form-select rounded-0"
-                  name="ProductID"
-                  value={entry.ProductID}
-                  onChange={(event) => handleInput(index, event)}
-                  id={`ProductID-${index}`}
-                >
-                  <option value="">Select Product</option>
-                  {products.map((product) => (
-                    <option key={product.ProductID} value={product.ProductID}>
-                      {product.ProductName}
-                    </option>
-                  ))}
-                </select>
-                {errors[index]?.ProductID && (
-                  <div className="text-danger">{errors[index].ProductID}</div>
-                )}
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`VariationID-${index}`}>
-                  <strong>Variation</strong>
-                </label>
-                <select
-                  className="form-select rounded-0"
-                  name="VariationID"
-                  value={entry.VariationID}
-                  onChange={(event) => handleInput(index, event)}
-                  id={`VariationID-${index}`}
-                >
-                  <option value="">Select Variation</option>
-                  {variations[index]?.map((variation) => (
-                    <option
-                      key={variation.VariationID}
-                      value={variation.VariationID}
-                    >
-                      {variation.SKU}
-                    </option>
-                  ))}
-                </select>
-                {errors[index]?.VariationID && (
-                  <div className="text-danger">{errors[index].VariationID}</div>
-                )}
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`Quantity-${index}`}>
-                  <strong>Quantity</strong>
-                </label>
-                <input
-                  onChange={(event) => handleInput(index, event)}
-                  type="number"
-                  placeholder="Enter Quantity"
-                  className="form-control rounded-0"
-                  name="Quantity"
-                  value={entry.Quantity}
-                  id={`Quantity-${index}`}
-                />
-                {errors[index]?.Quantity && (
-                  <div className="text-danger">{errors[index].Quantity}</div>
-                )}
-                {entry.ContainerStock > 0 && (
-                  <span className="text-success">
-                    Available: {entry.ContainerStock}
-                  </span>
-                )}
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`LooseQuantity-${index}`}>
-                  <strong>Loose Quantity</strong>
-                </label>
-                <input
-                  onChange={(event) => handleInput(index, event)}
-                  type="number"
-                  placeholder="Loose Quantity"
-                  className="form-control rounded-0"
-                  name="LooseQuantity"
-                  value={entry.LooseQuantity}
-                  id={`LooseQuantity-${index}`}
-                />
-                {errors[index]?.LooseQuantity && (
-                  <div className="text-danger">
-                    {errors[index].LooseQuantity}
-                  </div>
-                )}
-                {entry.LooseStock > 0 && (
-                  <span className="text-success">
-                    Available: {entry.LooseStock}
-                  </span>
-                )}
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`UnitPrice-${index}`}>
-                  <strong>Unit Price</strong>
-                </label>
-                <input
-                  type="number"
-                  placeholder="Unit Price"
-                  className="form-control rounded-0"
-                  name="UnitPrice"
-                  value={entry.UnitPrice}
-                  readOnly // Readonly as it is fetched
-                  id={`UnitPrice-${index}`}
-                />
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`LooseQuantityPrice-${index}`}>
-                  <strong>LooseQuantityPrice</strong>
-                </label>
-                <input
-                  type="number"
-                  placeholder="LooseQuantityPrice"
-                  className="form-control rounded-0"
-                  name="LooseQuantityPrice"
-                  value={entry.LooseQuantityPrice}
-                  readOnly // Readonly as it is fetched
-                  id={`LooseQuantityPrice-${index}`}
-                />
-              </div>
-              <div className="col-md-2 mb-3">
-                <label htmlFor={`Discount-${index}`}>
-                  <strong>Discount</strong>
-                </label>
-                <input
-                  onChange={(event) => handleInput(index, event)}
-                  type="number"
-                  placeholder="Discount"
-                  className="form-control rounded-0"
-                  name="Discount"
-                  value={entry.Discount}
-                  id={`Discount-${index}`}
-                />
-                {errors[index]?.Discount && (
-                  <div className="text-danger">{errors[index].Discount}</div>
-                )}
-              </div>
-              {/* <div className='col-md-2 mb-3'>
-                <label htmlFor={`Total-${index}`}><strong>Total</strong></label>
-                <input
-                  type='text'
-                  placeholder='Total Amount'
-                  className='form-control rounded-0'
-                  name='Total'
-                  value={await calculateTotal(entry.Quantity, entry.UnitPrice, entry.Discount, entry.LooseQuantity, entry.UnitPerPackage, entry.UnitType, entry.VariationID)} // Ensure this returns a value before rendering
-                  id={`Total-${index}`}
-                  readOnly
-                />
-              </div> */}
-              //1{" "}
-              {/* <input
-      className='form-control rounded-0'
-      name='Total'
-      value={total} // Use the total from state
-      id={`Total-${index}`}
-      readOnly
 
-/> */}
-              <div>Total: {total}</div>
-              <div className="col-md-1 mb-3">
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => removeEntry(index)}
-                >
-                  Remove
-                </button>
+              <div className="row">
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`Barcode-${index}`}>
+                      Barcode
+                    </label>
+                    <input
+                      onChange={(event) => handleInput(index, event)}
+                      type="text"
+                      placeholder="Scan or enter barcode"
+                      className="form-control"
+                      name="Barcode"
+                      value={entry.Barcode}
+                      id={`Barcode-${index}`}
+                    />
+                    {errors[index]?.Barcode && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].Barcode}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`ProductID-${index}`}>
+                      Product
+                    </label>
+                    <select
+                      className="form-control form-select"
+                      name="ProductID"
+                      value={entry.ProductID}
+                      onChange={(event) => handleInput(index, event)}
+                      id={`ProductID-${index}`}
+                    >
+                      <option value="">Select Product</option>
+                      {products.map((product) => (
+                        <option key={product.ProductID} value={product.ProductID}>
+                          {product.ProductName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors[index]?.ProductID && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].ProductID}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`VariationID-${index}`}>
+                      Variation
+                    </label>
+                    <select
+                      className="form-control form-select"
+                      name="VariationID"
+                      value={entry.VariationID}
+                      onChange={(event) => handleInput(index, event)}
+                      id={`VariationID-${index}`}
+                    >
+                      <option value="">Select Variation</option>
+                      {variations[index]?.map((variation) => (
+                        <option
+                          key={variation.VariationID}
+                          value={variation.VariationID}
+                        >
+                          {variation.SKU}
+                        </option>
+                      ))}
+                    </select>
+                    {errors[index]?.VariationID && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].VariationID}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`Quantity-${index}`}>
+                      Container Quantity
+                    </label>
+                    <input
+                      onChange={(event) => handleInput(index, event)}
+                      type="number"
+                      placeholder="Enter quantity"
+                      className="form-control"
+                      name="Quantity"
+                      value={entry.Quantity}
+                      id={`Quantity-${index}`}
+                      min="0"
+                    />
+                    {errors[index]?.Quantity && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].Quantity}
+                      </div>
+                    )}
+                    {entry.ContainerStock > 0 && (
+                      <div className="stock-info">
+                        <span className={`stock-badge ${getStockStatus(entry.ContainerStock)}`}>
+                          <i className="fas fa-box"></i>
+                          {getStockText(entry.ContainerStock)}: {entry.ContainerStock}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`LooseQuantity-${index}`}>
+                      Loose Quantity
+                    </label>
+                    <input
+                      onChange={(event) => handleInput(index, event)}
+                      type="number"
+                      placeholder="Loose items"
+                      className="form-control"
+                      name="LooseQuantity"
+                      value={entry.LooseQuantity}
+                      id={`LooseQuantity-${index}`}
+                      min="0"
+                    />
+                    {errors[index]?.LooseQuantity && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].LooseQuantity}
+                      </div>
+                    )}
+                    {entry.LooseStock > 0 && (
+                      <div className="stock-info">
+                        <span className={`stock-badge ${getStockStatus(entry.LooseStock)}`}>
+                          <i className="fas fa-cube"></i>
+                          {getStockText(entry.LooseStock)}: {entry.LooseStock}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`UnitPrice-${index}`}>
+                      Unit Price
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Unit price"
+                      className="form-control"
+                      name="UnitPrice"
+                      value={entry.UnitPrice}
+                      readOnly
+                      id={`UnitPrice-${index}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`LooseQuantityPrice-${index}`}>
+                      Loose Unit Price
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Loose unit price"
+                      className="form-control"
+                      name="LooseQuantityPrice"
+                      value={entry.LooseQuantityPrice}
+                      readOnly
+                      id={`LooseQuantityPrice-${index}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-md-3 col-sm-6 mb-3">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor={`Discount-${index}`}>
+                      Discount
+                    </label>
+                    <input
+                      onChange={(event) => handleInput(index, event)}
+                      type="number"
+                      placeholder="Discount amount"
+                      className="form-control"
+                      name="Discount"
+                      value={entry.Discount}
+                      id={`Discount-${index}`}
+                      min="0"
+                    />
+                    {errors[index]?.Discount && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].Discount}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
-          <button type="button" className="btn btn-primary" onClick={addEntry}>
-            Add Entry
-          </button>
-          <button
-            type="submit"
-            className="btn btn-success"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
+
+          <div className="total-section">
+            <p className="total-label">Total Amount</p>
+            <h3 className="total-amount">{formatCurrency(total)}</h3>
+          </div>
+
+          <div className="action-buttons">
+            <button type="button" className="btn btn-primary" onClick={addEntry}>
+              <i className="fas fa-plus"></i>
+              Add Entry
+            </button>
+            <button
+              type="submit"
+              className="btn btn-success"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="loading-spinner"></span>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-check"></i>
+                  Submit Order
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
