@@ -252,10 +252,13 @@ function UpdateSalesOrderForm() {
   useEffect(() => {
     axios.get('http://localhost:3001/api/customers')
       .then(res => {
-        setCustomers(res.data);
+        // Ensure customers is always an array
+        setCustomers(Array.isArray(res.data) ? res.data : []);
       })
       .catch(err => {
         console.error('Error fetching customers:', err);
+        // Set empty array on error to prevent map error
+        setCustomers([]);
       });
   }, []);
 
@@ -378,7 +381,7 @@ function UpdateSalesOrderForm() {
               value={values.CustomerID}
             >
               <option value="">Select a Customer</option>
-              {customers.map(customer => (
+              {Array.isArray(customers) && customers.map(customer => (
                 <option key={customer.CustomerID} value={customer.CustomerID}>
                   {customer.CustomerName}
                 </option>
