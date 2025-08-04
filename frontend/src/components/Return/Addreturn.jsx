@@ -23,18 +23,24 @@ function ReturnOrderForm() {
     if (values.OrderType === 'Customer') {
       axios.get('http://localhost:3001/api/customers')
         .then((res) => {
-          setOrderOptions(res.data); // Assuming response is an array of customers
+          // Handle the response structure: { data: [...] }
+          const customers = res.data.data || res.data || [];
+          setOrderOptions(customers);
         })
         .catch((err) => {
           console.error('Error fetching customers:', err);
+          setOrderOptions([]); // Set empty array on error
         });
     } else if (values.OrderType === 'Supplier') {
       axios.get('http://localhost:3001/api/suppliers')
         .then((res) => {
-          setOrderOptions(res.data); // Assuming response is an array of suppliers
+          // Handle the response structure: { suppliers: [...] }
+          const suppliers = res.data.suppliers || res.data || [];
+          setOrderOptions(suppliers);
         })
         .catch((err) => {
           console.error('Error fetching suppliers:', err);
+          setOrderOptions([]); // Set empty array on error
         });
     } else {
       setOrderOptions([]); // Clear the options if no type is selected
@@ -207,7 +213,7 @@ function ReturnOrderForm() {
               }}
             >
               <option value="">Select {values.OrderType} ID</option>
-              {orderOptions.map((option) => (
+              {Array.isArray(orderOptions) && orderOptions.map((option) => (
                 <option
                   key={values.OrderType === 'Customer' ? option.CustomerID : option.SupplierID}
                   value={values.OrderType === 'Customer' ? option.CustomerID : option.SupplierID}

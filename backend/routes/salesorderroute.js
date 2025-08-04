@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 
 // Read All SalesOrders with Pagination
 router.get('/', async (req, res) => {
-  const { page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
+  const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
 
   try {
     const offset = (page - 1) * limit;
@@ -31,7 +31,8 @@ router.get('/', async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     res.status(200).json({
       salesOrders: rows,
-      totalPages
+      totalPages,
+      totalRecords: count
     });
   } catch (err) {
     res.status(400).json({ error: err.message });

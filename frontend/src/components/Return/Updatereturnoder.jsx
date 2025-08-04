@@ -17,6 +17,7 @@ function UpdateReturnOrderForm() {
   const [orders, setOrders] = useState([]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -33,14 +34,22 @@ function UpdateReturnOrderForm() {
   }, [id]);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/${values.OrderType.toLowerCase()}s`) // Fetch orders for the dropdown
-      .then(res => {
-        setOrders(res.data);
-      })
-      .catch(err => {
+    const fetchOrders = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`http://localhost:3001/api/${values.OrderType.toLowerCase()}s`);
+        // Ensure we're setting an array
+        setOrders(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
         console.error('Error fetching orders:', err);
-      });
-  }, []);
+        setOrders([]); // Set empty array on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [values.OrderType]);
 
   const fetchReturnOrderDetails = (orderId) => {
     axios.get(`http://localhost:3001/api/returnordersdetails/returnorder/${orderId}/total`)
@@ -107,6 +116,19 @@ function UpdateReturnOrderForm() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className='d-flex vh-100 justify-content-center align-items-center' style={{ backgroundColor: '#263043' }}>
+        <div className='text-white'>
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-2">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='d-flex vh-100 justify-content-center align-items-center' style={{ backgroundColor: '#263043' }}>
       <div className='w-50 bg-white rounded p-3'>
@@ -134,7 +156,7 @@ function UpdateReturnOrderForm() {
               value={values.OrderID}
             >
               <option value="">Select an Order</option>
-              {orders.map(order => (
+              {Array.isArray(orders) && orders.map(order => (
                 <option key={order.OrderID} value={order.OrderID}>
                   {values.OrderType === 'Customer' ? order.CustomerName : order.SupplierName} {/* Show based on OrderType */}
                 </option>
