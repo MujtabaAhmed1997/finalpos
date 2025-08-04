@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaPlusCircle, FaBox, FaWeightHanging, FaDollarSign } from 'react-icons/fa';
+import { FaPlusCircle, FaBox, FaWeightHanging, FaDollarSign, FaTrash, FaList } from 'react-icons/fa';
 
 function PriceRuleForm() {
-  const [minQuantity, setMinQuantity] = useState('');
-  const [maxQuantity, setMaxQuantity] = useState('');
-  const [pricePerKg, setPricePerKg] = useState('');
-  const [variations, setVariations] = useState([]);
   const [selectedVariation, setSelectedVariation] = useState('');
+  const [priceRanges, setPriceRanges] = useState([
+    {
+      min_quantity: '',
+      max_quantity: '',
+      price_per_kg: ''
+    }
+  ]);
+  const [variations, setVariations] = useState([]);
   const [errors, setErrors] = useState({});
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   // Handle window resize
@@ -41,24 +46,68 @@ function PriceRuleForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    setIsSubmitting(true);
 
-    const priceRuleData = {
-      VariationID: selectedVariation,
-      min_quantity: minQuantity,
-      max_quantity: maxQuantity,
-      price_per_kg: pricePerKg,
-    };
+    if (!selectedVariation) {
+      setErrors({ apiError: 'Please select a product variation.' });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Filter out empty ranges
+    const validRanges = priceRanges.filter(range => 
+      range.min_quantity && range.max_quantity && range.price_per_kg
+    );
+
+    if (validRanges.length === 0) {
+      setErrors({ apiError: 'Please add at least one valid price range.' });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      await axios.post('http://localhost:3001/api/pricerule', priceRuleData);
+      // Submit each price range for the selected variation
+      const promises = validRanges.map(range => 
+        axios.post('http://localhost:3001/api/pricerule', {
+          VariationID: selectedVariation,
+          min_quantity: range.min_quantity,
+          max_quantity: range.max_quantity,
+          price_per_kg: range.price_per_kg,
+        })
+      );
+
+      await Promise.all(promises);
       navigate('/pricerule/show');
     } catch (error) {
-      console.error('Error adding price rule:', error);
+      console.error('Error adding price rules:', error);
       if (error.response && error.response.data && error.response.data.message) {
         setErrors({ apiError: error.response.data.message });
       } else {
-        setErrors({ apiError: 'Failed to add price rule.' });
+        setErrors({ apiError: 'Failed to add price rules.' });
       }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRangeChange = (index, field, value) => {
+    const updatedRanges = [...priceRanges];
+    updatedRanges[index][field] = value;
+    setPriceRanges(updatedRanges);
+  };
+
+  const addNewRange = () => {
+    setPriceRanges([...priceRanges, {
+      min_quantity: '',
+      max_quantity: '',
+      price_per_kg: ''
+    }]);
+  };
+
+  const removeRange = (index) => {
+    if (priceRanges.length > 1) {
+      const updatedRanges = priceRanges.filter((_, i) => i !== index);
+      setPriceRanges(updatedRanges);
     }
   };
 
@@ -75,7 +124,7 @@ function PriceRuleForm() {
         className="rounded-4 shadow-lg p-4 p-md-5"
         style={{
           minWidth: windowWidth < 480 ? "280px" : "320px",
-          maxWidth: "600px",
+          maxWidth: "800px",
           width: "100%",
           border: "1px solid #404040",
           background: "rgba(255,255,255,0.95)",
@@ -94,7 +143,7 @@ function PriceRuleForm() {
               fontSize: windowWidth < 768 ? "1.5rem" : "1.75rem"
             }}
           >
-            Add New Price Rule
+            Add Price Ranges
           </h3>
           <p 
             className="text-muted" 
@@ -102,7 +151,7 @@ function PriceRuleForm() {
               fontSize: windowWidth < 768 ? "14px" : "15px" 
             }}
           >
-            Create a new pricing rule for your product variations.
+            Create multiple price ranges for a single product variation based on quantity tiers.
           </p>
         </div>
 
@@ -113,7 +162,8 @@ function PriceRuleForm() {
             </div>
           )}
 
-          <div className="mb-3">
+          {/* Product Variation Selection */}
+          <div className="mb-4">
             <label htmlFor="variationSelect" className="form-label fw-semibold" style={{ color: "#263043" }}>
               <FaBox className="me-2" />
               Product Variation
@@ -149,107 +199,158 @@ function PriceRuleForm() {
             </select>
           </div>
 
-          <div className="row">
-            <div className="col-12 col-md-6 mb-3">
-              <label htmlFor="minQuantity" className="form-label fw-semibold" style={{ color: "#263043" }}>
-                <FaWeightHanging className="me-2" />
-                Min Quantity (kg)
-              </label>
-              <input
-                type="number"
-                className="form-control rounded-3"
-                value={minQuantity}
-                onChange={(e) => setMinQuantity(e.target.value)}
-                required
-                placeholder="Enter minimum quantity"
-                style={{
-                  background: "#f8f9fa",
-                  border: "1px solid #dee2e6",
-                  transition: "all 0.2s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  fontSize: windowWidth < 768 ? "14px" : "16px",
-                  padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = "#263043";
-                  e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = "#dee2e6";
-                  e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                }}
-              />
-            </div>
-
-            <div className="col-12 col-md-6 mb-3">
-              <label htmlFor="maxQuantity" className="form-label fw-semibold" style={{ color: "#263043" }}>
-                <FaWeightHanging className="me-2" />
-                Max Quantity (kg)
-              </label>
-              <input
-                type="number"
-                className="form-control rounded-3"
-                value={maxQuantity}
-                onChange={(e) => setMaxQuantity(e.target.value)}
-                required
-                placeholder="Enter maximum quantity"
-                style={{
-                  background: "#f8f9fa",
-                  border: "1px solid #dee2e6",
-                  transition: "all 0.2s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  fontSize: windowWidth < 768 ? "14px" : "16px",
-                  padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = "#263043";
-                  e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = "#dee2e6";
-                  e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                }}
-              />
-            </div>
-          </div>
-
+          {/* Price Ranges Section */}
           <div className="mb-4">
-            <label htmlFor="pricePerKg" className="form-label fw-semibold" style={{ color: "#263043" }}>
-              <FaDollarSign className="me-2" />
-              Price per kg
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              className="form-control rounded-3"
-              value={pricePerKg}
-              onChange={(e) => setPricePerKg(e.target.value)}
-              required
-              placeholder="Enter price per kg"
-              style={{
-                background: "#f8f9fa",
-                border: "1px solid #dee2e6",
-                transition: "all 0.2s",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: windowWidth < 768 ? "14px" : "16px",
-                padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
-              }}
-              onFocus={e => {
-                e.target.style.borderColor = "#263043";
-                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-              }}
-              onBlur={e => {
-                e.target.style.borderColor = "#dee2e6";
-                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-              }}
-            />
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="mb-0 fw-bold" style={{ color: "#263043" }}>
+                <FaList className="me-2" />
+                Price Ranges
+              </h6>
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-sm"
+                onClick={addNewRange}
+                style={{
+                  borderColor: "#263043",
+                  color: "#263043",
+                  fontSize: "12px",
+                  padding: "4px 8px"
+                }}
+              >
+                <FaPlusCircle className="me-1" />
+                Add Range
+              </button>
+            </div>
+
+            {priceRanges.map((range, index) => (
+              <div key={index} className="mb-4 p-3 border rounded-3" style={{ borderColor: "#dee2e6", backgroundColor: "#f8f9fa" }}>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h6 className="mb-0 fw-bold" style={{ color: "#263043" }}>
+                    Price Range #{index + 1}
+                  </h6>
+                  {priceRanges.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => removeRange(index)}
+                      style={{
+                        borderColor: "#dc3545",
+                        color: "#dc3545",
+                        fontSize: "12px",
+                        padding: "4px 8px"
+                      }}
+                    >
+                      <FaTrash className="me-1" />
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <div className="row">
+                  <div className="col-12 col-md-6 mb-3">
+                    <label htmlFor={`minQuantity-${index}`} className="form-label fw-semibold" style={{ color: "#263043" }}>
+                      <FaWeightHanging className="me-2" />
+                      Min Quantity (kg)
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control rounded-3"
+                      value={range.min_quantity}
+                      onChange={(e) => handleRangeChange(index, 'min_quantity', e.target.value)}
+                      required
+                      placeholder="Enter minimum quantity"
+                      style={{
+                        background: "white",
+                        border: "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <label htmlFor={`maxQuantity-${index}`} className="form-label fw-semibold" style={{ color: "#263043" }}>
+                      <FaWeightHanging className="me-2" />
+                      Max Quantity (kg)
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control rounded-3"
+                      value={range.max_quantity}
+                      onChange={(e) => handleRangeChange(index, 'max_quantity', e.target.value)}
+                      required
+                      placeholder="Enter maximum quantity"
+                      style={{
+                        background: "white",
+                        border: "1px solid #dee2e6",
+                        transition: "all 0.2s",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        fontSize: windowWidth < 768 ? "14px" : "16px",
+                        padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = "#263043";
+                        e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = "#dee2e6";
+                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor={`pricePerKg-${index}`} className="form-label fw-semibold" style={{ color: "#263043" }}>
+                    <FaDollarSign className="me-2" />
+                    Price per kg
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control rounded-3"
+                    value={range.price_per_kg}
+                    onChange={(e) => handleRangeChange(index, 'price_per_kg', e.target.value)}
+                    required
+                    placeholder="Enter price per kg"
+                    style={{
+                      background: "white",
+                      border: "1px solid #dee2e6",
+                      transition: "all 0.2s",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                      fontSize: windowWidth < 768 ? "14px" : "16px",
+                      padding: windowWidth < 768 ? "8px 12px" : "12px 16px",
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = "#263043";
+                      e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = "#dee2e6";
+                      e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
 
           <button
             type="submit"
             className="btn w-100 rounded-3 fw-bold"
+            disabled={isSubmitting}
             style={{
-              background: "#263043",
+              background: isSubmitting ? "#6c757d" : "#263043",
               border: "none",
               fontSize: windowWidth < 768 ? "16px" : "18px",
               letterSpacing: 1,
@@ -259,18 +360,25 @@ function PriceRuleForm() {
               padding: windowWidth < 768 ? "10px 16px" : "12px 20px",
             }}
             onMouseOver={e => {
-              e.target.style.background = "#1a2332";
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
+              if (!isSubmitting) {
+                e.target.style.background = "#1a2332";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
+              }
             }}
             onMouseOut={e => {
-              e.target.style.background = "#263043";
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
+              if (!isSubmitting) {
+                e.target.style.background = "#263043";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
+              }
             }}
           >
             <FaPlusCircle className="me-2 mb-1" />
-            Add Price Rule
+            {isSubmitting 
+              ? 'Adding...' 
+              : `Add ${priceRanges.length} Price Range${priceRanges.length > 1 ? 's' : ''}`
+            }
           </button>
         </form>
       </div>
