@@ -460,6 +460,7 @@ function AddProduct() {
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 fontSize: "1rem",
+                color: "#000000"
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -492,6 +493,7 @@ function AddProduct() {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 fontSize: "1rem",
                 minHeight: 80,
+                color: "#000000"
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -530,6 +532,7 @@ function AddProduct() {
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 fontSize: "1rem",
+                color: "#000000"
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -560,6 +563,7 @@ function AddProduct() {
                   transition: "all 0.2s",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                   fontSize: "1rem",
+                  color: "#000000"
                 }}
                 onFocus={e => {
                   e.target.style.borderColor = "#263043";
@@ -593,6 +597,7 @@ function AddProduct() {
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 fontSize: "1rem",
+                color: "#000000"
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -623,6 +628,7 @@ function AddProduct() {
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 fontSize: "1rem",
+                color: "#000000"
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
