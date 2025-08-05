@@ -18,7 +18,17 @@ function Category() {
   const fetchCategories = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/product-categories');
-      const fetchedCategories = response.data;
+      
+      // Categories API returns data directly without success wrapper
+      let fetchedCategories;
+      if (Array.isArray(response.data)) {
+        fetchedCategories = response.data;
+      } else if (response.data.success && response.data.categories) {
+        fetchedCategories = response.data.categories;
+      } else {
+        console.error('Invalid response format from categories API');
+        return;
+      }
 
       // Shuffle the icons array
       const availableIcons = shuffleIcons();

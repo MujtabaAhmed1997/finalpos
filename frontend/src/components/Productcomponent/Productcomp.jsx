@@ -6,31 +6,61 @@ import './Productcomp.css'; // Import the CSS file for this component
 
 function Product() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   // Function to fetch products
   const fetchProducts = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/products');
-      const fetchedProducts = response.data;
+      
+      if (response.data.success) {
+        const fetchedProducts = response.data.products;
 
-      // Shuffle the icons array
-      const availableIcons = shuffleIcons();
+        // Shuffle the icons array
+        const availableIcons = shuffleIcons();
 
-      // Map each product with an icon
-      const productsWithIcons = fetchedProducts.map((product, index) => ({
-        ...product,
-        icon: availableIcons[index % availableIcons.length] // Assign icons in a loop
-      }));
+        // Map each product with an icon
+        const productsWithIcons = fetchedProducts.map((product, index) => ({
+          ...product,
+          icon: availableIcons[index % availableIcons.length] // Assign icons in a loop
+        }));
 
-      setProducts(productsWithIcons);
+        setProducts(productsWithIcons);
+      } else {
+        console.error('Failed to fetch products:', response.data.message);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
     }
+  };
+
+  // Function to fetch categories
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/product-categories');
+      
+      if (Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else if (response.data.success && response.data.categories) {
+        setCategories(response.data.categories);
+      } else {
+        console.error('Invalid response format from categories API');
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  // Function to get category name by ID
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.CategoryID === categoryId);
+    return category ? category.CategoryName : 'Unknown Category';
   };
 
   // Function to shuffle icons array
@@ -53,28 +83,29 @@ function Product() {
 
   // Function to handle delete product
   const handleDeleteProduct = async (productId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this product?');
-    if (confirmDelete) {
-      try {
-        await axios.delete(`http://localhost:3001/api/products/${productId}`);
-        fetchProducts(); // Refresh products after deletion
-      } catch (error) {
-        console.error('Error deleting product:', error);
+    try {
+      const response = await axios.delete(`http://localhost:3001/api/products/${productId}`);
+      
+      if (response.data.success) {
+        // Remove the deleted product from state
+        setProducts(prevProducts => prevProducts.filter(product => product.ProductID !== productId));
+        alert('Product deleted successfully!');
+      } else {
+        alert(response.data.message || 'Failed to delete product');
       }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product');
     }
   };
-  // Function to handle update product (example, you can implement a modal or form for update)
-  const handleUpdateProduct = async (productId) => {
+
+  // Function to handle update product
+  const handleUpdateProduct = (productId) => {
     navigate(`/products/update/${productId}`);
   };
 
-  // Function to handle view product variations
-  const handleViewProduct = async (productId) => {
-    navigate(`/variations/${productId}`);
-  };
-
-  // Function to handle add product (example, you can implement a modal or form for add)
-  const handleAddProduct = async () => {
+  // Function to handle add product
+  const handleAddProduct = () => {
     navigate('/products/add');
   };
 
@@ -85,17 +116,24 @@ function Product() {
       </div>
 
       <div className='main-cards'>
-        {products.map((product) => (
-          <div className='card' key={product.ProductID}>
+        {products.map((product, index) => (
+          <div className="card" key={product.ProductID}>
             <div className='card-inner'>
-              <h3>{product.Unit}</h3>
+              <h3>{product.ProductName}</h3>
               {product.icon}
             </div>
-            <h1>{product.ProductName}</h1>
+            <h1>{product.Unit}</h1>
+            <p className='product-description'>Category: {getCategoryName(product.CategoryID)}</p>
             <div className='card-buttons'>
-              <button className='view-button' onClick={() => handleViewProduct(product.ProductID)}>View</button>
-              <button className='delete-button' onClick={() => handleDeleteProduct(product.ProductID)}>Delete</button>
-              <button className='update-button' onClick={() => handleUpdateProduct(product.ProductID)}>Update</button>
+              <button 
+                className='delete-button' 
+                onClick={() => handleDeleteProduct(product.ProductID)}
+              >
+                Delete
+              </button>
+              <button className='update-button' onClick={() => handleUpdateProduct(product.ProductID)}>
+                Update
+              </button>
             </div>
           </div>
         ))}
@@ -109,3 +147,4 @@ function Product() {
 }
 
 export default Product;
+

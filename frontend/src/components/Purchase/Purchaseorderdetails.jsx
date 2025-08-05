@@ -29,9 +29,28 @@ function AddPurchaseOrderDetail() {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("http://localhost:3001/api/products");
-        setProducts(response.data);
+        
+        if (response.data.success) {
+          setProducts(response.data.products);
+        } else {
+          console.error("Failed to fetch products:", response.data.message);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
+        
+        if (error.response) {
+          if (error.response.status === 500) {
+            console.error("Server error. Please try again later.");
+          } else if (error.response.status === 404) {
+            console.error("Products not found.");
+          } else {
+            console.error(error.response.data.message || "Failed to load products");
+          }
+        } else if (error.request) {
+          console.error("Network error. Please check your connection and try again.");
+        } else {
+          console.error("An unexpected error occurred. Please try again.");
+        }
       }
     };
 

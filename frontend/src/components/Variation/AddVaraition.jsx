@@ -25,9 +25,29 @@ function AddVariation() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/products");
-      setProducts(response.data);
+      
+      if (response.data.success) {
+        setProducts(response.data.products);
+      } else {
+        console.error("Failed to fetch products:", response.data.message);
+        setErrors({ apiError: "Failed to load products. Please try again." });
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
+      
+      if (error.response) {
+        if (error.response.status === 500) {
+          setErrors({ apiError: "Server error. Please try again later." });
+        } else if (error.response.status === 404) {
+          setErrors({ apiError: "Products not found." });
+        } else {
+          setErrors({ apiError: error.response.data.message || "Failed to load products" });
+        }
+      } else if (error.request) {
+        setErrors({ apiError: "Network error. Please check your connection and try again." });
+      } else {
+        setErrors({ apiError: "An unexpected error occurred. Please try again." });
+      }
     }
   };
 

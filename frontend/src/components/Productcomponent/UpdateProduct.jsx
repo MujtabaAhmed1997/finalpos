@@ -1,348 +1,7 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import axios from 'axios';
-
-// function UpdateProduct() {
-//   const { id } = useParams(); // Get the product ID from URL params
-//   const [values, setValues] = useState({
-//     productName: '',
-//     description: '',
-//     company: '',
-//     unit: '',
-//     reorderLevel: '',
-//     categoryID: ''
-//   });
-//   const [categories, setCategories] = useState([]);
-//   const [errors, setErrors] = useState({});
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     fetchProduct(); // Fetch the product data on component mount
-//     fetchCategories(); // Fetch the categories data on component mount
-//   }, []);
-
-//   // Function to fetch the product data
-//   const fetchProduct = async () => {
-//     try {
-//       const response = await axios.get(`http://localhost:3001/api/products/${id}`);
-//       const { ProductName, Description, Company, Unit, ReorderLevel, CategoryID } = response.data;
-//       setValues({
-//         productName: ProductName,
-//         description: Description,
-//         company: Company,
-//         unit: Unit,
-//         reorderLevel: ReorderLevel,
-//         categoryID: CategoryID
-//       });
-//     } catch (error) {
-//       console.error('Error fetching product:', error);
-//     }
-//   };
-
-//   // Function to fetch the categories data
-//   const fetchCategories = async () => {
-//     try {
-//       const response = await axios.get('http://localhost:3001/api/product-categories');
-//       setCategories(response.data);
-//     } catch (error) {
-//       console.error('Error fetching categories:', error);
-//     }
-//   };
-
-//   const handleInput = (event) => {
-//     const { name, value } = event.target;
-//     setValues((prev) => ({ ...prev, [name]: value }));
-//   };
-
-// //   const handleSubmit = (event) => {
-// //     event.preventDefault();
-// //     console.log('Submitting values:', values); // Debug: log form values
-
-// //     axios
-// //       .put(`http://localhost:3001/api/products/${id}`, values)
-// //       .then((res) => {
-// //         console.log('Update response:', res.data); // Debug: log response data
-// //         navigate('/products'); // Navigate to products page after successful update
-// //       })
-// //       .catch((err) => {
-// //         console.error('Error updating product:', err);
-// //         // You can handle the error state here if needed
-// //       });
-// //   };
-// const handleSubmit = (event) => {
-//     event.preventDefault();
-//     console.log('Submitting values:', values); // Debug: log form values
-
-//     axios
-//       .put(`http://localhost:3001/api/products/${id}`, values)
-//       .then((res) => {
-//         console.log('Update response:', res.data); // Debug: log response data
-//         navigate('/products'); // Navigate to products page after successful update
-//       })
-//       .catch((err) => {
-//         console.error('Error updating product:', err);
-//         // You can handle the error state here if needed
-//       });
-// };
-
-//   return (
-//     <div className='d-flex vh-100 justify-content-center align-items-center' style={{ backgroundColor: '#263043' }}>
-//       <div className='w-50 bg-white rounded p-3'>
-//         <form onSubmit={handleSubmit}>
-//           <div className='mb-3'>
-//             <label htmlFor='productName'>
-//               <strong>Product Name</strong>
-//             </label>
-//             <input
-//               onChange={handleInput}
-//               type='text'
-//               placeholder='Enter product name'
-//               className='form-control rounded-0'
-//               name='productName'
-//               value={values.productName}
-//             />
-//             {errors.productName && <span className='text-danger'>{errors.productName}</span>}
-//           </div>
-//           <div className='mb-3'>
-//             <label htmlFor='description'>
-//               <strong>Description</strong>
-//             </label>
-//             <textarea
-//               onChange={handleInput}
-//               placeholder='Enter product description'
-//               className='form-control rounded-0'
-//               name='description'
-//               value={values.description}
-//             />
-//             {errors.description && <span className='text-danger'>{errors.description}</span>}
-//           </div>
-
-//           <div className='mb-3'>
-//             <label htmlFor='unit'>
-//               <strong>Unit</strong>
-//             </label>
-//             <input
-//               onChange={handleInput}
-//               type='text'
-//               placeholder='Enter unit'
-//               className='form-control rounded-0'
-//               name='unit'
-//               value={values.unit}
-//             />
-//             {errors.unit && <span className='text-danger'>{errors.unit}</span>}
-//           </div>
-//           <div className='mb-3'>
-//             <label htmlFor='reorderLevel'>
-//               <strong>Reorder Level</strong>
-//             </label>
-//             <input
-//               onChange={handleInput}
-//               type='number'
-//               placeholder='Enter reorder level'
-//               className='form-control rounded-0'
-//               name='reorderLevel'
-//               value={values.reorderLevel}
-//             />
-//             {errors.reorderLevel && <span className='text-danger'>{errors.reorderLevel}</span>}
-//           </div>
-//           <div className='mb-3'>
-//             <label htmlFor='categoryID'>
-//               <strong>Category</strong>
-//             </label>
-//             <select
-//               onChange={handleInput}
-//               className='form-control rounded-0'
-//               name='categoryID'
-//               value={values.categoryID}
-//             >
-//               <option value=''>Select a category</option>
-//               {categories.map(category => (
-//                 <option key={category.CategoryID} value={category.CategoryID}>
-//                   {category.CategoryName}
-//                 </option>
-//               ))}
-//             </select>
-//             {errors.categoryID && <span className='text-danger'>{errors.categoryID}</span>}
-//           </div>
-//           <button type='submit' className='btn btn-success w-100 rounded-0'>
-//             Update Product
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default UpdateProduct;
-
-// import React, { useState, useEffect } from "react";
-// import { useNavigate, useParams } from "react-router-dom";
-// import axios from "axios";
-
-// function UpdateProduct() {
-//   const { id } = useParams(); // Get product ID from URL
-//   const [values, setValues] = useState({
-//     ProductName: "",
-//     Description: "",
-//     Unit: "",
-//     ReorderLevel: "",
-//     CategoryID: "",
-//   });
-
-//   const [categories, setCategories] = useState([]);
-//   const [errors, setErrors] = useState({});
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     // Fetch product details
-//     axios
-//       .get(`http://localhost:3001/api/products/${id}`)
-//       .then((res) => setValues(res.data))
-//       .catch((err) => console.error("Error fetching product:", err));
-
-//     // Fetch categories
-//     axios
-//       .get("http://localhost:3001/api/product-categories")
-//       .then((res) => setCategories(res.data))
-//       .catch((err) => console.error("Error fetching categories:", err));
-//   }, [id]);
-
-//   const handleInput = (event) => {
-//     setValues((prev) => ({
-//       ...prev,
-//       [event.target.name]: event.target.value,
-//     }));
-//   };
-
-//   const handleSubmit = (event) => {
-//     event.preventDefault();
-
-//     axios
-//       .put(`http://localhost:3001/api/products/${id}`, values)
-//       .then((res) => {
-//         navigate("/products");
-//       })
-//       .catch((err) => {
-//         console.error("Error updating product:", err);
-//       });
-//   };
-
-//   return (
-//     <div
-//       className="d-flex vh-100 justify-content-center align-items-center"
-//       style={{ backgroundColor: "#263043" }}
-//     >
-//       <div className="w-50 bg-white rounded p-3">
-//         <h2 className="text-center mb-4">Update Product</h2>
-//         <form onSubmit={handleSubmit}>
-//           <div className="mb-3">
-//             <label htmlFor="ProductName">
-//               <strong>Product Name</strong>
-//             </label>
-//             <input
-//               onChange={handleInput}
-//               type="text"
-//               value={values.ProductName}
-//               className="form-control rounded-0"
-//               name="ProductName"
-//             />
-//           </div>
-
-//           <div className="mb-3">
-//             <label htmlFor="Description">
-//               <strong>Description</strong>
-//             </label>
-//             <textarea
-//               onChange={handleInput}
-//               className="form-control rounded-0"
-//               name="Description"
-//               value={values.Description}
-//             />
-//           </div>
-
-//           <div className="mb-3">
-//             <label htmlFor="Unit">
-//               <strong>Unit</strong>
-//             </label>
-//             <select
-//               onChange={(e) => {
-//                 const value = e.target.value;
-//                 if (value === "Other") {
-//                   setValues((prev) => ({ ...prev, Unit: "" }));
-//                 } else {
-//                   setValues((prev) => ({ ...prev, Unit: value }));
-//                 }
-//               }}
-//               className="form-control rounded-0"
-//               value={
-//                 ["kg", "liter"].includes(values.Unit) ? values.Unit : "Other"
-//               }
-//             >
-//               <option value="">Select unit</option>
-//               <option value="kg">kg</option>
-//               <option value="liter">liter</option>
-//               <option value="Other">Other</option>
-//             </select>
-
-//             {!["kg", "liter"].includes(values.Unit) && (
-//               <input
-//                 type="text"
-//                 placeholder="Enter custom unit"
-//                 className="form-control mt-2 rounded-0"
-//                 value={values.Unit}
-//                 onChange={(e) =>
-//                   setValues((prev) => ({ ...prev, Unit: e.target.value }))
-//                 }
-//               />
-//             )}
-//           </div>
-
-//           <div className="mb-3">
-//             <label htmlFor="ReorderLevel">
-//               <strong>Reorder Level</strong>
-//             </label>
-//             <input
-//               onChange={handleInput}
-//               type="number"
-//               className="form-control rounded-0"
-//               name="ReorderLevel"
-//               value={values.ReorderLevel}
-//             />
-//           </div>
-
-//           <div className="mb-3">
-//             <label htmlFor="CategoryID">
-//               <strong>Category</strong>
-//             </label>
-//             <select
-//               onChange={handleInput}
-//               className="form-control rounded-0"
-//               name="CategoryID"
-//               value={values.CategoryID}
-//             >
-//               <option value="">Select a category</option>
-//               {categories.map((category) => (
-//                 <option key={category.CategoryID} value={category.CategoryID}>
-//                   {category.CategoryName}
-//                 </option>
-//               ))}
-//             </select>
-//           </div>
-
-//           <button type="submit" className="btn btn-primary w-100 rounded-0">
-//             Update Product
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default UpdateProduct;
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { FaEdit } from "react-icons/fa";
 
 function UpdateProduct() {
   const { id } = useParams();
@@ -358,51 +17,96 @@ function UpdateProduct() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3001/api/products/${id}`)
-      .then((res) => setValues(res.data))
-      .catch((err) => console.error("Error fetching product:", err));
-
-    axios
-      .get("http://localhost:3001/api/product-categories")
-      .then((res) => setCategories(res.data))
-      .catch((err) => console.error("Error fetching categories:", err));
-  }, [id]);
-
   const handleInput = (event) => {
-    setValues((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
+    setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
   };
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    fetchProduct();
+    fetchCategories();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/products/${id}`);
+      
+      if (response.data.success) {
+        setValues(response.data.product);
+      } else {
+        console.error("Failed to fetch product:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/product-categories");
+      
+      // Categories API returns data directly without success wrapper
+      if (Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else if (response.data.success && response.data.categories) {
+        setCategories(response.data.categories);
+      } else {
+        console.error('Invalid response format from categories API');
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setErrors({});
 
-    axios
-      .put(`http://localhost:3001/api/products/${id}`, values)
-      .then((res) => {
+    try {
+      const response = await axios.put(`http://localhost:3001/api/products/${id}`, values);
+      
+      if (response.data.success) {
+        alert('Product updated successfully!');
         navigate("/products");
-      })
-      .catch((err) => {
-        if (err.response?.data?.errors) {
-          setErrors(err.response.data.errors);
+      } else {
+        alert(response.data.message || 'Failed to update product');
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      
+      if (error.response) {
+        if (error.response.status === 400) {
+          // Validation errors
+          if (error.response.data.errors) {
+            setErrors(error.response.data.errors);
+          } else {
+            setErrors({ general: error.response.data.message || 'Validation failed' });
+          }
+        } else if (error.response.status === 404) {
+          setErrors({ general: 'Product not found or has been deleted.' });
+        } else if (error.response.status === 500) {
+          setErrors({ general: 'Server error. Please try again later.' });
         } else {
-          alert("An unexpected error occurred.");
+          setErrors({ general: error.response.data.message || 'Failed to update product' });
         }
-      });
+      } else if (error.request) {
+        setErrors({ general: 'Network error. Please check your connection and try again.' });
+      } else {
+        setErrors({ general: 'An unexpected error occurred. Please try again.' });
+      }
+    }
   };
 
   return (
     <div
-      className="container-fluid min-vh-100 d-flex justify-content-center align-items-center px-2"
-      style={{ backgroundColor: "#263043" }}
+      className="d-flex vh-100 justify-content-center align-items-center"
+      style={{
+        backgroundColor: "#263043",
+      }}
     >
       <div
-        className="rounded-4 shadow-lg p-4 p-md-5 w-100"
+        className="rounded-4 shadow-lg p-5"
         style={{
+          minWidth: 400,
           maxWidth: 450,
           width: "100%",
           border: "1px solid #404040",
@@ -411,30 +115,38 @@ function UpdateProduct() {
         }}
       >
         <div className="text-center mb-4">
-          <h3 className="fw-bold mt-2" style={{ color: "#263043", fontSize: "1.5rem" }}>
+          <FaEdit size={40} color="#263043" />
+          <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>
             Update Product
           </h3>
-          <p className="text-muted mb-0" style={{ fontSize: 15 }}>
-            Edit the product details below.
+          <p className="text-muted" style={{ fontSize: 15 }}>
+            Update product information in your inventory.
           </p>
         </div>
         <form onSubmit={handleSubmit}>
+          {errors.general && (
+            <div className="alert alert-danger" role="alert">
+              {errors.general}
+            </div>
+          )}
+
           <div className="mb-3">
             <label htmlFor="ProductName" className="form-label fw-semibold" style={{ color: "#263043" }}>
               Product Name
             </label>
             <input
-              onChange={handleInput}
               type="text"
-              value={values.ProductName}
               className="form-control rounded-3"
               name="ProductName"
+              placeholder="Enter product name"
+              value={values.ProductName}
+              onChange={handleInput}
               style={{
                 background: "#f8f9fa",
                 border: "1px solid #dee2e6",
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: "1rem",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -455,17 +167,18 @@ function UpdateProduct() {
               Description
             </label>
             <textarea
-              onChange={handleInput}
               className="form-control rounded-3"
               name="Description"
+              placeholder="Enter product description"
               value={values.Description}
+              onChange={handleInput}
               style={{
                 background: "#f8f9fa",
                 border: "1px solid #dee2e6",
+                minHeight: 80,
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: "1rem",
-                minHeight: 80,
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -485,25 +198,19 @@ function UpdateProduct() {
             <label htmlFor="Unit" className="form-label fw-semibold" style={{ color: "#263043" }}>
               Unit
             </label>
-            <select
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "Other") {
-                  setValues((prev) => ({ ...prev, Unit: "" }));
-                } else {
-                  setValues((prev) => ({ ...prev, Unit: value }));
-                }
-              }}
-              className="form-select rounded-3"
-              value={
-                ["kg", "liter"].includes(values.Unit) ? values.Unit : "Other"
-              }
+            <input
+              type="text"
+              className="form-control rounded-3"
+              name="Unit"
+              placeholder="Enter unit (e.g., pieces, kg, liters)"
+              value={values.Unit}
+              onChange={handleInput}
               style={{
                 background: "#f8f9fa",
                 border: "1px solid #dee2e6",
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: "1rem",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -513,41 +220,8 @@ function UpdateProduct() {
                 e.target.style.borderColor = "#dee2e6";
                 e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
               }}
-            >
-              <option value="">Select unit</option>
-              <option value="kg">kg</option>
-              <option value="liter">liter</option>
-              <option value="Other">Other</option>
-            </select>
-            {!["kg", "liter"].includes(values.Unit) && (
-              <input
-                type="text"
-                placeholder="Enter custom unit"
-                className="form-control rounded-3 mt-2"
-                value={values.Unit}
-                onChange={(e) =>
-                  setValues((prev) => ({ ...prev, Unit: e.target.value }))
-                }
-                style={{
-                  background: "#f8f9fa",
-                  border: "1px solid #dee2e6",
-                  transition: "all 0.2s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  fontSize: "1rem",
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = "#263043";
-                  e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = "#dee2e6";
-                  e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                }}
-              />
-            )}
-            {errors.Unit && (
-              <span className="text-danger small">{errors.Unit}</span>
-            )}
+            />
+            {errors.Unit && <span className="text-danger small">{errors.Unit}</span>}
           </div>
 
           <div className="mb-3">
@@ -555,17 +229,18 @@ function UpdateProduct() {
               Reorder Level
             </label>
             <input
-              onChange={handleInput}
               type="number"
               className="form-control rounded-3"
               name="ReorderLevel"
+              placeholder="Enter reorder level"
               value={values.ReorderLevel}
+              onChange={handleInput}
               style={{
                 background: "#f8f9fa",
                 border: "1px solid #dee2e6",
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: "1rem",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -581,21 +256,21 @@ function UpdateProduct() {
             )}
           </div>
 
-          <div className="mb-3">
+          <div className="mb-4">
             <label htmlFor="CategoryID" className="form-label fw-semibold" style={{ color: "#263043" }}>
               Category
             </label>
             <select
-              onChange={handleInput}
-              className="form-select rounded-3"
+              className="form-control rounded-3"
               name="CategoryID"
               value={values.CategoryID}
+              onChange={handleInput}
               style={{
                 background: "#f8f9fa",
                 border: "1px solid #dee2e6",
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                fontSize: "1rem",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -641,6 +316,7 @@ function UpdateProduct() {
               e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
             }}
           >
+            <FaEdit className="me-2 mb-1" />
             Update Product
           </button>
         </form>
