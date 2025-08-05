@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const sequelize = require('../db/sequelize'); // Corrected path to sequelize instance
 const { QueryTypes } = require('sequelize');
+const User = require('../models/usermodel');
 
-router.get('/getproducts', async (req, res) => {
-    const sql = "SELECT * FROM users";
+router.get('/getusers', async (req, res) => {
     try {
-        const result = await sequelize.query(sql, { type: QueryTypes.SELECT });
+        const result = await User.findAll();
         res.json(result);
     } catch (err) {
         console.error("Error fetch data:", err);
@@ -15,30 +15,34 @@ router.get('/getproducts', async (req, res) => {
 });
 
 router.get('/read/:id', async (req, res) => {
-    const sql = "SELECT * FROM users WHERE ID=?";
     const id = req.params.id;
-    try {
-        const result = await sequelize.query(sql, {
-            replacements: [id],
-            type: QueryTypes.SELECT
-        });
-        res.json(result);
-    } catch (err) {
-        console.error(`Error fetching data for ID ${id}:`, err);
-        res.status(500).json({ Message: `Error fetching data for ID ${id}` });
+    const user = await User.findByPk(id);
+    if (!user) {
+        return res.status(404).json({ Message: "User not found" });
     }
+    res.json(user);
 });
 
 router.put('/update/:id', async (req, res) => {
-    const sql = "UPDATE users SET `NAME`=?,`EMAIL`=?,`ROLE`=? WHERE ID=?";
-    const id = req.params.id;
-    const { name, email, role } = req.body;
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+        return res.status(404).json({ Message: "User not found" });
+    }
+    user.name = req.body.name;
+    user.email = req.body.email;
+    user.role = req.body.role;  
+    await user.save();
+    res.json(user);
+});
+
+router.delete('/delete/:id', async (req, res) => {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+        return res.status(404).json({ Message: "User not found" });
+    }
     try {
-        const result = await sequelize.query(sql, {
-            replacements: [name, email, role, id],
-            type: QueryTypes.UPDATE
-        });
-        res.json(result);
+        await user.destroy();
+        res.json({ Message: "User deleted successfully" });
     } catch (err) {
         console.error(`Error updating data for ID ${id}:`, err);
         res.status(500).json({ Message: `Error updating data for ID ${id}` });

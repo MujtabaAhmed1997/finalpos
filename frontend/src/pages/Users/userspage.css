@@ -1,56 +1,79 @@
-/* homepage.css */
+/* Users Page Styles - Using Theme Colors */
 .grid-container {
     display: grid;
-    grid-template-columns: 260px 1fr 1fr 1fr;
+    grid-template-columns: 260px 1fr;
     grid-template-rows: 0.2fr 3fr;
     grid-template-areas:
       'sidebar header header header'
       'sidebar main main main';
     height: 100vh;
- 
- }
-
- .product-container {
-  grid-area: main;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    background: #1d2634;
 }
-  body{
-  margin: 0 !important;
-  padding: 0;
-  background-color: #1d2634 !important;
-  color: #9e9ea4 !important;
-  font-family: 'Montserrat', sans-serif !important;
-  }
-  /* Responsive Breakpoints */
- 
-  .product-container .w-50 {
-    width: 90%; /* Adjust width as needed */
-  }
-  /* Medium <= 992px */
-  @media screen and (max-width: 992px) {
+
+.product-container {
+    grid-area: main;
+    overflow-y: auto;
+    background: transparent;
+}
+
+body {
+    margin: 0 !important;
+    padding: 0;
+    background-color: #1d2634 !important;
+    color: #9e9ea4 !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Responsive Breakpoints */
+@media screen and (max-width: 1200px) {
     .grid-container {
-      grid-template-columns: 1fr;
-      grid-template-rows: 0.2fr 3fr;
-      grid-template-areas:
-        'header'
-        'main';
+        grid-template-columns: 1fr;
+        grid-template-rows: 0.2fr 3fr;
+        grid-template-areas:
+          'header'
+          'main';
     }
+}
+
+@media screen and (max-width: 992px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 0.2fr 3fr;
+        grid-template-areas:
+          'header'
+          'main';
+    }
+    
     .product-container {
-      flex-direction: column; /* Stack elements vertically on small screens */
-      align-items: stretch;
+        padding: 0;
     }
-  
-    .product-container .w-50 {
-      width: 100%; /* Occupy full width on smaller screens */
+}
+
+@media screen and (max-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 0.2fr 3fr;
+        grid-template-areas:
+          'header'
+          'main';
     }
-  }
-  
-  /* Extra Small <= 576px */
-  @media screen and (max-width: 576px) {
-    .hedaer-left {
-      display: none;
+    
+    .product-container {
+        padding: 0;
     }
-  }
+}
+
+@media screen and (max-width: 576px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 0.2fr 3fr;
+        grid-template-areas:
+          'header'
+          'main';
+    }
+    
+    .product-container {
+        padding: 0;
+    }
+}
   
