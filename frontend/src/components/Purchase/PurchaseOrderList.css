@@ -150,24 +150,37 @@
   transform: translateY(-1px);
 }
 
-/* Table Styles */
+/* Table Styles with Horizontal Scroll */
 .table-container {
   padding: 20px;
   overflow-x: auto;
+  overflow-y: hidden;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  max-width: 100%;
+  position: relative;
+  /* Force horizontal scroll */
+  white-space: nowrap;
 }
 
 .purchase-order-table {
   width: 100%;
+  min-width: 1200px; /* Force minimum width to trigger scroll */
   border-collapse: collapse;
   background: white;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  table-layout: fixed; /* Fixed table layout for better control */
 }
 
 .purchase-order-table thead {
   background: #343a40;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .purchase-order-table th {
@@ -179,15 +192,68 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  min-width: 150px; /* Minimum column width */
 }
 
 .purchase-order-table td {
   padding: 12px 16px;
   border-bottom: 1px solid #dee2e6;
   vertical-align: middle;
+  white-space: nowrap;
+  min-width: 150px; /* Minimum column width */
 }
 
-.table-row:hover {
+/* Column specific widths to ensure proper scrolling */
+.purchase-order-table th:nth-child(1), /* Order ID */
+.purchase-order-table td:nth-child(1) {
+  min-width: 120px;
+  width: 120px;
+}
+
+.purchase-order-table th:nth-child(2), /* Supplier */
+.purchase-order-table td:nth-child(2) {
+  min-width: 180px;
+  width: 180px;
+}
+
+.purchase-order-table th:nth-child(3), /* Order Date */
+.purchase-order-table td:nth-child(3) {
+  min-width: 140px;
+  width: 140px;
+}
+
+.purchase-order-table th:nth-child(4), /* Total Amount */
+.purchase-order-table td:nth-child(4),
+.purchase-order-table th:nth-child(5), /* Amount Paid */
+.purchase-order-table td:nth-child(5),
+.purchase-order-table th:nth-child(6) { /* Remaining */
+  min-width: 150px;
+  width: 150px;
+}
+
+.purchase-order-table th:nth-child(7), /* Status */
+.purchase-order-table td:nth-child(7) {
+  min-width: 120px;
+  width: 120px;
+}
+
+.purchase-order-table th:nth-child(8), /* Actions */
+.purchase-order-table td:nth-child(8) {
+  min-width: 140px;
+  width: 140px;
+}
+
+.table-row-x {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.table-row-x:hover {
   background: #f8f9fa;
 }
 
@@ -200,6 +266,10 @@
 .supplier-name {
   font-weight: 500;
   color: #495057;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .order-date {
@@ -234,6 +304,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .status-paid {
@@ -266,6 +337,7 @@
   display: flex;
   gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -280,6 +352,7 @@
   transition: all 0.3s ease;
   text-decoration: none;
   font-size: 0.8rem;
+  min-width: 32px;
 }
 
 .view-btn {
@@ -419,7 +492,24 @@
   cursor: not-allowed;
 }
 
-/* Responsive Design */
+/* Enhanced Responsive Design */
+@media (max-width: 1200px) {
+  .purchase-order-container {
+    padding: 15px;
+  }
+  
+  .table-container {
+    margin: 15px;
+    padding: 15px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .purchase-order-table {
+    min-width: 1200px; /* Keep consistent minimum width */
+  }
+}
+
 @media (max-width: 768px) {
   .purchase-order-container {
     padding: 10px;
@@ -429,10 +519,13 @@
     padding: 15px;
     flex-direction: column;
     text-align: center;
+    gap: 15px;
   }
   
   .purchase-order-title {
     font-size: 1.5rem;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .filters-section {
@@ -441,27 +534,127 @@
   
   .filters-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
   
   .filter-actions {
     justify-content: center;
+    gap: 10px;
+  }
+  
+  .apply-filters-btn,
+  .clear-filters-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
   
   .table-container {
-    padding: 15px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
   }
   
   .purchase-order-table {
-    font-size: 0.9rem;
+    min-width: 1200px; /* Keep consistent minimum width */
+    font-size: 0.85rem;
   }
   
   .purchase-order-table th,
   .purchase-order-table td {
-    padding: 8px 12px;
+    padding: 10px 12px;
   }
   
   .action-buttons {
+    flex-direction: row;
+    gap: 6px;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+  
+  .pagination-container {
+    padding: 15px;
     flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .pagination-buttons {
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .pagination-btn {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    min-width: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .purchase-order-container {
+    padding: 5px;
+  }
+  
+  .purchase-order-header {
+    padding: 10px;
+  }
+  
+  .purchase-order-title {
+    font-size: 1.25rem;
+  }
+  
+  .add-button {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+  }
+  
+  .filters-section {
+    padding: 10px;
+  }
+  
+  .filters-grid {
+    gap: 10px;
+  }
+  
+  .filter-label {
+    font-size: 0.8rem;
+  }
+  
+  .filter-select,
+  .filter-datepicker {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .table-container {
+    padding: 5px;
+    margin: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .purchase-order-table {
+    min-width: 1200px; /* Keep consistent minimum width */
+    font-size: 0.8rem;
+  }
+  
+  .purchase-order-table th,
+  .purchase-order-table td {
+    padding: 8px 10px;
+  }
+  
+  .supplier-name {
+    max-width: 120px;
+  }
+  
+  .action-buttons {
     gap: 4px;
   }
   
@@ -471,35 +664,19 @@
     font-size: 0.7rem;
   }
   
-  .pagination-container {
-    padding: 15px;
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .pagination-buttons {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .purchase-order-table {
-    font-size: 0.8rem;
-  }
-  
-  .purchase-order-table th,
-  .purchase-order-table td {
-    padding: 6px 8px;
-  }
-  
   .status-badge {
-    padding: 2px 6px;
+    padding: 3px 6px;
     font-size: 0.7rem;
   }
   
+  .pagination-container {
+    padding: 10px;
+  }
+  
   .pagination-btn {
-    padding: 6px 10px;
+    padding: 6px 8px;
     font-size: 0.8rem;
+    min-width: 30px;
   }
 }
 
@@ -524,21 +701,97 @@
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Scrollbar Styling */
+/* Enhanced Scrollbar Styling */
+.table-container {
+  /* Add a subtle gradient to indicate scrollable content */
+  background: linear-gradient(to right, white 0%, white 95%, rgba(0,0,0,0.05) 100%);
+  /* Ensure scroll is always visible */
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Force scrollbar to always be visible */
 .table-container::-webkit-scrollbar {
-  height: 8px;
+  height: 12px;
+  width: 12px;
+  -webkit-appearance: none;
 }
 
 .table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .table-container::-webkit-scrollbar-thumb {
   background: #c1c1c1;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 2px solid #f1f1f1;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+.table-container::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+  border: 2px solid #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.table-container::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Firefox scrollbar */
+.table-container {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Mobile scrollbar adjustments */
+@media (max-width: 768px) {
+  .table-container::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  
+  .table-container::-webkit-scrollbar-thumb {
+    border: 1px solid #f1f1f1;
+  }
+}
+
+/* Table row hover effect for better UX */
+.purchase-order-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+/* Ensure table cells don't break layout */
+.purchase-order-table td,
+.purchase-order-table th {
+  box-sizing: border-box;
+}
+
+/* Add subtle border to table for better definition */
+.purchase-order-table {
+  border: 1px solid #dee2e6;
 } 

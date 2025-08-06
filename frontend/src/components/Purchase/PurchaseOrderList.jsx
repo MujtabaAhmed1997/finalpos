@@ -188,7 +188,7 @@ function PurchaseOrderlist() {
                 </thead>
                 <tbody>
                   {data.map((order, index) => (
-                    <tr key={index} className="table-row">
+                    <tr key={index} className="table-row-x">
                       <td className="order-id">#{order.PurchaseOrderID}</td>
                       <td className="supplier-name">
                         {order.Supplier ? order.Supplier.SupplierName : 'N/A'}
