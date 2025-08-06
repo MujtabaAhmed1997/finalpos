@@ -104,6 +104,7 @@ const Product = sequelize.define('Product', {
   Unit: {
     type: DataTypes.STRING,
     allowNull: false,
+    enum:["Container","Sack"],
     validate: {
       notEmpty: { msg: 'Unit is required.' }
     }

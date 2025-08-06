@@ -183,6 +183,30 @@ router.get('/productVariations/:id', async (req, res) => {
   }
 });
 
+// ==========================================
+// NEW ENDPOINT - Get ProductVariation with Product data
+// ==========================================
+// This endpoint was created to support dynamic unit type fetching
+// It returns a ProductVariation with its associated Product information
+// Usage: GET /api/productVariations/:id/with-product
+router.get('/productVariations/:id/with-product', async (req, res) => {
+  try {
+    const productVariation = await ProductVariation.findByPk(req.params.id, {
+      include: [Product] // Include associated Product model to get Unit field
+    });
+    
+    if (productVariation) {
+      // Response includes: variation data + Product.Unit for dynamic unit type
+      res.status(200).json(productVariation);
+    } else {
+      res.status(404).json({ message: 'ProductVariation not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching variation with product:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update a ProductVariation by ID
 // router.put('/productVariations/:id', async (req, res) => {
 //   try {

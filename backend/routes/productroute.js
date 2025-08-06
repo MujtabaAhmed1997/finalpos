@@ -16,6 +16,12 @@ router.post('/', async (req, res) => {
     
     if (!Unit || Unit.trim() === '') {
       validationErrors.Unit = 'Unit is required';
+    } else {
+      // Validate Unit enum values
+      const validUnits = ["Container", "Sack"];
+      if (!validUnits.includes(Unit.trim())) {
+        validationErrors.Unit = `Unit must be one of: ${validUnits.join(', ')}`;
+      }
     }
     
     if (ReorderLevel === null || ReorderLevel === undefined || ReorderLevel === '') {

@@ -151,19 +151,65 @@ function AddPurchaseOrderDetail() {
           entries: entriesWithBatchIds,
         });
 
-        // Create Stock Transactions
-        const stockTransactionPromises = entriesWithBatchIds.map((entry) =>
-          axios.post("http://localhost:3001/api/stocktransaction", {
+        // ==========================================
+        // DYNAMIC UNIT TYPE IMPLEMENTATION - NEW CODE
+        // ==========================================
+        // Create Stock Transactions with dynamic unit type fetching from Product model
+        
+        // STEP 1: Get all unique variation IDs to minimize API calls
+        const uniqueVariationIds = [...new Set(entriesWithBatchIds.map(entry => entry.VariationID))];
+        console.log("Unique Variation IDs:", uniqueVariationIds);
+        
+        // STEP 2: Fetch product data for all variations in parallel (batch request)
+        const variationDataPromises = uniqueVariationIds.map(variationId => 
+          axios.get(`http://localhost:3001/api/productVariations/${variationId}/with-product`)
+        );
+        const variationDataResponses = await Promise.all(variationDataPromises);
+        console.log("Variation data responses:", variationDataResponses.map(r => r.data));
+        
+        // STEP 3: Create a lookup map for efficient unit type access
+        // Map structure: { variationId: unitType }
+        const variationUnitMap = {};
+        variationDataResponses.forEach(response => {
+          const variation = response.data;
+          variationUnitMap[variation.VariationID] = variation.Product.Unit;
+        });
+        console.log("Unit type mapping:", variationUnitMap);
+        
+        // STEP 4: Create stock transactions using the dynamically fetched unit types
+        const stockTransactionPromises = entriesWithBatchIds.map((entry) => {
+          const unitType = variationUnitMap[entry.VariationID];
+          console.log(`Creating stock transaction for variation ${entry.VariationID} with unit type: ${unitType}`);
+          
+          return axios.post("http://localhost:3001/api/stocktransaction", {
             VariationID: entry.VariationID,
             TransactionDate: new Date(),
             Quantity: entry.Quantity,
             RemainingQuantity: entry.Quantity,
             TransactionType: "IN",
-            UnitType: "Container",
+            UnitType: unitType, // Dynamic unit type from Product model
             BuyingPrice: entry.UnitPrice,
             BatchID: entry.BatchID,
-          })
-        );
+          });
+        });
+        
+        // ==========================================
+        // OLD CODE - COMMENTED OUT
+        // ==========================================
+        // Previous implementation had empty UnitType field:
+        // const stockTransactionPromises = entriesWithBatchIds.map((entry) =>
+        //   axios.post("http://localhost:3001/api/stocktransaction", {
+        //     VariationID: entry.VariationID,
+        //     TransactionDate: new Date(),
+        //     Quantity: entry.Quantity,
+        //     RemainingQuantity: entry.Quantity,
+        //     TransactionType: "IN",
+        //     UnitType: ,  // <-- This was empty and causing the issue
+        //     BuyingPrice: entry.UnitPrice,
+        //     BatchID: entry.BatchID,
+        //   })
+        // );
+        // ==========================================
         await Promise.all(stockTransactionPromises);
 
         navigate(`/purchaseorder/update/${PurchaseOrderID}`);

@@ -384,6 +384,7 @@ function AddCategory() {
                 border: "1px solid #dee2e6",
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";
@@ -415,6 +416,7 @@ function AddCategory() {
                 minHeight: 80,
                 transition: "all 0.2s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                color: "#000000",
               }}
               onFocus={e => {
                 e.target.style.borderColor = "#263043";

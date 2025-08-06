@@ -198,11 +198,9 @@ function UpdateProduct() {
             <label htmlFor="Unit" className="form-label fw-semibold" style={{ color: "#263043" }}>
               Unit
             </label>
-            <input
-              type="text"
+            <select
               className="form-control rounded-3"
               name="Unit"
-              placeholder="Enter unit (e.g., pieces, kg, liters)"
               value={values.Unit}
               onChange={handleInput}
               style={{
@@ -220,7 +218,11 @@ function UpdateProduct() {
                 e.target.style.borderColor = "#dee2e6";
                 e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
               }}
-            />
+            >
+              <option value="">Select Unit</option>
+              <option value="Container">Container</option>
+              <option value="Sack">Sack</option>
+            </select>
             {errors.Unit && <span className="text-danger small">{errors.Unit}</span>}
           </div>
 
