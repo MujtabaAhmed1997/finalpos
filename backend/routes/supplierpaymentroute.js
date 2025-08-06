@@ -130,4 +130,40 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Get today's payments for a specific supplier
+router.get('/today/:supplierId', async (req, res) => {
+  try {
+    const { supplierId } = req.params;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    const todayPayments = await SupplierPayment.findAll({
+      where: {
+        SupplierId: supplierId,
+        PaymentDate: {
+          [Op.gte]: startOfDay,
+          [Op.lt]: endOfDay
+        }
+      },
+      include: [{
+        model: Supplier,
+        attributes: ['SupplierName']
+      }],
+      order: [['PaymentDate', 'DESC']]
+    });
+
+    const totalToday = todayPayments.reduce((sum, payment) => sum + parseFloat(payment.PaymentAmount || 0), 0);
+
+    res.json({
+      todayPayments,
+      totalToday,
+      paymentCount: todayPayments.length
+    });
+  } catch (err) {
+    console.error('Error fetching today\'s supplier payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

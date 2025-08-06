@@ -246,7 +246,40 @@ router.get('/total/:salesOrderId', async (req, res) => {
   }
 });
 
+// Get today's payments for a specific customer
+router.get('/today/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
+    const todayPayments = await CustomerPayment.findAll({
+      where: {
+        CustomerId: customerId,
+        PaymentDate: {
+          [Op.gte]: startOfDay,
+          [Op.lt]: endOfDay
+        }
+      },
+      include: [{
+        model: Customer,
+        attributes: ['CustomerName']
+      }],
+      order: [['PaymentDate', 'DESC']]
+    });
 
+    const totalToday = todayPayments.reduce((sum, payment) => sum + parseFloat(payment.PaymentAmount || 0), 0);
+
+    res.json({
+      todayPayments,
+      totalToday,
+      paymentCount: todayPayments.length
+    });
+  } catch (err) {
+    console.error('Error fetching today\'s customer payments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 module.exports = router;

@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt } from 'react-icons/fa';
+import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import './recipt.css';
 
 const GenericReceipt = ({ orderType }) => {
+  console.log("GenericReceipt component rendered with orderType:", orderType);
+  
   const [data, setData] = useState(null);
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tableOverflow, setTableOverflow] = useState(false);
+  const [todayPayments, setTodayPayments] = useState(null);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
 
   const { id: OrderID } = useParams();
   const navigate = useNavigate();
@@ -19,6 +23,15 @@ const GenericReceipt = ({ orderType }) => {
     fetchOrder(OrderID);
     fetchOrderDetails(OrderID);
   }, [OrderID]);
+
+  useEffect(() => {
+    if (data) {
+      console.log("Data is available, calling fetchTodayPayments", { data, orderType });
+      fetchTodayPayments();
+    } else {
+      console.log("Data is not available yet", { data, orderType });
+    }
+  }, [data]);
 
   useEffect(() => {
     const checkTableOverflow = () => {
@@ -38,9 +51,11 @@ const GenericReceipt = ({ orderType }) => {
 
   const fetchOrder = async (id) => {
     try {
+      console.log("Fetching order with ID:", id, "orderType:", orderType);
       const res = await axios.get(
         `http://localhost:3001/api/${orderType}-orders/${id}`
       );
+      console.log("Order data fetched:", res.data);
       setData(res.data);
     } catch (err) {
       console.error(`Error fetching ${orderType} order:`, err);
@@ -60,6 +75,53 @@ const GenericReceipt = ({ orderType }) => {
       setError('Failed to load order details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTodayPayments = async () => {
+    if (!data) return;
+    
+    console.log("Starting fetchTodayPayments with data:", data);
+    setPaymentsLoading(true);
+    try {
+      let entityId;
+      let endpoint;
+      
+      if (orderType === 'sales') {
+        entityId = data.CustomerID;
+        endpoint = `http://localhost:3001/api/customerpayments/today/${entityId}`;
+      } else {
+        entityId = data.SupplierID;
+        endpoint = `http://localhost:3001/api/supplierpayments/today/${entityId}`;
+      }
+
+      console.log("Entity ID:", entityId, "Endpoint:", endpoint);
+
+      if (entityId) {
+        console.log("Making API call to:", endpoint);
+        const res = await axios.get(endpoint);
+        console.log("API response received:", res.data);
+        setTodayPayments(res.data);
+        console.log("Today's payments fetched:", res.data);
+        console.log("todayPayments structure:", {
+          todayPayments: res.data.todayPayments,
+          totalToday: res.data.totalToday,
+          paymentCount: res.data.paymentCount
+        });
+      } else {
+        console.log("No entityId found, skipping API call");
+      }
+    } catch (err) {
+      console.error('Error fetching today\'s payments:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      // Don't set error state for payments as it's not critical
+    } finally {
+      console.log("Setting paymentsLoading to false");
+      setPaymentsLoading(false);
     }
   };
 
@@ -244,7 +306,7 @@ const GenericReceipt = ({ orderType }) => {
         </div>
 
         {/* Summary */}
-        <div className="summary-container">
+        {/* <div className="summary-container">
           <div className="summary-card">
             <h3 className="summary-title">
               <FaDollarSign className="me-2" />
@@ -275,7 +337,94 @@ const GenericReceipt = ({ orderType }) => {
               </tbody>
             </table>
           </div>
-        </div>
+        </div> */}
+
+        {/* Today's Payments Section */}
+        {todayPayments && (
+          <div className="payments-container">
+            {(() => {
+              console.log("Rendering payments container");
+              return null;
+            })()}
+            <div className="payments-card">
+              <h3 className="payments-title">
+                <FaMoneyBillWave className="me-2" />
+                Today's {orderType === 'sales' ? 'Customer' : 'Supplier'} Payments
+              </h3>
+              
+              {(() => {
+                console.log("Rendering payments section:", {
+                  todayPayments,
+                  todayPaymentsArray: todayPayments?.todayPayments,
+                  length: todayPayments?.todayPayments?.length,
+                  condition: todayPayments?.todayPayments && todayPayments?.todayPayments?.length > 0
+                });
+                return null;
+              })()}
+              
+              {paymentsLoading ? (
+                <div className="payments-loading">
+                  <div className="loading-spinner"></div>
+                  <span>Loading payments...</span>
+                </div>
+              ) : todayPayments.todayPayments && todayPayments.todayPayments.length > 0 ? (
+                <div className="payments-content">
+                  <div className="payments-summary">
+                    <div className="payment-stat">
+                      <span className="stat-label">Total Today:</span>
+                      <span className="stat-value">{formatCurrency(todayPayments.totalToday)}</span>
+                    </div>
+                    <div className="payment-stat">
+                      <span className="stat-label">Payment Count:</span>
+                      <span className="stat-value">{todayPayments.paymentCount}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="payments-table-container">
+                    <table className="payments-table">
+                      <thead>
+                        <tr>
+                          <th><FaCreditCard className="me-2" />Payment Date</th>
+                          <th><FaDollarSign className="me-2" />Amount</th>
+                          <th><FaListAlt className="me-2" />Payment Method</th>
+                          <th><FaListAlt className="me-2" />Reference</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {todayPayments.todayPayments.map((payment, index) => (
+                          <tr key={index}>
+                            <td>{formatDate(payment.PaymentDate)}</td>
+                            <td>{formatCurrency(payment.PaymentAmount)}</td>
+                            <td>{payment.PaymentMethod || 'N/A'}</td>
+                            <td>{payment.Reference || 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="no-payments">
+                  {(() => {
+                    console.log("Rendering no-payments message");
+                    return null;
+                  })()}
+                  <p style={{ 
+                    color: '#7f8c8d', 
+                    fontSize: '1.1rem', 
+                    fontWeight: '500',
+                    fontStyle: 'italic',
+                    textAlign: 'center',
+                    padding: '1rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                  }}>No payments recorded for today</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="receipt-actions">
