@@ -24,7 +24,7 @@ const conn=mysql.createConnection({
     port:process.env.databasename,
     user:process.env.user,
     password:process.env.password,
-    database:process.env.dbname
+    database:process.env.databasename
 });
 conn.connect((err) => {
     if (err) {

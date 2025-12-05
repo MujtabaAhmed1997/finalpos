@@ -22,11 +22,24 @@ console.log('password:', process.env.password ? '[HIDDEN]' : 'undefined');
 console.log('host:', process.env.host);
 console.log('dbport:', process.env.dbport);
 
+// const sequelize = new Sequelize(process.env.databasename, process.env.user, process.env.password, {
+//   host: process.env.host,
+//   port: process.env.dbport,
+//   dialect: 'mysql',
+//   logging:false,
+// });
+
 const sequelize = new Sequelize(process.env.databasename, process.env.user, process.env.password, {
   host: process.env.host,
   port: process.env.dbport,
-  dialect: 'mysql',
-  logging:false,
+  dialect: "mysql",
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
 });
 
 module.exports = sequelize;
