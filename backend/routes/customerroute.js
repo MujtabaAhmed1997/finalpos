@@ -64,7 +64,6 @@ const { Op } = require('sequelize');
 
 
 router.post('/', async (req, res) => {
-    console.log('Received customer creation request:', req.body);
     const { CustomerName, Address, Phone, Email, AvailableBalance } = req.body;
 
     // === Basic validation ===
@@ -244,9 +243,12 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const customer = await Customer.findByPk(req.params.id);
+        console.log("🚀 ~ customer:", customer)
         if (customer) {
             customer.softDelete = true; // Mark as soft-deleted
-            await customer.save();
+          softDeleted=  await customer.save();
+          console.log("🚀 ~ softDeleted:", softDeleted)
+
             res.status(204).end(); // No content
         } else {
             res.status(404).json({ error: 'Customer not found' });
@@ -268,7 +270,8 @@ router.get('/searching', async (req, res) => {
             where: {
                 customerName: {
                     [Op.like]: `%${name}%`
-                }
+                },
+                softDelete:false
             },
             limit: parseInt(limit),
             offset: parseInt(offset)
@@ -298,6 +301,9 @@ router.get('/', async (req, res) => {
             limit,
             offset,
             order: [['CustomerID', 'ASC']],
+            where:{
+            softDelete:false
+            }
         });
 
         res.json({
