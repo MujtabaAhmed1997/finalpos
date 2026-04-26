@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authAPI } from '../service/apiClient';
 import Loginvalidation from '../controllers/loginvalidation';
 import { FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -38,9 +38,10 @@ function Login() {
 
         if (Object.values(validationErrors).every(error => error === '')) {
             try {
-                const response = await axios.post('http://localhost:3001/api/users/login', values);
+                const response = await authAPI.login(values);
                 if (response.data.message === 'Login successful') {
-                    localStorage.setItem('authToken', response.data.token);
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
                     navigation('/Homepage');
                 } else {
                     setErrorMessage("Invalid email or password");

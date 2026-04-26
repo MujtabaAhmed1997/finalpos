@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "test": "jest --testMatch='**/tests/**/*.test.js' --passWithNoTests",
+    "test:watch": "jest --watch",
+    "start": "nodemon server.js",
+    "start:prod": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.19.2",
+    "express-validator": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "mysql": "^2.18.1",
@@ -24,5 +27,9 @@
     "sequelize": "^6.37.3",
     "twilio": "^5.2.2",
     "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
   }
 }

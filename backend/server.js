@@ -4,6 +4,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./db/sequelize');
+const { requestLogger, globalErrorHandler } = require('./helpers/logger');
 
 const productCategoryRoutes = require('./routes/categoryroute');
 const userRoutes = require('./routes/userRoute'); // Ensure correct import
@@ -52,18 +53,13 @@ const productmodel = require('./models/product');
 
 
 const app = express();
-const port = 3001;
+const port = process.env.Port || 3001;
 
 app.use(express.json());
 app.use(cors());
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-
+// Logging middleware (log all requests)
+app.use(requestLogger);
 
 // Use the routes
 app.use('/api/users', userRoutes);
@@ -144,6 +140,9 @@ async function syncDatabase() {
 }
 
 syncDatabase();
+
+// Error handling middleware (must be at the end, after all routes)
+app.use(globalErrorHandler);
 
 // app.listen(port, () => {
 //   console.log(`Server is running on http://localhost:${port}`);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signupvalidtion } from '../../../controllers/signupvalidation';
-import axios from 'axios';
+import { authAPI } from '../../../service/apiClient';
 import { FaUserPlus, FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Addcomponent() {
@@ -28,14 +28,14 @@ function Addcomponent() {
     // Check if there are any validation errors
     if (Object.values(errors).every(error => error === '')) {
       // If no errors, submit the form
-      axios.post('http://localhost:3001/api/users/signup', values)
+      authAPI.signup(values)
         .then(res => {
           navigation('/users');
           console.log(res);
         })
         .catch((err) => {
           setErrors(err);
-          console.log("email dp")
+          console.log("email already exists or signup error")
         });
     }
   };

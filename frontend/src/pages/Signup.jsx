@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signupvalidtion } from '../controllers/signupvalidation';
-import axios from 'axios';
+import { authAPI } from '../service/apiClient';
 import { FaUserPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Signup() {
@@ -41,7 +41,7 @@ function Signup() {
         // Check if there are any validation errors
         if (Object.values(errors).every(error => error === '')) {
             try {
-                const res = await axios.post('http://localhost:3001/signup', values);
+                const res = await authAPI.signup(values);
                 navigation('/'); // Navigate to login page after successful signup
             } catch (err) {
                 if (err.response && err.response.data.msg) {
