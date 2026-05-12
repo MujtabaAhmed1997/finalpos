@@ -58,10 +58,13 @@ const port = process.env.Port || 3001;
 app.use(express.json());
 app.use(cors());
 
+// Serve static files from frontend build (if they exist)
+app.use(express.static('public'));
+
 // Logging middleware (log all requests)
 app.use(requestLogger);
 
-// Simple root status page for backend health
+// Simple root status page for backend health (fallback when no static file matches)
 app.get(['/', '/status'], (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
