@@ -1,39 +1,19 @@
-# Multi-stage build: Frontend + Backend
-# Build frontend React app
-FROM node:20-bookworm-slim AS frontend-build
-
-WORKDIR /frontend
-
-COPY frontend/package*.json ./
-RUN npm ci
-
-COPY frontend .
-RUN npm run build
-
-# Backend stage
-FROM node:20-bookworm-slim AS backend
-
-ENV NODE_ENV=production
-ENV Port=3001
+FROM node:20-bookworm-slim AS build
 
 WORKDIR /app
 
-# Copy backend dependencies and source
-COPY backend/package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+COPY package*.json ./
 
-COPY backend .
+RUN npm ci
 
-# Copy built frontend static files to serve from backend
-COPY --from=frontend-build /frontend/build /app/public
+COPY . .
 
-# Non-root user
-USER node
+RUN npm run build
 
-EXPOSE 3001
+FROM nginx:alpine
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+COPY --from=build /app/build /usr/share/nginx/html
 
-CMD ["node", "server.js"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
