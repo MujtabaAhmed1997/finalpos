@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function UpdateProduct() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ function UpdateProduct() {
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleInput = (event) => {
     setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -65,10 +67,10 @@ function UpdateProduct() {
       const response = await axios.put(`http://localhost:3001/api/products/${id}`, values);
       
       if (response.data.success) {
-        alert('Product updated successfully!');
+        toast.success("Product updated successfully!");
         navigate("/products");
       } else {
-        alert(response.data.message || 'Failed to update product');
+        toast.error(response.data.message || "Failed to update product");
       }
     } catch (error) {
       console.error("Error updating product:", error);
@@ -93,6 +95,8 @@ function UpdateProduct() {
       } else {
         setErrors({ general: 'An unexpected error occurred. Please try again.' });
       }
+
+      toast.error(error.response?.data?.message || "Failed to update product");
     }
   };
 

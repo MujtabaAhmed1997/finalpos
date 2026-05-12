@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { validateSalesOrder } from '../../controllers/salesvalidator';
 import { FaEdit, FaCreditCard, FaTimes } from 'react-icons/fa';
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function UpdateSalesOrderForm() {
   const { id } = useParams();
@@ -27,6 +28,7 @@ function UpdateSalesOrderForm() {
   const [paymentErrors, setPaymentErrors] = useState({});
 
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     axios.get(`http://localhost:3001/api/sales-orders/${id}`)
@@ -177,12 +179,12 @@ function UpdateSalesOrderForm() {
 
         await axios.put(`http://localhost:3001/api/sales-orders/${id}`, updatedValues);
 
-        alert('Payment processed successfully!');
+        toast.success("Payment processed successfully!");
         setShowPaymentModal(false);
         window.location.reload();
       } catch (error) {
         console.error('Error processing payment:', error);
-        alert('Error processing payment. Please try again.');
+        toast.error("Error processing payment. Please try again.");
       }
     }
   };

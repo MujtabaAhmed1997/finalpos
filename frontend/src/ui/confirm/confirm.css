@@ -1,0 +1,100 @@
+.app-confirm__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  padding: 18px;
+}
+
+.app-confirm__modal {
+  width: min(520px, 100%);
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: confirmIn 160ms ease-out;
+}
+
+@keyframes confirmIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-confirm__header {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.app-confirm__title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  font-size: 16px;
+}
+
+.app-confirm__body {
+  padding: 16px 18px;
+  color: rgba(17, 24, 39, 0.9);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.app-confirm__actions {
+  padding: 14px 18px 18px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.app-confirm__btn {
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.app-confirm__btn:active {
+  transform: translateY(1px);
+}
+
+.app-confirm__btn--ghost {
+  background: rgba(17, 24, 39, 0.06);
+  color: rgba(17, 24, 39, 0.8);
+}
+.app-confirm__btn--ghost:hover {
+  background: rgba(17, 24, 39, 0.10);
+}
+
+.app-confirm__btn--danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.25);
+}
+.app-confirm__btn--danger:hover {
+  box-shadow: 0 12px 26px rgba(239, 68, 68, 0.35);
+}
+
+.app-confirm__btn--primary {
+  background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-2) 100%);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.22);
+}
+.app-confirm__btn--primary:hover {
+  box-shadow: 0 12px 26px rgba(102, 126, 234, 0.34);
+}
+

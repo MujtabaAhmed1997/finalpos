@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './PurchaseOrderList.css';
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function PurchaseOrderlist() {
   const [data, setData] = useState([]);
@@ -16,6 +18,8 @@ function PurchaseOrderlist() {
   const [endDate, setEndDate] = useState(null);
   const navigate = useNavigate();
   const pageSize = 7;
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   useEffect(() => {
     fetchPurchaseOrders(currentPage, selectedSupplier, startDate, endDate);
@@ -52,14 +56,23 @@ function PurchaseOrderlist() {
       });
   };
 
-  const handleDelete = (purchaseOrderId) => {
-    if (window.confirm('Are you sure you want to delete this purchase order?')) {
-      axios.delete(`http://localhost:3001/api/purchase-orders/${purchaseOrderId}`)
-        .then(res => {
-          console.log('Purchase order deleted successfully');
-          fetchPurchaseOrders(currentPage, selectedSupplier, startDate, endDate);
-        })
-        .catch(err => console.log(err));
+  const handleDelete = async (purchaseOrderId) => {
+    const ok = await confirm({
+      title: "Delete purchase order?",
+      description: "This will permanently remove the purchase order (and may remove its details depending on backend rules).",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/purchase-orders/${purchaseOrderId}`);
+      toast.success("Purchase order deleted.");
+      fetchPurchaseOrders(currentPage, selectedSupplier, startDate, endDate);
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete purchase order.");
     }
   };
 

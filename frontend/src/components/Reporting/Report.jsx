@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import { FaChartBar, FaArrowLeft, FaCalendarAlt, FaDollarSign, FaBox, FaChartLine, FaFileAlt, FaSearch, FaDownload, FaPrint, FaFileCsv, FaFileExcel, FaFilePdf, FaCog } from 'react-icons/fa';
 import './Report.css';
+import { useToast } from "../../ui/toast/ToastProvider";
 
 const ReportComponent = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -21,6 +22,7 @@ const ReportComponent = () => {
   const [exporting, setExporting] = useState(false);
   const [showExportOptions, setShowExportOptions] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -137,7 +139,7 @@ const ReportComponent = () => {
       exportToCSV(csvData, filename);
     } catch (error) {
       console.error("Error exporting CSV:", error);
-      alert("Failed to export CSV file. Please try again.");
+      toast.error("Failed to export CSV file. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -165,7 +167,7 @@ const ReportComponent = () => {
       exportToCSV(csvData, filename);
     } catch (error) {
       console.error("Error exporting CSV:", error);
-      alert("Failed to export CSV file. Please try again.");
+      toast.error("Failed to export CSV file. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -198,7 +200,7 @@ const ReportComponent = () => {
       exportToCSV(csvData, filename);
     } catch (error) {
       console.error("Error exporting CSV:", error);
-      alert("Failed to export CSV file. Please try again.");
+      toast.error("Failed to export CSV file. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -241,7 +243,7 @@ const ReportComponent = () => {
       exportToCSV(excelData, filename);
     } catch (error) {
       console.error("Error exporting Excel:", error);
-      alert("Failed to export Excel file. Please try again.");
+      toast.error("Failed to export Excel file. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -301,7 +303,7 @@ const ReportComponent = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      alert("Failed to export PDF file. Please try again.");
+      toast.error("Failed to export PDF file. Please try again.");
     } finally {
       setExporting(false);
     }

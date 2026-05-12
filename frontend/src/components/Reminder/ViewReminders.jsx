@@ -13,8 +13,14 @@ import {
   BsExclamationCircle
 } from "react-icons/bs";
 import "./ViewReminders.css";
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
+import { useNavigate } from "react-router-dom";
 
 const ViewReminders = () => {
+  const { confirm } = useConfirm();
+  const toast = useToast();
+  const navigate = useNavigate();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,14 +49,22 @@ const ViewReminders = () => {
   };
 
   const handleDelete = async (reminderId) => {
-    if (window.confirm("Are you sure you want to delete this reminder?")) {
-      try {
-        await axios.delete(`http://localhost:3001/api/reminders/${reminderId}`);
-        fetchAllReminders();
-      } catch (error) {
-        console.error("Failed to delete reminder:", error);
-        alert("Failed to delete reminder");
-      }
+    const ok = await confirm({
+      title: "Delete reminder?",
+      description: "This will permanently delete the reminder.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/reminders/${reminderId}`);
+      toast.success("Reminder deleted.");
+      fetchAllReminders();
+    } catch (error) {
+      console.error("Failed to delete reminder:", error);
+      toast.error("Failed to delete reminder");
     }
   };
 
@@ -64,10 +78,11 @@ const ViewReminders = () => {
       await axios.put(`http://localhost:3001/api/reminders/${selectedReminder.ReminderID}`, updatedData);
       setShowModal(false);
       setSelectedReminder(null);
+      toast.success("Reminder updated.");
       fetchAllReminders();
     } catch (error) {
       console.error("Failed to update reminder:", error);
-      alert("Failed to update reminder");
+      toast.error("Failed to update reminder");
     }
   };
 
@@ -184,7 +199,7 @@ const ViewReminders = () => {
           </div>
         </div>
         <button 
-          onClick={() => window.location.href = "/reminder/add"}
+          onClick={() => navigate("/reminder/add")}
           className="add-reminder-btn"
         >
           <BsPlus /> Add Reminder
@@ -247,7 +262,7 @@ const ViewReminders = () => {
             </p>
             {!searchTerm && !filterDate && (
               <button 
-                onClick={() => window.location.href = "/reminder/add"}
+                onClick={() => navigate("/reminder/add")}
                 className="add-first-reminder-btn"
               >
                 <BsPlus /> Add Your First Reminder

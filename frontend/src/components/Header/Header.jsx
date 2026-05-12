@@ -9,9 +9,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../Header/Header.css";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function Header({ OpenSidebar }) {
   const navigate = useNavigate();
+  const toast = useToast();
   const [hasReminder, setHasReminder] = useState(false);
   const [hasOverdue, setHasOverdue] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,8 +78,8 @@ function Header({ OpenSidebar }) {
     navigate("/notification");
   };
 
-  const handleEnvelopeClick = () => alert("Messages clicked!");
-  const handlePersonClick = () => alert("Profile clicked!");
+  const handleEnvelopeClick = () => toast.info("Messages feature is not implemented yet.");
+  const handlePersonClick = () => toast.info("Profile feature is not implemented yet.");
   const handleSearch = (e) => {
     e.preventDefault();
     // Implement search functionality

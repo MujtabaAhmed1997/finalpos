@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function AddProduct() {
   const [values, setValues] = useState({
@@ -15,6 +16,7 @@ function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleInput = (event) => {
     setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -49,10 +51,10 @@ function AddProduct() {
       const response = await axios.post("http://localhost:3001/api/products", values);
       
       if (response.data.success) {
-        alert('Product created successfully!');
+        toast.success("Product created successfully!");
         navigate("/products");
       } else {
-        alert(response.data.message || 'Failed to create product');
+        toast.error(response.data.message || "Failed to create product");
       }
     } catch (error) {
       console.error("Error creating product:", error);
@@ -75,6 +77,8 @@ function AddProduct() {
       } else {
         setErrors({ general: 'An unexpected error occurred. Please try again.' });
       }
+
+      toast.error(error.response?.data?.message || "Failed to create product");
     }
   };
 

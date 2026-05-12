@@ -4,6 +4,8 @@ import axios from "axios";
 import { SalesOrderDetailvalidator } from "../../controllers/Sorderdeatil";
 import conversionService from "../../service/Conversionservice";
 import "./Salesorderdetail.css";
+import { useToast } from "../../ui/toast/ToastProvider";
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 
 const { sellQuantity } = conversionService;
 
@@ -34,6 +36,8 @@ function AddSalesOrderDetail() {
   const [total, setTotal] = useState(0);
 
   const navigate = useNavigate();
+  const toast = useToast();
+  const { confirm } = useConfirm();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -345,13 +349,33 @@ function AddSalesOrderDetail() {
         }
       }
 
-      alert("Sales Order submitted successfully!");
+      toast.success("Sales order submitted successfully!");
       navigate(`/salesorder/update/${SalesOrderID}`);
     } catch (error) {
       console.error("Error submitting sales order:", error);
-      alert(error.response?.data?.message || "Failed to submit sales order.");
+      toast.error(error.response?.data?.message || "Failed to submit sales order.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    const ok = await confirm({
+      title: "Cancel this sales order?",
+      description:
+        "If you cancel now, we will try to delete the sales order to avoid leaving a partial order in the system.",
+      confirmText: "Cancel order",
+      cancelText: "Keep working",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/sales-orders/${SalesOrderID}`);
+      toast.info("Sales order cancelled.");
+      navigate("/salesorder/show");
+    } catch (e) {
+      toast.error("Could not cancel the order (server rejected delete).");
     }
   };
 
@@ -597,6 +621,15 @@ function AddSalesOrderDetail() {
             <button type="button" className="btn btn-primary" onClick={addEntry}>
               <i className="fas fa-plus"></i>
               Add Entry
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              disabled={isSubmitting}
+              onClick={handleCancelOrder}
+            >
+              <i className="fas fa-times"></i>
+              Cancel Order
             </button>
             <button
               type="submit"

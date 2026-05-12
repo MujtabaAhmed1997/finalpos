@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function PriceRuleList() {
   const [data, setData] = useState([]);
@@ -11,6 +13,8 @@ function PriceRuleList() {
   const [limit] = useState(5);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   // Fetch price rules (either all or filtered)
   const fetchPriceRules = async (page, search = "") => {
@@ -52,14 +56,23 @@ function PriceRuleList() {
   }, [searchTerm, currentPage]);
 
   const handleDelete = async (priceRuleId) => {
-    if (window.confirm("Are you sure you want to delete this price rule?")) {
-      try {
-        await axios.delete(`http://localhost:3001/api/pricerule/${priceRuleId}`);
-        fetchPriceRules(currentPage, searchTerm);
-      } catch (error) {
-        console.error("Error deleting price rule:", error);
-        setError("Failed to delete price rule");
-      }
+    const ok = await confirm({
+      title: "Delete price rule?",
+      description: "This will permanently remove the price rule.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/pricerule/${priceRuleId}`);
+      toast.success("Price rule deleted.");
+      fetchPriceRules(currentPage, searchTerm);
+    } catch (error) {
+      console.error("Error deleting price rule:", error);
+      toast.error("Failed to delete price rule");
+      setError("Failed to delete price rule");
     }
   };
 

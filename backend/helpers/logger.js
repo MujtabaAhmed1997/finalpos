@@ -1,5 +1,7 @@
 const winston = require('winston');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
 
 // Define custom log levels
 const customLevels = {
@@ -21,11 +23,32 @@ const customLevels = {
     }
 };
 
-// Ensure logs directory exists
-const logsDir = path.join(__dirname, '../logs');
-const fs = require('fs');
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
+// Ensure logs directory exists and is writable.
+const defaultLogsDir = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
+const fallbackLogsDir = path.join(os.tmpdir(), 'pos-logs');
+let logsDir = defaultLogsDir;
+
+const ensureDirectory = (dir) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+};
+
+try {
+    ensureDirectory(logsDir);
+} catch (err) {
+    if (err.code === 'EACCES' || err.code === 'EPERM') {
+        console.warn(`Log directory ${logsDir} is not writable, falling back to ${fallbackLogsDir}`);
+        logsDir = fallbackLogsDir;
+        try {
+            ensureDirectory(logsDir);
+        } catch (fallbackErr) {
+            console.error(`Unable to create fallback log directory ${logsDir}:`, fallbackErr);
+            logsDir = null;
+        }
+    } else {
+        throw err;
+    }
 }
 
 // Create logger instance
@@ -40,32 +63,32 @@ const logger = winston.createLogger({
     ),
     transports: [
         // Error logs
-        new winston.transports.File({
-            filename: path.join(logsDir, 'error.log'),
-            level: 'error',
-            maxsize: 5242880, // 5MB
-            maxFiles: 5
-        }),
+        ...(logsDir ? [
+            new winston.transports.File({
+                filename: path.join(logsDir, 'error.log'),
+                level: 'error',
+                maxsize: 5242880, // 5MB
+                maxFiles: 5
+            }),
 
-        // Combined logs (all levels)
-        new winston.transports.File({
-            filename: path.join(logsDir, 'combined.log'),
-            maxsize: 5242880, // 5MB
-            maxFiles: 10
-        }),
-
-        // Console output in development
-        ...(process.env.NODE_ENV !== 'production' ? [
-            new winston.transports.Console({
-                format: winston.format.combine(
-                    winston.format.colorize({ colors: customLevels.colors }),
-                    winston.format.printf(({ timestamp, level, message, ...meta }) => {
-                        const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-                        return `${timestamp} [${level}]: ${message} ${metaStr}`;
-                    })
-                )
+            // Combined logs (all levels)
+            new winston.transports.File({
+                filename: path.join(logsDir, 'combined.log'),
+                maxsize: 5242880, // 5MB
+                maxFiles: 10
             })
-        ] : [])
+        ] : []),
+
+        // Console output in development or fallback mode
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize({ colors: customLevels.colors }),
+                winston.format.printf(({ timestamp, level, message, ...meta }) => {
+                    const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
+                    return `${timestamp} [${level}]: ${message} ${metaStr}`;
+                })
+            )
+        })
     ]
 });
 

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Pagination } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function ReturnOrderShow() {
   const [data, setData] = useState([]);
@@ -13,6 +15,8 @@ function ReturnOrderShow() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const pageSize = 10; // Define the number of records per page
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   useEffect(() => {
     fetchReturnOrders(currentPage);
@@ -34,22 +38,29 @@ function ReturnOrderShow() {
       });
   };
 
-  const handleDelete = (ReturnOrderID) => {
-    if (!window.confirm('Are you sure you want to delete this return order?')) {
-      return;
-    }
+  const handleDelete = async (ReturnOrderID) => {
+    const ok = await confirm({
+      title: "Delete return order?",
+      description: "This will permanently delete the return order.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
 
     setLoading(true);
     axios.delete(`http://localhost:3001/api/return-orders/${ReturnOrderID}`)
       .then(res => {
         console.log('Return order deleted successfully');
         setSuccess('Return order deleted successfully!');
+        toast.success("Return order deleted.");
         fetchReturnOrders(currentPage);
         setTimeout(() => setSuccess(''), 3000);
       })
       .catch(err => {
         console.log(err);
         setError('Failed to delete return order. Please try again.');
+        toast.error("Failed to delete return order.");
         setTimeout(() => setError(''), 3000);
       })
       .finally(() => {

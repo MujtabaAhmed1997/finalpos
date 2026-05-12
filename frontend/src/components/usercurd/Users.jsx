@@ -3,12 +3,16 @@ import {Link, useNavigate} from 'react-router-dom';
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import './Users.css'
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function Users() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
+    const { confirm } = useConfirm();
+    const toast = useToast();
   
     useEffect(() => {
         setLoading(true);
@@ -23,13 +27,23 @@ function Users() {
             });
     }, []);
 
-    const handleDelete = (id, name) => {
-        if (window.confirm(`Are you sure you want to delete user "${name}"?`)) {
-            axios.delete(`http://localhost:3001/api/usercurd/delete/${id}`)
-                .then(res => {
-                    navigate(0);
-                })
-                .catch(err => console.log(err));
+    const handleDelete = async (id, name) => {
+        const ok = await confirm({
+            title: "Delete user?",
+            description: `Are you sure you want to delete user "${name}"?`,
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            tone: "danger",
+        });
+        if (!ok) return;
+
+        try {
+            await axios.delete(`http://localhost:3001/api/usercurd/delete/${id}`);
+            toast.success("User deleted.");
+            navigate(0);
+        } catch (err) {
+            console.log(err);
+            toast.error("Failed to delete user.");
         }
     };
 

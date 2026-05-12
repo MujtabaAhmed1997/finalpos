@@ -2,6 +2,8 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './Salesordershow.css';
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function SalesOrdershow() {
   const [data, setData] = useState([]);
@@ -11,6 +13,8 @@ function SalesOrdershow() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const pageSize = 10; // Define the number of records per page
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   useEffect(() => {
     fetchSalesOrders(currentPage);
@@ -32,14 +36,23 @@ function SalesOrdershow() {
       });
   };
 
-  const handleDelete = (SalesOrderID) => {
-    if (window.confirm('Are you sure you want to delete this sales order?')) {
-      axios.delete(`http://localhost:3001/api/sales-orders/${SalesOrderID}`)
-        .then(res => {
-          console.log('Sales order deleted successfully');
-          fetchSalesOrders(currentPage);
-        })
-        .catch(err => console.log(err));
+  const handleDelete = async (SalesOrderID) => {
+    const ok = await confirm({
+      title: "Delete sales order?",
+      description: "This will permanently remove the sales order (and may remove its details depending on backend rules).",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/sales-orders/${SalesOrderID}`);
+      toast.success("Sales order deleted.");
+      fetchSalesOrders(currentPage);
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete sales order. Please try again.");
     }
   };
 

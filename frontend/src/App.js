@@ -13,7 +13,6 @@ import Supplier from './pages/Supplierpage/Supplier'
 import AddSupplier from './components/supplier/suppliercomponen/AddSupplier'
 import Readsupplier from './components/supplier/suppliercomponen/Readsupplier'
 import UpdateSupplier from './components/supplier/suppliercomponen/UpdateSupplier'
-import ProductForm from './components/productadder'
 import Variations from './components/Variation/Variations'
 import AddVariation from './components/Variation/AddVaraition'
 import Userpage from './pages/Users/Userpage'
@@ -31,15 +30,14 @@ import SupplierPaymentsList from './components/Supplierpayment/SPaymentlist'
 import AddCustomer from './components/Customer/AddCustomer'
 import CustomerComponent from './components/Customer/Customer'
 import UpdateCustomer from './components/Customer/Updatecustomer'
-import SalesOrderList from './components/Sales/Salesorderdetail'
-import SalesOrderForm from './components/Sales/Salesorder'
-import UpdateSalesOrderForm from './components/Sales/Updatesaleorder'
-import AddSalesOrderDetail from './components/Sales/Salesorderdetail'
+import SalesOrderDetailPage from './pages/Sales/SalesOrderDetailPage'
+import SalesOrderFormPage from './pages/Sales/SalesOrderFormPage'
+import UpdateSalesOrderPage from './pages/Sales/UpdateSalesOrderPage'
 import StockComponent from './components/Stock/Stock'
 import StockDetail from './components/Stock/StockDetails'
 import PriceHistory from './components/Pricehistory/PriceHistory'
-import SalesOrdershow from './components/Sales/Salesordershow'
-import SaleOrderDetailList from './components/Sales/Sorderdeaillist'
+import Sales from './pages/Sales/Sales'
+import SaleOrderDetailListPage from './pages/Sales/SaleOrderDetailListPage'
 import AddCustomerPayment from './components/Customerpayment/Customerpayments'
 import GenericReceipt from './components/Recipt/Reciept'
 import OverdueCustomers from './components/Supplierpayment/Overduepayment'
@@ -63,7 +61,6 @@ import AddReminder from './pages/Reminder/AddReminder'
 import DisplayReminderComponent from './components/Reminder/DisplayReminderComponent'
 import ViewReminders from './components/Reminder/ViewReminders'
 import NotificationsPage from './components/NotificationBell'
-import ProductVariationList from './components/Variation/AllVariation'
 import AllVariation from './components/Variation/AllVariation'
 //import Home from './pages/Home'
 
@@ -133,16 +130,16 @@ function App() {
 
             {/* <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} /> */}
 
-            <Route path='/salesorder/show' element={<SalesOrdershow />} />
-            <Route path='/salesorder/add' element={<SalesOrderForm />} />
-            <Route path='/salesorder/update/:id' element={<UpdateSalesOrderForm />}></Route>
+            <Route path='/salesorder/show' element={<Sales />} />
+            <Route path='/salesorder/add' element={<SalesOrderFormPage />} />
+            <Route path='/salesorders/update/:id' element={<UpdateSalesOrderPage />} />
 
             <Route path="/salesorder/receipt/:id" element={<GenericReceipt orderType="sales" />} />
             <Route path="/purchaseorder/receipt/:id" element={<GenericReceipt orderType="purchase" />} />
 
 
-            <Route path='/salesorderdetail/:id' element={<AddSalesOrderDetail />} />
-            <Route path='/salesorderdetaillist/:id' element={<SaleOrderDetailList />} />
+            <Route path='/salesorderdetail/:id' element={<SalesOrderDetailPage />} />
+            <Route path='/salesorderdetaillist/:id' element={<SaleOrderDetailListPage />} />
 
 
 

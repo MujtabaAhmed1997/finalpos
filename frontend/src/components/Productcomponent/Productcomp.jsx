@@ -3,11 +3,15 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill } from 'react-icons/bs';
 import './Productcomp.css'; // Import the CSS file for this component
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function Product() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   useEffect(() => {
     fetchProducts();
@@ -83,19 +87,28 @@ function Product() {
 
   // Function to handle delete product
   const handleDeleteProduct = async (productId) => {
+    const ok = await confirm({
+      title: "Delete product?",
+      description: "This will permanently delete the product. If it has variations/orders, the server may reject the delete.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
     try {
       const response = await axios.delete(`http://localhost:3001/api/products/${productId}`);
       
       if (response.data.success) {
         // Remove the deleted product from state
         setProducts(prevProducts => prevProducts.filter(product => product.ProductID !== productId));
-        alert('Product deleted successfully!');
+        toast.success("Product deleted.");
       } else {
-        alert(response.data.message || 'Failed to delete product');
+        toast.error(response.data.message || "Failed to delete product");
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Failed to delete product');
+      toast.error("Failed to delete product");
     }
   };
 

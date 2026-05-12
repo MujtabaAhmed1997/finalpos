@@ -3,6 +3,8 @@ import axios from "axios";
 import { Table, Button, Modal, Form, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./expense.css";
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 const ViewAllExpenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -11,6 +13,8 @@ const ViewAllExpenses = () => {
   const [success, setSuccess] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,8 +42,14 @@ const ViewAllExpenses = () => {
 
   // Handle delete
   const deleteExpense = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this expense?"))
-      return;
+    const ok = await confirm({
+      title: "Delete expense?",
+      description: "This will permanently delete the expense.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
 
     setLoading(true);
     try {
@@ -48,8 +58,10 @@ const ViewAllExpenses = () => {
       );
       setExpenses((prev) => prev.filter((expense) => expense.id !== id));
       setSuccess("Expense deleted successfully!");
+      toast.success("Expense deleted.");
     } catch (err) {
       setError("Failed to delete expense. Please try again.");
+      toast.error("Failed to delete expense.");
     } finally {
       setLoading(false);
       setTimeout(() => setSuccess(""), 3000); // Clear success message after 3 seconds
@@ -74,6 +86,7 @@ const ViewAllExpenses = () => {
       !selectedExpense.Date
     ) {
       setError("Please fill out all fields.");
+      toast.error("Please fill out all fields.");
       return;
     }
 
@@ -89,9 +102,11 @@ const ViewAllExpenses = () => {
         )
       );
       setSuccess("Expense updated successfully!");
+      toast.success("Expense updated.");
       handleModalClose();
     } catch (err) {
       setError("Failed to update expense. Please try again.");
+      toast.error("Failed to update expense.");
     } finally {
       setLoading(false);
       setTimeout(() => setError(""), 3000); // Clear error message after 3 seconds

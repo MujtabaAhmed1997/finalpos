@@ -2,6 +2,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import "./Customerleisure.css";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function CustomerLeisureShow() {
   const [data, setData] = useState([]);
@@ -16,6 +17,7 @@ function CustomerLeisureShow() {
   const [endDate, setEndDate] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchCustomers();
@@ -129,7 +131,7 @@ function CustomerLeisureShow() {
 
   const downloadCSV = () => {
     if (!selectedCustomer || filteredData.length === 0) {
-      alert("Please select a customer and ensure there's data to download");
+      toast.error("Select a customer and make sure there is data to download.");
       return;
     }
 
@@ -302,7 +304,7 @@ function CustomerLeisureShow() {
       setIsDownloading(false);
     } catch (error) {
       console.error('Error downloading CSV:', error);
-      alert('Error downloading file. Please try again.');
+      toast.error("Error downloading file. Please try again.");
       setIsDownloading(false);
     }
   };

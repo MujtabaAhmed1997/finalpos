@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
+import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useToast } from "../../ui/toast/ToastProvider";
 
 function Variations() {
   const [variations, setVariations] = useState([]);
@@ -11,6 +13,8 @@ function Variations() {
   const [limit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { confirm } = useConfirm();
+  const toast = useToast();
 
   // Fetch variations (either all or filtered)
   const fetchVariations = async (page, search = "") => {
@@ -57,14 +61,22 @@ function Variations() {
   }, [searchTerm, currentPage]);
 
   const handleDelete = async (variationId) => {
-    if (window.confirm("Are you sure you want to delete this variation?")) {
-      try {
-        await axios.delete(`http://localhost:3001/api/productVariations/${variationId}`);
-        fetchVariations(currentPage, searchTerm);
-      } catch (err) {
-        console.error("Error deleting variation:", err);
-        alert("Failed to delete variation.");
-      }
+    const ok = await confirm({
+      title: "Delete variation?",
+      description: "This will permanently remove the variation.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/productVariations/${variationId}`);
+      toast.success("Variation deleted.");
+      fetchVariations(currentPage, searchTerm);
+    } catch (err) {
+      console.error("Error deleting variation:", err);
+      toast.error("Failed to delete variation.");
     }
   };
 

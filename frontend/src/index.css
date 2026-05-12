@@ -1,0 +1,55 @@
+/* Global theme + base styles */
+
+:root {
+  /* Brand */
+  --app-bg: #1d2634;
+  --app-surface: rgba(255, 255, 255, 0.95);
+  --app-surface-2: rgba(255, 255, 255, 0.08);
+  --app-border: rgba(255, 255, 255, 0.12);
+  --app-text: rgba(255, 255, 255, 0.92);
+  --app-text-muted: rgba(255, 255, 255, 0.7);
+
+  --app-primary: #667eea;
+  --app-primary-2: #764ba2;
+  --app-success: #22c55e;
+  --app-warning: #f59e0b;
+  --app-danger: #ef4444;
+  --app-info: #06b6d4;
+
+  /* Layout */
+  --sidebar-width: 280px;
+  --header-height: 70px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Common card surface */
+.app-surface {
+  background: var(--app-surface);
+  border: 1px solid rgba(64, 64, 64, 0.6);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Simple page container helper (useful for non-grid screens) */
+.app-page {
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
+}
+
