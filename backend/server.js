@@ -61,6 +61,43 @@ app.use(cors());
 // Logging middleware (log all requests)
 app.use(requestLogger);
 
+// Simple root status page for backend health
+app.get(['/', '/status'], (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pak Brotherz Backend</title>
+  <style>
+    body { margin:0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e3a8a, #0f172a 60%); color:#e2e8f0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .container { max-width: 520px; width: 100%; padding: 32px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 28px; box-shadow: 0 18px 60px rgba(15, 23, 42, 0.45); }
+    h1 { margin: 0 0 12px; font-size: 2.2rem; color:#f8fafc; }
+    p { margin: 0 0 16px; line-height:1.75; color:#cbd5e1; }
+    .status { display:inline-flex; align-items:center; gap:10px; margin-bottom:18px; font-size:1rem; font-weight:600; }
+    .dot { width:12px; height:12px; border-radius:9999px; background:#22c55e; box-shadow:0 0 12px rgba(34,197,94,.45); }
+    .card { margin-top:18px; padding:18px; border-radius:18px; background: rgba(30, 41, 59, 0.8); border:1px solid rgba(148, 163, 184, 0.14); }
+    a.button { display:inline-block; margin-top:18px; padding:12px 20px; border-radius:14px; background:linear-gradient(135deg,#3b82f6,#9333ea); color:#fff; text-decoration:none; transition: transform .2s ease, box-shadow .2s ease; }
+    a.button:hover { transform: translateY(-2px); box-shadow: 0 18px 30px rgba(59,130,246,.25); }
+    .small { font-size:.95rem; color:#94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="status"><span class="dot"></span>Backend is running</div>
+    <h1>Pak Brotherz Backend</h1>
+    <p>This server is live and responding. Use your frontend or API clients to connect to the available endpoints under <strong>/api</strong>.</p>
+    <div class="card">
+      <p><strong>Health check:</strong> GET <code>/</code> or <code>/status</code></p>
+      <p class="small">If you want to log in, use the frontend or POST to <code>/api/users/login</code>.</p>
+    </div>
+    <a class="button" href="/api/users/login">Go to login API</a>
+  </div>
+</body>
+</html>
+  `);
+});
+
 // Use the routes
 app.use('/api/users', userRoutes);
 
@@ -148,7 +185,6 @@ app.use(globalErrorHandler);
 //   console.log(`Server is running on http://localhost:${port}`);
 // });
 
-
-app.listen(`${process.env.Port}`, () => {
-  console.log(`Server is running on http://localhost:${process.env.Port}`);
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
