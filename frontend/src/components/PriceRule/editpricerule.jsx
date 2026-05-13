@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaEdit, FaBox, FaWeightHanging, FaDollarSign } from 'react-icons/fa';
+import { get, put } from "../../service/apiClient";
 
 function EditPriceRuleForm() {
   const { id: priceRuleId } = useParams();
@@ -29,7 +29,7 @@ function EditPriceRuleForm() {
   useEffect(() => {
     const fetchVariations = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/productVariations');
+        const response = await get('/productVariations');
         setVariations(response.data);
       } catch (error) {
         console.error('Error fetching variations:', error);
@@ -44,7 +44,7 @@ function EditPriceRuleForm() {
   useEffect(() => {
     const fetchPriceRule = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/pricerule/${priceRuleId}`);
+        const response = await get(`/pricerule/${priceRuleId}`);
         const { VariationID, min_quantity, max_quantity, price_per_kg } = response.data;
 
         setSelectedVariation(VariationID);
@@ -73,7 +73,7 @@ function EditPriceRuleForm() {
     };
 
     try {
-      await axios.put(`http://localhost:3001/api/pricerule/${priceRuleId}`, priceRuleData);
+      await put(`/pricerule/${priceRuleId}`, priceRuleData);
       navigate('/pricerule/show');
     } catch (error) {
       console.error('Error updating price rule:', error);

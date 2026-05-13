@@ -1,8 +1,8 @@
-import axios from "axios";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import "./Customerleisure.css";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get } from "../../service/apiClient";
 
 function CustomerLeisureShow() {
   const [data, setData] = useState([]);
@@ -38,8 +38,7 @@ function CustomerLeisureShow() {
 
   const fetchCustomerLeisureById = (customerId) => {
     setLoading(true);
-    axios
-      .get(`http://localhost:3001/api/customerleisure/customer/${customerId}`)
+    get(`/customerleisure/customer/${customerId}`)
       .then((res) => {
         setData(res.data || []);
         setLoading(false);
@@ -51,8 +50,7 @@ function CustomerLeisureShow() {
   };
 
   const fetchCustomers = () => {
-    axios
-      .get("http://localhost:3001/api/customers")
+    get("/customers")
       .then((res) => {
         const customersData = res.data?.data || [];
         setCustomers(customersData);

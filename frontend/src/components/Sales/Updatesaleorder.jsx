@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { validateSalesOrder } from '../../controllers/salesvalidator';
 import { FaEdit, FaCreditCard, FaTimes } from 'react-icons/fa';
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, post, put } from "../../service/apiClient";
 
 function UpdateSalesOrderForm() {
   const { id } = useParams();
@@ -31,7 +31,7 @@ function UpdateSalesOrderForm() {
   const toast = useToast();
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/sales-orders/${id}`)
+    get(`/sales-orders/${id}`)
       .then(res => {
         setValues(prev => ({
           ...prev,
@@ -49,7 +49,7 @@ function UpdateSalesOrderForm() {
   }, [id]);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/customers')
+    get('/customers')
       .then(res => {
         setCustomers(Array.isArray(res.data) ? res.data : []);
       })
@@ -60,7 +60,7 @@ function UpdateSalesOrderForm() {
   }, []);
 
   const fetchSalesOrderDetails = (salesOrderId) => {
-    axios.get(`http://localhost:3001/api/salesordersdetails/salesOrder/${salesOrderId}/total`)
+    get(`/salesordersdetails/salesOrder/${salesOrderId}/total`)
       .then(res => {
         const totalAmount = res.data.total;
         setValues(prev => ({
@@ -125,7 +125,7 @@ function UpdateSalesOrderForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
 
-      axios.put(`http://localhost:3001/api/sales-orders/${id}`, values)
+      put(`/sales-orders/${id}`, values)
         .then(res => {
           console.log('Sales order updated:', res.data);
 
@@ -136,7 +136,7 @@ function UpdateSalesOrderForm() {
             TransactionID: id,
           };
 
-          return axios.post('http://localhost:3001/api/customerleisure/create', leisureEntry);
+          return post('/customerleisure/create', leisureEntry);
         })
         .then(res => {
           console.log('CustomerLeisure entry created:', res.data);
@@ -167,7 +167,7 @@ function UpdateSalesOrderForm() {
           Notes: paymentData.Notes
         };
 
-        await axios.post('http://localhost:3001/api/customerpayments', paymentPayload);
+        await post('/customerpayments', paymentPayload);
 
         const newAmountPaid = values.AmountPaid + parseFloat(paymentData.PaymentAmount);
         const updatedValues = {
@@ -177,7 +177,7 @@ function UpdateSalesOrderForm() {
           PaymentStatus: newAmountPaid >= values.TotalAmount ? 'Paid' : 'Partial'
         };
 
-        await axios.put(`http://localhost:3001/api/sales-orders/${id}`, updatedValues);
+        await put(`/sales-orders/${id}`, updatedValues);
 
         toast.success("Payment processed successfully!");
         setShowPaymentModal(false);

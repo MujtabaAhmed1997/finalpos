@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill } from 'react-icons/bs';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './category.css'; // Import the CSS file for this component
+import { get, delete_ } from '../../service/apiClient';
 
 function Category() {
   const [categories, setCategories] = useState([]);
@@ -17,7 +17,7 @@ function Category() {
   // Function to fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/product-categories');
+      const response = await get('/product-categories');
       
       // Categories API returns data directly without success wrapper
       let fetchedCategories;
@@ -66,7 +66,7 @@ function Category() {
   // Function to handle delete category
   const handleDeleteCategory = async (categoryId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/product-categories/${categoryId}`);
+      await delete_(`/product-categories/${categoryId}`);
       fetchCategories(); // Refresh categories after deletion
     } catch (error) {
       console.error('Error deleting category:', error);

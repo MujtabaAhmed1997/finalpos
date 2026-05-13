@@ -2,8 +2,8 @@ import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./AddReminderComponent.css";
+import { post } from "../../service/apiClient";
 
 const AddReminderComponent = () => {
   const [value, setChange] = useState(new Date());
@@ -26,13 +26,10 @@ const AddReminderComponent = () => {
     try {
       const formattedDate = value.toISOString().split("T")[0]; // yyyy-mm-dd
 
-      const response = await axios.post(
-        "http://localhost:3001/api/reminders/add",
-        {
-          TaskDescription: taskDescription,
-          Date: formattedDate,
-        }
-      );
+      const response = await post("/reminders/add", {
+        TaskDescription: taskDescription,
+        Date: formattedDate,
+      });
 
       setSuccessMsg("Reminder added successfully!");
       setTaskDescription(""); // Clear the textarea

@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
+import { get, delete_ } from "../../service/apiClient";
 
 function CustomerPaymentsList() {
   const [data, setData] = useState([]);
@@ -26,10 +26,10 @@ function CustomerPaymentsList() {
         params.append('search', search.trim());
       }
 
-      const url = `http://localhost:3001/api/customerpayments?${params}`;
+      const url = `/customerpayments?${params}`;
       console.log("Making request to:", url);
       
-      const res = await axios.get(url);
+      const res = await get(url);
       console.log("Customer payments response:", res.data);
       
       const payments = res.data.customerPayments || [];
@@ -63,7 +63,7 @@ function CustomerPaymentsList() {
 
   const handleDelete = async (paymentId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/customerpayments/${paymentId}`);
+      await delete_(`/customerpayments/${paymentId}`);
       fetchCustomerPayments(currentPage, searchTerm);
     } catch (err) {
       console.error("Error deleting customer payment:", err);

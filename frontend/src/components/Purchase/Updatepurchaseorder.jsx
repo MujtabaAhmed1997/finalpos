@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { validatePurchaseOrder } from '../../controllers/Purchaseordervalidator';
 import { FaEdit, FaSave, FaArrowLeft, FaBuilding, FaCalendarAlt, FaDollarSign } from 'react-icons/fa';
 import './UpdatePurchaseOrderForm.css';
+import { get, post, put } from "../../service/apiClient";
 
 function UpdatePurchaseOrderForm() {
   const { id } = useParams();
@@ -27,8 +27,8 @@ function UpdatePurchaseOrderForm() {
       try {
         setIsLoading(true);
         const [purchaseOrderRes, suppliersRes] = await Promise.all([
-          axios.get(`http://localhost:3001/api/purchase-orders/${id}`),
-          axios.get('http://localhost:3001/api/suppliers')
+          get(`/purchase-orders/${id}`),
+          get('/suppliers')
         ]);
 
         const purchaseOrder = purchaseOrderRes.data;
@@ -55,7 +55,7 @@ function UpdatePurchaseOrderForm() {
   }, [id]);
 
   const fetchPurchaseOrderDetails = (purchaseOrderId) => {
-    axios.get(`http://localhost:3001/api/purchaseordersdetails/purchaseOrder/${purchaseOrderId}/details`)
+    get(`/purchaseordersdetails/purchaseOrder/${purchaseOrderId}/details`)
       .then(res => {
         const details = res.data;
         console.log("Fetched details object:", details);
@@ -102,7 +102,7 @@ function UpdatePurchaseOrderForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       
-      axios.put(`http://localhost:3001/api/purchase-orders/${id}`, values)
+      put(`/purchase-orders/${id}`, values)
         .then(res => {
           console.log('Purchase order updated:', res.data);
   
@@ -113,7 +113,7 @@ function UpdatePurchaseOrderForm() {
             TransactionID: id,
           };
   
-          return axios.post('http://localhost:3001/api/supplierleisure/create', leisureEntry);
+          return post('/supplierleisure/create', leisureEntry);
         })
         .then(res => {
           console.log('SupplierLeisure entry created:', res.data);

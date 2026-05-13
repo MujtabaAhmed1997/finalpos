@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { validateSupplier } from './validator';
 import { FaPlusCircle, FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope } from "react-icons/fa";
+import { post } from "../../../service/apiClient";
 
 function AddSupplier() {
   const [values, setValues] = useState({
@@ -33,7 +33,7 @@ function AddSupplier() {
       setIsSubmitting(true);
       
       try {
-        const response = await axios.post('http://localhost:3001/api/suppliers', values);
+        const response = await post('/suppliers', values);
         console.log("Supplier added:", response.data);
         navigate('/suppliers');
       } catch (err) {

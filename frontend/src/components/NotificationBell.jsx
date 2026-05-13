@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import "./NotificationBell.css";
+import { get } from "../service/apiClient";
 
 const NotificationPage = () => {
   const [reminders, setReminders] = useState([]);
@@ -15,8 +15,8 @@ const NotificationPage = () => {
         const today = new Date().toISOString().split("T")[0];
 
         const [remindersRes, overdueRes] = await Promise.all([
-          axios.get(`http://localhost:3001/api/reminders?date=${today}`),
-          axios.get("http://localhost:3001/api/overdue"),
+          get(`/reminders?date=${today}`),
+          get("/overdue"),
         ]);
 
         setReminders(remindersRes.data?.reminders || []);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { validatePayment } from '../../controllers/spaymentvalidator';
 import { FaPlusCircle, FaUser, FaCalendarAlt, FaMoneyBillWave, FaCreditCard } from "react-icons/fa";
+import { get, post } from "../../service/apiClient";
 
 function AddPayment() {
   const todayDate = new Date().toISOString().split("T")[0];
@@ -26,7 +26,7 @@ function AddPayment() {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const res = await axios.get('http://localhost:3001/api/suppliers');
+        const res = await get('/suppliers');
         setSuppliers(res.data);
       } catch (err) {
         console.error('Error fetching suppliers:', err);
@@ -59,7 +59,7 @@ function AddPayment() {
             ? values.CustomPaymentMethod
             : values.PaymentMethod;
 
-        const response = await axios.post('http://localhost:3001/api/supplierpayment', {
+        const response = await post('/supplierpayment', {
           ...values,
           PaymentMethod: paymentMethod,
         });
@@ -76,7 +76,7 @@ function AddPayment() {
           Description: `Payment made via ${paymentData.PaymentMethod}`,
         };
 
-        await axios.post('http://localhost:3001/api/supplierleisure/create', leisureEntry);
+        await post('/supplierleisure/create', leisureEntry);
 
         console.log("Leisure entry added, navigating to payment list...");
         navigate("/supplierpayments/list");

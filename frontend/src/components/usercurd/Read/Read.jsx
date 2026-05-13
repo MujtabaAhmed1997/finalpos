@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaUserTag, FaCalendar, FaArrowLeft, FaEdit, FaSpinner } from 'react-icons/fa';
+import { get } from "../../../service/apiClient";
 
 function Read() {
   const { id } = useParams();
@@ -10,7 +10,7 @@ function Read() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/usercurd/read/${id}`)
+    get(`/usercurd/read/${id}`)
       .then(res => {
         console.log(res);
         setProducts(res.data);

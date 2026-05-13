@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './Salesordershow.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function SalesOrdershow() {
   const [data, setData] = useState([]);
@@ -22,7 +22,7 @@ function SalesOrdershow() {
 
   const fetchSalesOrders = (page) => {
     setLoading(true);
-    axios.get(`http://localhost:3001/api/sales-orders?page=${page}&limit=${pageSize}`)
+    get(`/sales-orders?page=${page}&limit=${pageSize}`)
       .then(res => {
         console.log('Sales Orders API Response:', res.data);
         setData(res.data.salesOrders);
@@ -47,7 +47,7 @@ function SalesOrdershow() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/sales-orders/${SalesOrderID}`);
+      await delete_(`/sales-orders/${SalesOrderID}`);
       toast.success("Sales order deleted.");
       fetchSalesOrders(currentPage);
     } catch (err) {

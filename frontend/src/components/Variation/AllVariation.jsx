@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function AllVariation() {
   const [variations, setVariations] = useState([]);
@@ -21,9 +21,9 @@ function AllVariation() {
     try {
       setLoading(true);
       // Use the correct endpoint that supports both search and pagination
-      const endpoint = `http://localhost:3001/api/productVariations/all?page=${page}&limit=${limit}${search ? `&search=${search}` : ''}`;
+      const endpoint = `/productVariations/all?page=${page}&limit=${limit}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
 
-      const response = await axios.get(endpoint);
+      const response = await get(endpoint);
       
       if (response.data.variations) {
         setVariations(response.data.variations);
@@ -70,7 +70,7 @@ function AllVariation() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/productVariations/${variationId}`);
+      await delete_(`/productVariations/${variationId}`);
       toast.success("Variation deleted.");
       fetchVariations(currentPage, searchTerm);
     } catch (err) {

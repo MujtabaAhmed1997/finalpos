@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaShoppingCart, FaBox, FaDollarSign, FaListAlt } from 'react-icons/fa';
 import './PurchaseOrderDetailList.css';
+import { get } from "../../service/apiClient";
 
 function PurchaseOrderDetailList() {
   const { id: purchaseOrderId } = useParams();
@@ -18,7 +18,7 @@ function PurchaseOrderDetailList() {
 
   const fetchPurchaseOrderDetails = () => {
     setLoading(true);
-    axios.get(`http://localhost:3001/api/purchaseordersdetails/purchaseOrder/${purchaseOrderId}/details`)
+    get(`/purchaseordersdetails/purchaseOrder/${purchaseOrderId}/details`)
       .then(res => {
         setDetails(res.data.OrderDetails);
         setLoading(false);
@@ -30,7 +30,7 @@ function PurchaseOrderDetailList() {
   };
 
   const fetchPurchaseOrderInfo = () => {
-    axios.get(`http://localhost:3001/api/purchase-orders/${purchaseOrderId}`)
+    get(`/purchase-orders/${purchaseOrderId}`)
       .then(res => {
         setPurchaseOrder(res.data);
       })

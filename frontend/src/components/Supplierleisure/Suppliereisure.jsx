@@ -768,7 +768,7 @@
 import {jwtDecode }from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient, { get } from "../../service/apiClient";
 function SupplierLeisureShow() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -820,10 +820,8 @@ function SupplierLeisureShow() {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      const res = await axios.get(`http://localhost:3001/api/supplierleisure/supplier/${supplierId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const res = await apiClient.get(`/supplierleisure/supplier/${supplierId}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       setData(res.data || []);
     } catch (err) {
@@ -835,7 +833,7 @@ function SupplierLeisureShow() {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/suppliers');
+      const res = await get('/suppliers');
       setSuppliers(res.data || []);
       setFilteredSuppliers(res.data || []);
     } catch (err) {

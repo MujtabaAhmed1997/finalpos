@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaPlusCircle, FaBox, FaWeightHanging, FaDollarSign, FaTrash, FaList } from 'react-icons/fa';
+import { get, post } from "../../service/apiClient";
 
 function PriceRuleForm() {
   const [selectedVariation, setSelectedVariation] = useState('');
@@ -32,7 +32,7 @@ function PriceRuleForm() {
   useEffect(() => {
     const fetchVariations = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/productVariations');
+        const response = await get('/productVariations');
         setVariations(response.data);
       } catch (error) {
         console.error('Error fetching variations:', error);
@@ -68,7 +68,7 @@ function PriceRuleForm() {
     try {
       // Submit each price range for the selected variation
       const promises = validRanges.map(range => 
-        axios.post('http://localhost:3001/api/pricerule', {
+        post('/pricerule', {
           VariationID: selectedVariation,
           min_quantity: range.min_quantity,
           max_quantity: range.max_quantity,

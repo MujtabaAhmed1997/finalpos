@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { FaEdit, FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaSpinner } from "react-icons/fa";
+import { get, put } from "../../../service/apiClient";
 
 function UpdateSupplier() {
   const { id } = useParams();
@@ -23,7 +23,7 @@ function UpdateSupplier() {
   useEffect(() => {
     const fetchSupplier = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/suppliers/${id}`);
+        const response = await get(`/suppliers/${id}`);
         setSupplier(response.data);
       } catch (err) {
         console.error('Error fetching supplier:', err);
@@ -49,7 +49,7 @@ function UpdateSupplier() {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put(`http://localhost:3001/api/suppliers/${id}`, supplier);
+      const response = await put(`/suppliers/${id}`, supplier);
       console.log("Supplier updated:", response.data);
       navigate('/suppliers');
     } catch (err) {

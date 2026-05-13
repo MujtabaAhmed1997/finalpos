@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaBox, FaArrowLeft, FaHistory, FaChartLine, FaCalendarAlt, FaExchangeAlt, FaPlus, FaMinus, FaExclamationTriangle, FaCheckCircle, FaClock } from 'react-icons/fa';
 import './StockDetails.css';
+import { get } from "../../service/apiClient";
 
 function StockDetail() {
   const { variationID } = useParams();
@@ -38,7 +38,7 @@ function StockDetail() {
     setError(null);
     
     try {
-      const res = await axios.get(`http://localhost:3001/api/stocktransaction/stock/${variationID}`);
+      const res = await get(`/stocktransaction/stock/${variationID}`);
       setData(res.data);
       console.log('Stock details fetched:', res.data);
     } catch (err) {

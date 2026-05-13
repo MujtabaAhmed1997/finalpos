@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill } from 'react-icons/bs';
 import './Productcomp.css'; // Import the CSS file for this component
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -21,7 +21,7 @@ function Product() {
   // Function to fetch products
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/products');
+      const response = await get('/products');
       
       if (response.data.success) {
         const fetchedProducts = response.data.products;
@@ -47,7 +47,7 @@ function Product() {
   // Function to fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/product-categories');
+      const response = await get('/product-categories');
       
       if (Array.isArray(response.data)) {
         setCategories(response.data);
@@ -97,7 +97,7 @@ function Product() {
     if (!ok) return;
 
     try {
-      const response = await axios.delete(`http://localhost:3001/api/products/${productId}`);
+      const response = await delete_(`/products/${productId}`);
       
       if (response.data.success) {
         // Remove the deleted product from state

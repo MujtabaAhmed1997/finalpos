@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
+import { get, delete_ } from "../../../service/apiClient";
 
 function SupplierComponent() {
   const [data, setData] = useState([]);
@@ -26,10 +26,10 @@ function SupplierComponent() {
         params.append('search', search.trim());
       }
 
-      const url = `http://localhost:3001/api/suppliers?${params}`;
+      const url = `/suppliers?${params}`;
       console.log("Making request to:", url);
       
-      const res = await axios.get(url);
+      const res = await get(url);
       console.log("Suppliers response:", res.data);
       
       const suppliers = res.data.suppliers || res.data || [];
@@ -63,7 +63,7 @@ function SupplierComponent() {
 
   const handleDelete = async (supplierId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/suppliers/${supplierId}`);
+      await delete_(`/suppliers/${supplierId}`);
       fetchSuppliers(currentPage, searchTerm);
     } catch (err) {
       console.error("Error deleting supplier:", err);

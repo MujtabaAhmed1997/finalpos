@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaUserEdit } from "react-icons/fa";
+import { get, put } from "../../service/apiClient";
 
 function UpdateCustomer() {
   const { id } = useParams();
@@ -20,8 +20,7 @@ function UpdateCustomer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/api/customers/${id}`)
+    get(`/customers/${id}`)
       .then((res) => setCustomer(res.data))
       .catch((err) => {
         console.error(err);
@@ -44,7 +43,7 @@ function UpdateCustomer() {
     setApiError("");
     
     try {
-      await axios.put(`http://localhost:3001/api/customers/${id}`, customer);
+      await put(`/customers/${id}`, customer);
       navigate("/customers");
     } catch (err) {
       if (err.response?.data?.errors) {

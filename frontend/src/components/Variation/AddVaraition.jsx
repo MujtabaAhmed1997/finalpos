@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
+import { get, post } from "../../service/apiClient";
 
 function AddVariation() {
   const [values, setValues] = useState({
@@ -24,7 +24,7 @@ function AddVariation() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/products");
+      const response = await get("/products");
       
       if (response.data.success) {
         setProducts(response.data.products);
@@ -126,10 +126,7 @@ function AddVariation() {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/productVariations",
-        submitData
-      );
+      const response = await post("/productVariations", submitData);
       console.log("Variation added:", response.data);
       navigate("/variations/all");
     } catch (err) {

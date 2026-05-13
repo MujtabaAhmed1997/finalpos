@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
+import { get, delete_ } from "../../service/apiClient";
 
 function SupplierPaymentsList() {
   const [data, setData] = useState([]);
@@ -26,10 +26,10 @@ function SupplierPaymentsList() {
         params.append('search', search.trim());
       }
 
-      const url = `http://localhost:3001/api/supplierpayment?${params}`;
+      const url = `/supplierpayment?${params}`;
       console.log("Making request to:", url);
       
-      const res = await axios.get(url);
+      const res = await get(url);
       console.log("Supplier payments response:", res.data);
       
       const payments = res.data.supplierPayments || [];
@@ -63,7 +63,7 @@ function SupplierPaymentsList() {
 
   const handleDelete = async (paymentId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/supplierpayment/${paymentId}`);
+      await delete_(`/supplierpayment/${paymentId}`);
       fetchSupplierPayments(currentPage, searchTerm);
     } catch (err) {
       console.error("Error deleting supplier payment:", err);

@@ -1,8 +1,8 @@
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import "./AddReminderComponent.css"; // Reuse the same styling
+import { get } from "../../service/apiClient";
 
 const DisplayReminderComponent = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -16,9 +16,7 @@ const DisplayReminderComponent = () => {
       setLoading(true);
       try {
         const formattedDate = formatDate(selectedDate);
-        const response = await axios.get(
-          `http://localhost:3001/api/reminders?date=${formattedDate}`
-        );
+        const response = await get(`/reminders?date=${formattedDate}`);
         setReminders(response.data.reminders);
       } catch (error) {
         console.error("Failed to fetch reminders:", error);

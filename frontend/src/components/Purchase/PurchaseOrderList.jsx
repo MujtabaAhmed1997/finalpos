@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
@@ -6,6 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './PurchaseOrderList.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function PurchaseOrderlist() {
   const [data, setData] = useState([]);
@@ -33,7 +33,7 @@ function PurchaseOrderlist() {
     if (start) queryParams += `&startDate=${start.toISOString()}`;
     if (end) queryParams += `&endDate=${end.toISOString()}`;
     console.log(queryParams);
-    axios.get(`http://localhost:3001/api/purchase-orders?${queryParams}`)
+    get(`/purchase-orders?${queryParams}`)
       .then(res => {
         setData(res.data.purchaseOrders);
         setTotalPages(res.data.totalPages);
@@ -46,7 +46,7 @@ function PurchaseOrderlist() {
   };
 
   const fetchSuppliers = () => {
-    axios.get('http://localhost:3001/api/suppliers')
+    get('/suppliers')
       .then(res => {
         setSuppliers(res.data.suppliers || []);
       })
@@ -67,7 +67,7 @@ function PurchaseOrderlist() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/purchase-orders/${purchaseOrderId}`);
+      await delete_(`/purchase-orders/${purchaseOrderId}`);
       toast.success("Purchase order deleted.");
       fetchPurchaseOrders(currentPage, selectedSupplier, startDate, endDate);
     } catch (err) {

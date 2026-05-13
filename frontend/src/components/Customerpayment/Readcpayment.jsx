@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { get, delete_ } from "../../service/apiClient";
 
 function EachCustomerPaymentsList() {
   const [data, setData] = useState([]);
@@ -18,7 +18,7 @@ function EachCustomerPaymentsList() {
 
   const fetchCustomerPayments = (page) => {
     setLoading(true);
-    axios.get(`http://localhost:3001/api/customerpayments/customer/${customerId}?page=${page}&pageSize=${pageSize}`)
+    get(`/customerpayments/customer/${customerId}?page=${page}&pageSize=${pageSize}`)
       .then(res => {
         const payments = res.data.customerPayments;
         console.log('Fetched payments:', payments); // Log the fetched data
@@ -37,7 +37,7 @@ function EachCustomerPaymentsList() {
   };
 
   const handleDelete = (paymentId) => {
-    axios.delete(`http://localhost:3001/api/customerpayments/${paymentId}`)
+    delete_(`/customerpayments/${paymentId}`)
       .then(res => {
         console.log('Customer payment deleted successfully');
         fetchCustomerPayments(currentPage);

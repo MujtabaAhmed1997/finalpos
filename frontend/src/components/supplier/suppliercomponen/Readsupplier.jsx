@@ -11,14 +11,14 @@
 // export default Readsupplier
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import { get } from "../../../service/apiClient";
 
 function Readsupplier() {
   const { id } = useParams();
   const [supplier, setSupplier] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/suppliers/${id}`)
+    get(`/suppliers/${id}`)
       .then(res => {
         console.log(res);
         setSupplier(res.data);

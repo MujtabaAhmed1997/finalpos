@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Pagination } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function ReturnOrderShow() {
   const [data, setData] = useState([]);
@@ -25,7 +25,7 @@ function ReturnOrderShow() {
   const fetchReturnOrders = (page) => {
     setLoading(true);
     setError('');
-    axios.get(`http://localhost:3001/api/return-orders?page=${page}&limit=${pageSize}`)
+    get(`/return-orders?page=${page}&limit=${pageSize}`)
       .then(res => {
         setData(res.data.returnOrders);
         setTotalPages(res.data.totalPages);
@@ -49,7 +49,7 @@ function ReturnOrderShow() {
     if (!ok) return;
 
     setLoading(true);
-    axios.delete(`http://localhost:3001/api/return-orders/${ReturnOrderID}`)
+    delete_(`/return-orders/${ReturnOrderID}`)
       .then(res => {
         console.log('Return order deleted successfully');
         setSuccess('Return order deleted successfully!');

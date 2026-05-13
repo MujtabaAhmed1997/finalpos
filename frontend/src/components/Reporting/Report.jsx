@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import { FaChartBar, FaArrowLeft, FaCalendarAlt, FaDollarSign, FaBox, FaChartLine, FaFileAlt, FaSearch, FaDownload, FaPrint, FaFileCsv, FaFileExcel, FaFilePdf, FaCog } from 'react-icons/fa';
 import './Report.css';
 import { useToast } from "../../ui/toast/ToastProvider";
+import apiClient from "../../service/apiClient";
 
 const ReportComponent = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -55,7 +55,7 @@ const ReportComponent = () => {
     setError(null);
     
     try {
-      const response = await axios.get("http://localhost:3001/api/report", {
+      const response = await apiClient.get("/report", {
         params: { startDate, endDate },
       });
       setReportData(response.data.reportData);

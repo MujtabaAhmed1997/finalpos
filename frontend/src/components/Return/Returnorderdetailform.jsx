@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { ReturnOrderDetailValidator } from '../../controllers/rorderdetails';
 import './Returnorderdetailform.css';
+import { get, post } from "../../service/apiClient";
 
 function AddReturnOrderDetail() {
   const { id: ReturnOrderID } = useParams();
@@ -28,7 +28,7 @@ function AddReturnOrderDetail() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('http://localhost:3001/api/products');
+        const response = await get('/products');
         
         if (response.data.success) {
           setProducts(response.data.products);
@@ -74,7 +74,7 @@ function AddReturnOrderDetail() {
 
   const fetchVariations = async (productId, index) => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/products/${productId}/variations`);
+      const response = await get(`/products/${productId}/variations`);
       setVariations(prev => ({ ...prev, [index]: response.data }));
     } catch (error) {
       console.error('Error fetching variations:', error);
@@ -83,7 +83,7 @@ function AddReturnOrderDetail() {
 
   const fetchVariationDetails = async (variationId, index) => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/productVariations/${variationId}`);
+      const response = await get(`/productVariations/${variationId}`);
       const variation = response.data;
       setEntries(prevEntries => {
         const newEntries = [...prevEntries];
@@ -137,7 +137,7 @@ function AddReturnOrderDetail() {
         
         // STEP 2: Fetch product data for all variations in parallel (batch request)
         const variationDataPromises = uniqueVariationIds.map(variationId => 
-          axios.get(`http://localhost:3001/api/productVariations/${variationId}/with-product`)
+          get(`/productVariations/${variationId}/with-product`)
         );
         const variationDataResponses = await Promise.all(variationDataPromises);
         console.log("Variation data responses:", variationDataResponses.map(r => r.data));
@@ -160,7 +160,7 @@ function AddReturnOrderDetail() {
             console.log(`Creating stock transaction for variation ${entry.VariationID} with unit type: ${unitType}`);
             
             stockTransactionPromises.push(
-              axios.post("http://localhost:3001/api/stocktransaction", {
+              post("/stocktransaction", {
                 VariationID: entry.VariationID,
                 TransactionDate: new Date(),
                 Quantity: entry.Quantity,
@@ -179,7 +179,7 @@ function AddReturnOrderDetail() {
             console.log(`Creating loose stock transaction for variation ${entry.VariationID} with unit type: ${unitType}`);
             
             stockTransactionPromises.push(
-              axios.post("http://localhost:3001/api/stocktransaction", {
+              post("/stocktransaction", {
                 VariationID: entry.VariationID,
                 TransactionDate: new Date(),
                 Quantity: entry.LooseQuantity,
@@ -226,7 +226,7 @@ function AddReturnOrderDetail() {
         */
         
         // STEP 6: Create return order details
-        await axios.post('http://localhost:3001/api/returnordersdetails', { entries });
+        await post('/returnordersdetails', { entries });
         navigate(`/updatereturnorder/${ReturnOrderID}`);
         
       } catch (err) {

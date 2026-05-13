@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { BsFillAlarmFill, BsClock, BsExclamationCircle } from "react-icons/bs";
 import "./ReminderWidget.css";
+import { get } from "../../service/apiClient";
 
 const ReminderWidget = () => {
   const [upcomingReminders, setUpcomingReminders] = useState([]);
@@ -17,7 +17,7 @@ const ReminderWidget = () => {
   const fetchUpcomingReminders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3001/api/reminders/all");
+      const response = await get("/reminders/all");
       const allReminders = response.data.reminders || [];
       
       console.log("All reminders:", allReminders); // Debug log

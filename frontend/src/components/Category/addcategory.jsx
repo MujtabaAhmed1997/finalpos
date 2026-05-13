@@ -294,8 +294,8 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
+import { post } from "../../service/apiClient";
 
 function AddCategory() {
   const [values, setValues] = useState({
@@ -316,10 +316,7 @@ function AddCategory() {
     setErrors({}); // Clear previous errors
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/product-categories",
-        values
-      );
+      const response = await post("/product-categories", values);
       console.log("Category added:", response.data);
       navigate("/categories");
     } catch (err) {

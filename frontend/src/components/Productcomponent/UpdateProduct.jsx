@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { FaEdit } from "react-icons/fa";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, put } from "../../service/apiClient";
 
 function UpdateProduct() {
   const { id } = useParams();
@@ -30,7 +30,7 @@ function UpdateProduct() {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/products/${id}`);
+      const response = await get(`/products/${id}`);
       
       if (response.data.success) {
         setValues(response.data.product);
@@ -44,7 +44,7 @@ function UpdateProduct() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/product-categories");
+      const response = await get("/product-categories");
       
       // Categories API returns data directly without success wrapper
       if (Array.isArray(response.data)) {
@@ -64,7 +64,7 @@ function UpdateProduct() {
     setErrors({});
 
     try {
-      const response = await axios.put(`http://localhost:3001/api/products/${id}`, values);
+      const response = await put(`/products/${id}`, values);
       
       if (response.data.success) {
         toast.success("Product updated successfully!");

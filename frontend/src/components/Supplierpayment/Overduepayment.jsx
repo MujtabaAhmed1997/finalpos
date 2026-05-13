@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
+import { get } from "../../service/apiClient";
 
 function Overduepayment() {
   const [data, setData] = useState([]);
@@ -15,10 +15,10 @@ function Overduepayment() {
   const fetchOverdueCustomers = async (page, name = "") => {
     try {
       const endpoint = name
-        ? `http://localhost:3001/api/overdue?search=${name}&page=${page}&pageSize=${limit}`
-        : `http://localhost:3001/api/overdue?page=${page}&pageSize=${limit}`;
+        ? `/overdue?search=${encodeURIComponent(name)}&page=${page}&pageSize=${limit}`
+        : `/overdue?page=${page}&pageSize=${limit}`;
 
-      const response = await axios.get(endpoint);
+      const response = await get(endpoint);
       console.log("Response data:", response.data);
 
       if (Array.isArray(response.data)) {

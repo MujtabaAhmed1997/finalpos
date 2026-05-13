@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { validateReturnOrder } from '../../controllers/rorder'; // Adjust the import path as needed
+import { get, post, put } from "../../service/apiClient";
 
 function UpdateReturnOrderForm() {
   const { id } = useParams(); 
@@ -22,7 +22,7 @@ function UpdateReturnOrderForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/return-orders/${id}`)
+    get(`/return-orders/${id}`)
       .then(res => {
         setValues(res.data);
         console.log(res.data.ReturnOrderID);
@@ -37,7 +37,7 @@ function UpdateReturnOrderForm() {
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/${values.OrderType.toLowerCase()}s`);
+        const response = await get(`/${values.OrderType.toLowerCase()}s`);
         // Ensure we're setting an array
         setOrders(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
@@ -52,7 +52,7 @@ function UpdateReturnOrderForm() {
   }, [values.OrderType]);
 
   const fetchReturnOrderDetails = (orderId) => {
-    axios.get(`http://localhost:3001/api/returnordersdetails/returnorder/${orderId}/total`)
+    get(`/returnordersdetails/returnorder/${orderId}/total`)
       .then(res => {
         setValues(prev => ({
           ...prev,
@@ -86,7 +86,7 @@ function UpdateReturnOrderForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       console.log(values);
-      axios.put(`http://localhost:3001/api/return-orders/${id}`, values)
+      put(`/return-orders/${id}`, values)
         .then(res => {
             console.log('Return Order  updated:', res.data);
   
@@ -100,7 +100,7 @@ function UpdateReturnOrderForm() {
 
           };
   
-          return axios.post('http://localhost:3001/api/customerleisure/create', leisureEntry);
+          return post('/customerleisure/create', leisureEntry);
         })
         .then(res => {
           console.log('CustomerLeisure entry created:', res.data);

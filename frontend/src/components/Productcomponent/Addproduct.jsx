@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, post } from "../../service/apiClient";
 
 function AddProduct() {
   const [values, setValues] = useState({
@@ -28,7 +28,7 @@ function AddProduct() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/product-categories");
+      const response = await get("/product-categories");
       
       // Categories API returns data directly without success wrapper
       if (Array.isArray(response.data)) {
@@ -48,7 +48,7 @@ function AddProduct() {
     setErrors({});
 
     try {
-      const response = await axios.post("http://localhost:3001/api/products", values);
+      const response = await post("/products", values);
       
       if (response.data.success) {
         toast.success("Product created successfully!");

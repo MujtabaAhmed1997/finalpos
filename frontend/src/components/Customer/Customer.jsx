@@ -1,9 +1,9 @@
 
 
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
+import { get, delete_ } from "../../service/apiClient";
 
 function CustomerComponent() {
   const [data, setData] = useState([]);
@@ -15,11 +15,11 @@ function CustomerComponent() {
   // Fetch customers (either all or filtered)
   const fetchCustomers = async (page, name = "") => {
     const endpoint = name
-      ? `http://localhost:3001/api/customers/searching?name=${name}&page=${page}&limit=${limit}`
-      : `http://localhost:3001/api/customers?page=${page}&limit=${limit}`;
+      ? `/customers/searching?name=${encodeURIComponent(name)}&page=${page}&limit=${limit}`
+      : `/customers?page=${page}&limit=${limit}`;
 
     try {
-      const res = await axios.get(endpoint);
+      const res = await get(endpoint);
       console.log("name", name);
       const customers = res.data.data;
       const pages = res.data.totalPages;
@@ -56,9 +56,7 @@ function CustomerComponent() {
 
   const fetchLastBalance = async (customerId) => {
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/customers/customerleisure/lastbalance/${customerId}`
-      );
+      const res = await get(`/customers/customerleisure/lastbalance/${customerId}`);
       return res.data.lastBalance;
     } catch (err) {
       console.error("Error fetching last balance:", err);
@@ -68,7 +66,7 @@ function CustomerComponent() {
 
   const handleDelete = async (customerId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/customers/${customerId}`);
+      await delete_(`/customers/${customerId}`);
       fetchCustomers(currentPage, searchTerm);
     } catch (err) {
       console.error("Error deleting customer:", err);

@@ -98,8 +98,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import { get, put } from "../../service/apiClient";
 
 function UpdateCategory() {
   const { id } = useParams();
@@ -117,9 +117,7 @@ function UpdateCategory() {
 
   const fetchCategory = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/product-categories/${id}`
-      );
+      const response = await get(`/product-categories/${id}`);
       const { CategoryName, Description } = response.data;
       setValues({ categoryName: CategoryName, description: Description });
     } catch (error) {
@@ -136,8 +134,7 @@ function UpdateCategory() {
     event.preventDefault();
     setServerError(""); // Reset before new request
 
-    axios
-      .put(`http://localhost:3001/api/product-categories/${id}`, values)
+    put(`/product-categories/${id}`, values)
       .then((res) => {
         navigation("/categories");
       })

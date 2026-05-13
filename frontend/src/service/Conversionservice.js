@@ -65,13 +65,11 @@
 
 
 
-import axios from 'axios';
-
-const API_URL = 'http://localhost:3001/api/conversion';
+import { post } from './apiClient';
 
 const sellQuantity = async (VariationID, containerQuantity, looseQuantity, unitType) => {
     try {
-        const response = await axios.post(`${API_URL}/sell-quantity`, {
+        const response = await post(`/conversion/sell-quantity`, {
             VariationID,
             containerQuantity,
             looseQuantity,

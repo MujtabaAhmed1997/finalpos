@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { SalesOrderDetailvalidator } from "../../controllers/Sorderdeatil";
 import conversionService from "../../service/Conversionservice";
 import "./Salesorderdetail.css";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { get, post, delete_ } from "../../service/apiClient";
 
 const { sellQuantity } = conversionService;
 
@@ -42,7 +42,7 @@ function AddSalesOrderDetail() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/products");
+        const response = await get("/products");
         
         if (response.data.success) {
           setProducts(response.data.products);
@@ -89,9 +89,7 @@ function AddSalesOrderDetail() {
 
   const fetchVariations = async (productId, index) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/products/${productId}/variations`
-      );
+      const response = await get(`/products/${productId}/variations`);
       setVariations((prev) => ({ ...prev, [index]: response.data }));
     } catch (error) {
       console.error("Error fetching variations:", error);
@@ -100,13 +98,9 @@ function AddSalesOrderDetail() {
 
   const fetchVariationDetails = async (variationId, index) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/productVariations/${variationId}`
-      );
+      const response = await get(`/productVariations/${variationId}`);
       const variation = response.data;
-      const stockResponse = await axios.get(
-        `http://localhost:3001/api/stocktransaction/get-stock/${variationId}`
-      );
+      const stockResponse = await get(`/stocktransaction/get-stock/${variationId}`);
       setEntries((prevEntries) => {
         const newEntries = [...prevEntries];
         newEntries[index].UnitPrice = variation.SellingPrice;
@@ -124,13 +118,9 @@ function AddSalesOrderDetail() {
 
   const fetchVariationByBarcode = async (barcode, index) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/productVariations/barcode/${barcode}`
-      );
+      const response = await get(`/productVariations/barcode/${barcode}`);
       const variation = response.data;
-      const stockResponse = await axios.get(
-        `http://localhost:3001/api/stocktransaction/get-stock/${variation.VariationID}`
-      );
+      const stockResponse = await get(`/stocktransaction/get-stock/${variation.VariationID}`);
       setEntries((prevEntries) => {
         const newEntries = [...prevEntries];
         newEntries[index].VariationID = variation.VariationID;
@@ -193,14 +183,8 @@ function AddSalesOrderDetail() {
       };
     } else if (unitType === "Sack") {
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/pricerule/rate",
-          {
-            params: {
-              variationID: variationID,
-              looseQuantity: looseQuantity,
-            },
-          }
+        const response = await get(
+          `/pricerule/rate?variationID=${encodeURIComponent(variationID)}&looseQuantity=${encodeURIComponent(looseQuantity)}`
         );
 
         const looseQuantityP = response.data.looseQuantityPrice;
@@ -329,8 +313,8 @@ function AddSalesOrderDetail() {
 
     try {
       for (const entry of entries) {
-        const response = await axios.post(
-          "http://localhost:3001/api/sellingnewlogic/sell-quantity",
+        const response = await post(
+          "/sellingnewlogic/sell-quantity",
           {
             SalesOrderID,
             ProductID: entry.ProductID,
@@ -371,7 +355,7 @@ function AddSalesOrderDetail() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/sales-orders/${SalesOrderID}`);
+      await delete_(`/sales-orders/${SalesOrderID}`);
       toast.info("Sales order cancelled.");
       navigate("/salesorder/show");
     } catch (e) {

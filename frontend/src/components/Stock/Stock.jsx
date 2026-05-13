@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaBox, FaEye, FaWarehouse, FaCubes, FaExclamationTriangle, FaCheckCircle, FaClock, FaSearch } from 'react-icons/fa';
 import './Stock.css';
+import { get } from "../../service/apiClient";
 
 function StockComponent() {
   const [data, setData] = useState([]);
@@ -36,7 +36,7 @@ function StockComponent() {
     setError(null);
     
     try {
-      const res = await axios.get(`http://localhost:3001/api/stocktransaction/stk/all`);
+      const res = await get(`/stocktransaction/stk/all`);
       setData(res.data);
       console.log(res.data);
     } catch (err) {

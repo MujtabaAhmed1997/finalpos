@@ -7,9 +7,9 @@ import {
   BsJustify,
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "../Header/Header.css";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, post } from "../../service/apiClient";
 
 function Header({ OpenSidebar }) {
   const navigate = useNavigate();
@@ -21,9 +21,7 @@ function Header({ OpenSidebar }) {
   // Check today's reminders only
   const checkTodayReminders = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3001/api/reminders/all"
-      );
+      const response = await get("/reminders/all");
       const today = new Date().toISOString().split("T")[0];
 
       const todayReminders = response.data.reminders.filter((reminder) => {
@@ -42,9 +40,7 @@ function Header({ OpenSidebar }) {
   // Check today's overdue payments only
   const checkTodayOverduePayments = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3001/api/overdue"
-      );
+      const response = await get("/overdue");
       
       // The overdue service returns customers whose latest payment is older than 5 days
       // We'll show the notification if there are any overdue customers
@@ -68,7 +64,7 @@ function Header({ OpenSidebar }) {
 
   const handleBellClick = async () => {
     try {
-      await axios.post("http://localhost:3001/api/notifications/dismiss");
+      await post("/notifications/dismiss");
       setHasReminder(false);
       setHasOverdue(false);
     } catch (err) {

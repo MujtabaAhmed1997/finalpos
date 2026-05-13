@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { validatePurchaseOrder } from '../../controllers/Purchaseordervalidator';
 import { FaShoppingCart, FaCalendarAlt, FaBuilding } from 'react-icons/fa';
 import './PurchaseOrderForm.css';
+import { get, post } from "../../service/apiClient";
 
 function PurchaseOrderForm() {
   const [values, setValues] = useState({
@@ -21,10 +21,8 @@ function PurchaseOrderForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/suppliers')
-      .then(res => {
-        setSuppliers(res.data.suppliers || []);
-      })
+    get('/suppliers')
+      .then(res => setSuppliers(res.data.suppliers || []))
       .catch(err => {
         console.error('Error fetching suppliers:', err);
         setSuppliers([]);
@@ -66,7 +64,7 @@ function PurchaseOrderForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
       try {
-        const res = await axios.post('http://localhost:3001/api/purchase-orders', values);
+        const res = await post('/purchase-orders', values);
         const purchaseOrderId = res.data.PurchaseOrderID;
         navigate(`/purchaseorderdetail/${purchaseOrderId}`);
         console.log(res);

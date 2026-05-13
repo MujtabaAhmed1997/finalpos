@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import './recipt.css';
+import { get } from "../../service/apiClient";
 
 const GenericReceipt = ({ orderType }) => {
   console.log("GenericReceipt component rendered with orderType:", orderType);
@@ -52,9 +52,7 @@ const GenericReceipt = ({ orderType }) => {
   const fetchOrder = async (id) => {
     try {
       console.log("Fetching order with ID:", id, "orderType:", orderType);
-      const res = await axios.get(
-        `http://localhost:3001/api/${orderType}-orders/${id}`
-      );
+      const res = await get(`/${orderType}-orders/${id}`);
       console.log("Order data fetched:", res.data);
       setData(res.data);
     } catch (err) {
@@ -65,8 +63,8 @@ const GenericReceipt = ({ orderType }) => {
 
   const fetchOrderDetails = async (id) => {
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/${orderType}ordersdetails/${orderType}Order/${id}/details`
+      const res = await get(
+        `/${orderType}ordersdetails/${orderType}Order/${id}/details`
       );
       setDetail(res.data);
       console.log("Order details fetched:", res.data);
@@ -89,17 +87,17 @@ const GenericReceipt = ({ orderType }) => {
       
       if (orderType === 'sales') {
         entityId = data.CustomerID;
-        endpoint = `http://localhost:3001/api/customerpayments/today/${entityId}`;
+        endpoint = `/customerpayments/today/${entityId}`;
       } else {
         entityId = data.SupplierID;
-        endpoint = `http://localhost:3001/api/supplierpayments/today/${entityId}`;
+        endpoint = `/supplierpayments/today/${entityId}`;
       }
 
       console.log("Entity ID:", entityId, "Endpoint:", endpoint);
 
       if (entityId) {
         console.log("Making API call to:", endpoint);
-        const res = await axios.get(endpoint);
+        const res = await get(endpoint);
         console.log("API response received:", res.data);
         setTodayPayments(res.data);
         console.log("Today's payments fetched:", res.data);

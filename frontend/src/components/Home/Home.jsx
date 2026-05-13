@@ -24,6 +24,7 @@ import {
 import DashboardCard from "./DashboardCard";
 import ReminderWidget from "../Reminder/ReminderWidget";
 import "./home.css";
+import { get } from "../../service/apiClient";
 
 function Home() {
   const [stats, setStats] = useState({
@@ -34,9 +35,8 @@ function Home() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/stats")
-      .then((response) => response.json())
-      .then((data) => setStats(data))
+    get("/stats")
+      .then((res) => setStats(res.data))
       .catch((error) => console.error("Error fetching stats:", error));
   }, []);
 

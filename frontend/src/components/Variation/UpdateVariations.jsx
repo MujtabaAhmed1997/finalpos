@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import { get, put } from "../../service/apiClient";
 
 function UpdateVariations() {
   const { id } = useParams();
@@ -27,7 +27,7 @@ function UpdateVariations() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/products");
+      const response = await get("/products");
       
       if (response.data.success) {
         setProducts(response.data.products);
@@ -56,9 +56,7 @@ function UpdateVariations() {
 
   const fetchVariationDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/productVariations/${id}`
-      );
+      const response = await get(`/productVariations/${id}`);
       setValues(response.data);
     } catch (error) {
       console.error("Error fetching variation details:", error);
@@ -131,10 +129,7 @@ function UpdateVariations() {
     }
 
     try {
-      const response = await axios.put(
-        `http://localhost:3001/api/productVariations/${id}`,
-        values
-      );
+      const response = await put(`/productVariations/${id}`, values);
       console.log("Variation updated:", response.data);
       navigate("/variations/all");
     } catch (err) {

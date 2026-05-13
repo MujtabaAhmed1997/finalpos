@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { validateCustomer } from "../../controllers/Customervalidator";
 import { FaUserPlus } from "react-icons/fa";
+import { post } from "../../service/apiClient";
 
 function AddCustomer() {
   const [values, setValues] = useState({
@@ -39,8 +39,7 @@ function AddCustomer() {
 
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-      axios
-        .post("http://localhost:3001/api/customers", values)
+      post("/customers", values)
         .then((res) => {
           navigate("/customers");
         })

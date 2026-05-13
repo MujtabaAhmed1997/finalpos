@@ -1,10 +1,10 @@
-import axios from 'axios'
 import {Link, useNavigate} from 'react-router-dom';
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import './Users.css'
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function Users() {
     const [data, setData] = useState([]);
@@ -16,7 +16,7 @@ function Users() {
   
     useEffect(() => {
         setLoading(true);
-        axios.get('http://localhost:3001/api/usercurd/getusers')
+        get('/usercurd/getusers')
             .then(res => {
                 setData(res.data);
                 setLoading(false);
@@ -38,7 +38,7 @@ function Users() {
         if (!ok) return;
 
         try {
-            await axios.delete(`http://localhost:3001/api/usercurd/delete/${id}`);
+            await delete_(`/usercurd/delete/${id}`);
             toast.success("User deleted.");
             navigate(0);
         } catch (err) {

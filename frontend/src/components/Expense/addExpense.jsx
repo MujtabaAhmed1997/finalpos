@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import CreatableSelect from "react-select/creatable";
 import { FaPlusCircle } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { get, post } from "../../service/apiClient";
 
 const AddExpense = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -23,7 +23,7 @@ const AddExpense = () => {
 
   const fetchExpenseTypes = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/expensetype/all");
+      const res = await get("/expensetype/all");
       const options = res.data.map((type) => ({
         label: type.TypeName,
         value: type.TypeName,
@@ -40,12 +40,9 @@ const AddExpense = () => {
     if (selectedOption.__isNew__) {
       // New option was typed
       try {
-        const response = await axios.post(
-          "http://localhost:3001/api/expensetype/addtype",
-          {
-            TypeName: selectedOption.value,
-          }
-        );
+        const response = await post("/expensetype/addtype", {
+          TypeName: selectedOption.value,
+        });
 
         const newOption = {
           label: response.data.TypeName,
@@ -85,14 +82,11 @@ const AddExpense = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/expense/addExpense",
-        {
-          ExpenseType: expense.ExpenseType,
-          Amount: expense.Amount,
-          Date: expense.Date,
-        }
-      );
+      const response = await post("/expense/addExpense", {
+        ExpenseType: expense.ExpenseType,
+        Amount: expense.Amount,
+        Date: expense.Date,
+      });
       setSuccess("Expense added successfully!");
       setExpense({ ExpenseType: "", Amount: "", Date: currentDate });
     } catch (err) {

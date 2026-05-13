@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { FaUserEdit, FaUser, FaEnvelope, FaUserTag, FaSpinner } from 'react-icons/fa';
+import { get, put } from "../../../service/apiClient";
 
 function Update() {
   const { id } = useParams();
@@ -29,7 +29,7 @@ function Update() {
       return;
     }
 
-    axios.put(`http://localhost:3001/api/usercurd/update/${id}`, values)
+    put(`/usercurd/update/${id}`, values)
       .then(res => {
         navigate('/users');
         console.log(res);
@@ -41,7 +41,7 @@ function Update() {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/usercurd/read/${id}`)
+    get(`/usercurd/read/${id}`)
       .then(res => {
         console.log(res);
         setValues(v => ({

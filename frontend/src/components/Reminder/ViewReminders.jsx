@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { 
   BsFillAlarmFill, 
   BsSearch, 
@@ -16,6 +15,7 @@ import "./ViewReminders.css";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { useNavigate } from "react-router-dom";
+import { get, put, delete_ } from "../../service/apiClient";
 
 const ViewReminders = () => {
   const { confirm } = useConfirm();
@@ -36,7 +36,7 @@ const ViewReminders = () => {
   const fetchAllReminders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3001/api/reminders/all");
+      const response = await get("/reminders/all");
       setReminders(response.data.reminders || []);
       setError(null);
     } catch (error) {
@@ -59,7 +59,7 @@ const ViewReminders = () => {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/reminders/${reminderId}`);
+      await delete_(`/reminders/${reminderId}`);
       toast.success("Reminder deleted.");
       fetchAllReminders();
     } catch (error) {
@@ -75,7 +75,7 @@ const ViewReminders = () => {
 
   const handleUpdate = async (updatedData) => {
     try {
-      await axios.put(`http://localhost:3001/api/reminders/${selectedReminder.ReminderID}`, updatedData);
+      await put(`/reminders/${selectedReminder.ReminderID}`, updatedData);
       setShowModal(false);
       setSelectedReminder(null);
       toast.success("Reminder updated.");

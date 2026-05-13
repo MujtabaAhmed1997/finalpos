@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import debounce from "lodash.debounce";
 import { Link } from "react-router-dom";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, delete_ } from "../../service/apiClient";
 
 function PriceRuleList() {
   const [data, setData] = useState([]);
@@ -21,10 +21,10 @@ function PriceRuleList() {
     try {
       setLoading(true);
       const endpoint = search
-        ? `http://localhost:3001/api/pricerule/search?sku=${search}&page=${page}&limit=${limit}`
-        : `http://localhost:3001/api/pricerule?page=${page}&limit=${limit}`;
+        ? `/pricerule/search?sku=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
+        : `/pricerule?page=${page}&limit=${limit}`;
 
-      const response = await axios.get(endpoint);
+      const response = await get(endpoint);
       const priceRules = response.data.data || response.data;
       const pages = response.data.totalPages || 1;
 
@@ -66,7 +66,7 @@ function PriceRuleList() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/pricerule/${priceRuleId}`);
+      await delete_(`/pricerule/${priceRuleId}`);
       toast.success("Price rule deleted.");
       fetchPriceRules(currentPage, searchTerm);
     } catch (error) {

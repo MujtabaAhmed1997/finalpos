@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { get, post } from "../../service/apiClient";
 
 function ReturnOrderForm() {
   const currentDate = new Date().toISOString().split('T')[0];
@@ -21,7 +21,7 @@ function ReturnOrderForm() {
   useEffect(() => {
     // Fetch data when the OrderType changes
     if (values.OrderType === 'Customer') {
-      axios.get('http://localhost:3001/api/customers')
+      get('/customers')
         .then((res) => {
           // Handle the response structure: { data: [...] }
           const customers = res.data.data || res.data || [];
@@ -32,7 +32,7 @@ function ReturnOrderForm() {
           setOrderOptions([]); // Set empty array on error
         });
     } else if (values.OrderType === 'Supplier') {
-      axios.get('http://localhost:3001/api/suppliers')
+      get('/suppliers')
         .then((res) => {
           // Handle the response structure: { suppliers: [...] }
           const suppliers = res.data.suppliers || res.data || [];
@@ -106,7 +106,7 @@ function ReturnOrderForm() {
     console.log('Payload:', values); // Log the payload being sent
 
     axios
-      .post('http://localhost:3001/api/return-orders', values)
+      .post('/return-orders', values)
       .then((res) => {
         const returnOrderId = res.data.ReturnOrderID;
         navigate(`/addreturndetails/${returnOrderId}`);

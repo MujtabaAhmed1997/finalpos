@@ -121,8 +121,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import './Sorderdeaillist.css';
+import { get } from "../../service/apiClient";
 
 function SaleOrderDetailList() {
   const { id: saleorderid } = useParams();
@@ -137,7 +137,7 @@ function SaleOrderDetailList() {
 
   const fetchSaleOrderDetails = () => {
     setLoading(true);
-    axios.get(`http://localhost:3001/api/salesordersdetails/salesOrder/${saleorderid}/details`)
+    get(`/salesordersdetails/salesOrder/${saleorderid}/details`)
       .then(res => {
         // Ensure we always set an array, even if the response is unexpected
         const detailsData = res.data?.OrderDetails || res.data?.salesOrderDetails || res.data || [];

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
+import { get } from "../../service/apiClient";
 
 function PriceHistory() {
   const { id } = useParams();
@@ -15,7 +15,7 @@ function PriceHistory() {
 
   const fetchPriceHistory = async (variationId) => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/pricehistory/${variationId}`);
+      const response = await get(`/pricehistory/${variationId}`);
       setPriceHistory(response.data);
     } catch (error) {
       setError(error);

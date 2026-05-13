@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { validatePayment } from "../../controllers/cpaymentvalidator";
 import { FaPlusCircle, FaUser, FaCalendarAlt, FaMoneyBillWave, FaCreditCard } from "react-icons/fa";
+import { get, post } from "../../service/apiClient";
 
 function AddCustomerPayment() {
   const { customerId } = useParams(); // Get customerId from URL parameter
@@ -27,7 +27,7 @@ function AddCustomerPayment() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/customers");
+        const res = await get("/customers");
         setCustomers(res.data);
         console.log(res.data);
         
@@ -69,7 +69,7 @@ function AddCustomerPayment() {
             ? values.CustomPaymentMethod
             : values.PaymentMethod;
 
-        const response = await axios.post("http://localhost:3001/api/customerpayments", {
+        const response = await post("/customerpayments", {
           ...values,
           PaymentMethod: paymentMethod,
         });
@@ -86,10 +86,7 @@ function AddCustomerPayment() {
           Description: `Payment received via ${paymentData.PaymentMethod}`,
         };
 
-        await axios.post(
-          "http://localhost:3001/api/customerleisure/create",
-          leisureEntry
-        );
+        await post("/customerleisure/create", leisureEntry);
 
         console.log("Leisure entry added, navigating to payment list...");
         navigate("/customerpayment/list");

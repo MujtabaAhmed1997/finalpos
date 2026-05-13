@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
 import { FaChartLine, FaCalendarAlt, FaBox, FaDollarSign, FaArrowUp, FaArrowDown, FaEquals, FaCog, FaFileAlt } from 'react-icons/fa';
 import './ProfitLoss.css';
+import { post } from "../../service/apiClient";
 
 const ProfitLossScreen = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -27,14 +27,11 @@ const ProfitLossScreen = () => {
     setError(null);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/profitloss/",
-        {
-          startDate,
-          endDate,
-          variationID,
-        }
-      );
+      const response = await post("/profitloss", {
+        startDate,
+        endDate,
+        variationID,
+      });
       setReportData(response.data);
       setShowReport(true);
     } catch (err) {

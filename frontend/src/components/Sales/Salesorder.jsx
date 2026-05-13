@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import CreatableSelect from "react-select/creatable";
 import { validateSalesOrder } from "../../controllers/salesvalidator";
 import { FaShoppingCart, FaUser, FaCalendar, FaPlusCircle } from "react-icons/fa";
 import "./Salesorder.css";
+import { get, post } from "../../service/apiClient";
 
 function SalesOrderForm() {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -45,8 +45,7 @@ function SalesOrderForm() {
 
   useEffect(() => {
     console.log("Fetching customers...");
-    axios
-      .get("http://localhost:3001/api/customers")
+    get("/customers")
       .then((res) => {
         console.log("Customers fetched:", res.data);
         // Handle paginated response structure
@@ -139,8 +138,7 @@ function SalesOrderForm() {
     setCustomerErrors({}); // Clear previous errors
     setCustomerSuccess(""); // Clear previous success message
     
-    axios
-      .post("http://localhost:3001/api/customers", newCustomer)
+    post("/customers", newCustomer)
       .then((res) => {
         const newCustomerData = res.data;
         setCustomers((prev) => [
@@ -211,8 +209,7 @@ function SalesOrderForm() {
 
   const createSalesOrder = (customerId) => {
     const salesOrderData = { ...values, CustomerID: customerId };
-    axios
-      .post("http://localhost:3001/api/sales-orders", salesOrderData)
+    post("/sales-orders", salesOrderData)
       .then((res) => {
         console.log("Response from API:", res);
         const salesOrderId = res.data.SalesOrderID;

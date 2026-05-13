@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import CreatableSelect from "react-select/creatable";
 import { validatePurchaseOrderDetail } from "../../controllers/POrderdetailsvalidator";
 import { FaShoppingCart, FaPlus, FaTrash, FaSave, FaArrowLeft, FaBox, FaTag, FaHashtag, FaDollarSign } from 'react-icons/fa';
 import './PurchaseOrderDetailsForm.css';
+import { get, post } from "../../service/apiClient";
 
 function AddPurchaseOrderDetail() {
   const { id: PurchaseOrderID } = useParams();
@@ -28,7 +28,7 @@ function AddPurchaseOrderDetail() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/products");
+        const response = await get("/products");
         
         if (response.data.success) {
           setProducts(response.data.products);
@@ -56,7 +56,7 @@ function AddPurchaseOrderDetail() {
 
     const fetchPurchaseOrderInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/purchase-orders/${PurchaseOrderID}`);
+        const response = await get(`/purchase-orders/${PurchaseOrderID}`);
         setPurchaseOrder(response.data);
       } catch (error) {
         console.error("Error fetching purchase order info:", error);
@@ -80,9 +80,7 @@ function AddPurchaseOrderDetail() {
 
   const fetchVariations = async (productId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/products/${productId}/variations`
-      );
+      const response = await get(`/products/${productId}/variations`);
       console.log("response: ", response.data);
       setVariations(response.data);
     } catch (error) {
@@ -125,7 +123,7 @@ function AddPurchaseOrderDetail() {
       try {
         // Create Batches
         const batchPromises = entries.map((entry) =>
-          axios.post("http://localhost:3001/api/batch/create", {
+          post("/batch/create", {
             ProductID: entry.ProductID,
             VariationID: entry.VariationID,
             CostPricePerUnit: entry.UnitPrice,
@@ -147,7 +145,7 @@ function AddPurchaseOrderDetail() {
         console.log("batch with ids", entriesWithBatchIds);
         
         // Add Purchase Order Details
-        await axios.post("http://localhost:3001/api/purchaseordersdetails", {
+        await post("/purchaseordersdetails", {
           entries: entriesWithBatchIds,
         });
 
@@ -162,7 +160,7 @@ function AddPurchaseOrderDetail() {
         
         // STEP 2: Fetch product data for all variations in parallel (batch request)
         const variationDataPromises = uniqueVariationIds.map(variationId => 
-          axios.get(`http://localhost:3001/api/productVariations/${variationId}/with-product`)
+          get(`/productVariations/${variationId}/with-product`)
         );
         const variationDataResponses = await Promise.all(variationDataPromises);
         console.log("Variation data responses:", variationDataResponses.map(r => r.data));
@@ -181,7 +179,7 @@ function AddPurchaseOrderDetail() {
           const unitType = variationUnitMap[entry.VariationID];
           console.log(`Creating stock transaction for variation ${entry.VariationID} with unit type: ${unitType}`);
           
-          return axios.post("http://localhost:3001/api/stocktransaction", {
+          return post("/stocktransaction", {
             VariationID: entry.VariationID,
             TransactionDate: new Date(),
             Quantity: entry.Quantity,

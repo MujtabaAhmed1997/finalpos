@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Table, Button, Modal, Form, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./expense.css";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { get, put, delete_ } from "../../service/apiClient";
 
 const ViewAllExpenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -26,9 +26,7 @@ const ViewAllExpenses = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/expense/allexpenses"
-        );
+        const response = await get("/expense/allexpenses");
         setExpenses(response.data.expenses || []);
       } catch (err) {
         setError("Failed to fetch expenses. Please try again later.");
@@ -53,9 +51,7 @@ const ViewAllExpenses = () => {
 
     setLoading(true);
     try {
-      await axios.delete(
-        `http://localhost:3001/api/expense/deleteExpense/${id}`
-      );
+      await delete_(`/expense/deleteExpense/${id}`);
       setExpenses((prev) => prev.filter((expense) => expense.id !== id));
       setSuccess("Expense deleted successfully!");
       toast.success("Expense deleted.");
@@ -92,10 +88,7 @@ const ViewAllExpenses = () => {
 
     setLoading(true);
     try {
-      await axios.put(
-        `http://localhost:3001/api/expense/updateExpense/${selectedExpense.id}`,
-        selectedExpense
-      );
+      await put(`/expense/updateExpense/${selectedExpense.id}`, selectedExpense);
       setExpenses((prev) =>
         prev.map((exp) =>
           exp.id === selectedExpense.id ? selectedExpense : exp
