@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../service/apiClient';
 import Loginvalidation from '../controllers/loginvalidation';
 import { FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Login.css';
 
 function Login() {
     const [values, setValues] = useState({
@@ -19,7 +20,6 @@ function Login() {
     const handleInput = (event) => {
         const { name, value } = event.target;
         setValues(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -32,12 +32,12 @@ function Login() {
         event.preventDefault();
         setIsLoading(true);
         setErrorMessage("");
-        
+
         const validationErrors = Loginvalidation(values);
         setErrors(validationErrors);
 
-        if (Object.values(validationErrors).every(error => error === '')) {
-            try {
+        try {
+            if (Object.values(validationErrors).every(error => error === '')) {
                 const response = await authAPI.login(values);
                 if (response.data.message === 'Login successful') {
                     localStorage.setItem('token', response.data.token);
@@ -46,208 +46,124 @@ function Login() {
                 } else {
                     setErrorMessage("Invalid email or password");
                 }
-            } catch (error) {
-                console.error('Error logging in:', error);
-                setErrorMessage(error.response?.data?.error || "An error occurred. Please try again later.");
             }
+        } catch (error) {
+            console.error('Error logging in:', error);
+            setErrorMessage(error.response?.data?.error || "An error occurred. Please try again later.");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
     return (
-        <div
-            className="d-flex vh-100 justify-content-center align-items-center"
-            style={{
-                backgroundColor: "#263043",
-            }}
-        >
-            <div
-                className="rounded-4 shadow-lg p-5"
-                style={{
-                    minWidth: 400,
-                    maxWidth: 450,
-                    width: "100%",
-                    border: "1px solid #404040",
-                    background: "rgba(255,255,255,0.95)",
-                    boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
-                }}
-            >
+        <div className="login-page">
+            <div className="login-card shadow-lg p-4 p-sm-5">
                 <div className="text-center mb-4">
-                    <FaSignInAlt size={40} color="#263043" />
-                    <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>
-                        Welcome Back
-                    </h3>
-                    <p className="text-muted" style={{ fontSize: 15 }}>
+                    <div className="login-brand-icon" aria-hidden>
+                        <FaSignInAlt size={22} />
+                    </div>
+                    <h1 className="h4 fw-bold mb-1" style={{ color: '#263043' }}>
+                        Welcome back
+                    </h1>
+                    <p className="text-muted small mb-0">
                         Sign in to access your account
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                     {errorMessage && (
-                        <div className="alert alert-danger" role="alert">
+                        <div className="alert alert-danger py-2 small" role="alert">
                             {errorMessage}
                         </div>
                     )}
 
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label fw-semibold" style={{ color: "#263043" }}>
-                            Email Address
+                        <label htmlFor="email" className="form-label login-label">
+                            Email address
                         </label>
                         <input
+                            id="email"
                             type="email"
-                            className="form-control rounded-3"
+                            autoComplete="email"
+                            className="form-control login-input"
                             name="email"
-                            placeholder="Enter your email address"
+                            placeholder="you@example.com"
                             value={values.email}
                             onChange={handleInput}
-                            style={{
-                                background: "#f8f9fa",
-                                border: "1px solid #dee2e6",
-                                transition: "all 0.2s",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                            }}
-                            onFocus={e => {
-                                e.target.style.borderColor = "#263043";
-                                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                            }}
-                            onBlur={e => {
-                                e.target.style.borderColor = "#dee2e6";
-                                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                            }}
                         />
                         {errors.email && (
-                            <span className="text-danger small">{errors.email}</span>
+                            <span className="text-danger small d-block mt-1">{errors.email}</span>
                         )}
                     </div>
 
                     <div className="mb-4">
-                        <label htmlFor="password" className="form-label fw-semibold" style={{ color: "#263043" }}>
+                        <label htmlFor="password" className="form-label login-label">
                             Password
                         </label>
-                        <div className="position-relative">
+                        <div className="login-password-field">
                             <input
+                                id="password"
                                 type={showPassword ? "text" : "password"}
-                                className="form-control rounded-3"
+                                autoComplete="current-password"
+                                className="form-control login-input"
                                 name="password"
                                 placeholder="Enter your password"
                                 value={values.password}
                                 onChange={handleInput}
-                                style={{
-                                    background: "#f8f9fa",
-                                    border: "1px solid #dee2e6",
-                                    transition: "all 0.2s",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                                    paddingRight: "40px"
-                                }}
-                                onFocus={e => {
-                                    e.target.style.borderColor = "#263043";
-                                    e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                                }}
-                                onBlur={e => {
-                                    e.target.style.borderColor = "#dee2e6";
-                                    e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                                }}
                             />
                             <button
                                 type="button"
-                                className="btn position-absolute"
-                                style={{
-                                    right: "10px",
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    background: "none",
-                                    border: "none",
-                                    color: "#6c757d"
-                                }}
-                                onClick={togglePasswordVisibility}
+                                className="login-password-toggle"
+                                onClick={() => setShowPassword((v) => !v)}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                tabIndex={0}
                             >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
                             </button>
                         </div>
                         {errors.password && (
-                            <span className="text-danger small">{errors.password}</span>
+                            <span className="text-danger small d-block mt-1">{errors.password}</span>
                         )}
                     </div>
 
                     <button
                         type="submit"
-                        className="btn w-100 rounded-3 fw-bold mb-3"
+                        className="btn w-100 login-submit mb-3"
                         disabled={isLoading}
-                        style={{
-                            background: "#263043",
-                            border: "none",
-                            fontSize: 18,
-                            letterSpacing: 1,
-                            boxShadow: "0 4px 12px rgba(38, 48, 67, 0.3)",
-                            transition: "all 0.3s",
-                            color: "white",
-                        }}
-                        onMouseOver={e => {
-                            if (!isLoading) {
-                                e.target.style.background = "#1a2332";
-                                e.target.style.transform = "translateY(-2px)";
-                                e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
-                            }
-                        }}
-                        onMouseOut={e => {
-                            if (!isLoading) {
-                                e.target.style.background = "#263043";
-                                e.target.style.transform = "translateY(0)";
-                                e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
-                            }
-                        }}
                     >
                         {isLoading ? (
-                            <span>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                Signing In...
+                            <span className="d-inline-flex align-items-center justify-content-center gap-2">
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                Signing in…
                             </span>
                         ) : (
-                            <>
-                                <FaSignInAlt className="me-2 mb-1" />
-                                Sign In
-                            </>
+                            <span className="d-inline-flex align-items-center justify-content-center gap-2">
+                                <FaSignInAlt />
+                                Sign in
+                            </span>
                         )}
                     </button>
 
                     <div className="text-center">
-                        <Link 
-                            to="/forgot-password" 
-                            className="text-decoration-none"
-                            style={{ color: "#263043", fontSize: 14 }}
+                        <Link
+                            to="/forgot-password"
+                            className="text-decoration-none small"
+                            style={{ color: '#263043' }}
                         >
-                            Forgot Password?
+                            Forgot password?
                         </Link>
                     </div>
 
-                    <hr className="my-4" />
+                    <hr className="my-4 text-muted opacity-25" />
 
                     <div className="text-center">
-                        <p className="text-muted mb-2" style={{ fontSize: 14 }}>
-                            Don't have an account?
-                        </p>
-                        <Link 
-                            to="/signup" 
+                        <p className="text-muted small mb-2">Don&apos;t have an account?</p>
+                        <Link
+                            to="/signup"
                             className="btn btn-outline-secondary w-100 rounded-3"
-                            style={{
-                                borderColor: "#263043",
-                                color: "#263043",
-                                transition: "all 0.3s"
-                            }}
-                            onMouseOver={e => {
-                                e.target.style.background = "#263043";
-                                e.target.style.color = "white";
-                            }}
-                            onMouseOut={e => {
-                                e.target.style.background = "transparent";
-                                e.target.style.color = "#263043";
-                            }}
+                            style={{ borderColor: '#263043', color: '#263043' }}
                         >
-                            Create Account
+                            Create account
                         </Link>
                     </div>
                 </form>

@@ -85,12 +85,12 @@ function App() {
 
             <Route path='/suppliers' element={<Supplier />} />
             <Route path='/suppliers/add' element={<AddSupplier />} />
-            <Route path='suppliers/read/:id' element={<Readsupplier />}></Route>
-            <Route path='suppliers/update/:id' element={<UpdateSupplier />}></Route>
+            <Route path='/suppliers/read/:id' element={<Readsupplier />}></Route>
+            <Route path='/suppliers/update/:id' element={<UpdateSupplier />}></Route>
 
             <Route path='/customers' element={<CustomerComponent />} />
             <Route path='/customers/add' element={<AddCustomer />} />
-            <Route path='customers/update/:id' element={<UpdateCustomer />}></Route>
+            <Route path='/customers/update/:id' element={<UpdateCustomer />}></Route>
 
             <Route path='/variations/:id' element={<Variations />} />
             {/* <Route path='/variations/all' element={<ProductVariationList />} /> */}
