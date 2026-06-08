@@ -4,6 +4,8 @@ import { validateSalesOrder } from '../../controllers/salesvalidator';
 import { FaEdit, FaCreditCard, FaTimes } from 'react-icons/fa';
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, post, put } from "../../service/apiClient";
+import OrderPrintButtons from "./OrderPrintButtons";
+import "./sales.css";
 
 function UpdateSalesOrderForm() {
   const { id } = useParams();
@@ -391,6 +393,10 @@ function UpdateSalesOrderForm() {
                 <option value="Advance">Advance</option>
               </select>
               {errors.PaymentStatus && <span className="text-danger small">{errors.PaymentStatus}</span>}
+            </div>
+
+            <div className="mb-3">
+              <OrderPrintButtons orderId={id} />
             </div>
 
             <div className="d-grid gap-2">

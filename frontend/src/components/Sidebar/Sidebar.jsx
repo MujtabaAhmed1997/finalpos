@@ -1,90 +1,105 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   BsCart3, BsGrid1X2Fill, BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill,
-  BsListCheck, BsMenuButtonWideFill, BsFillGearFill, BsChevronDown, BsChevronUp
+  BsListCheck, BsMenuButtonWideFill, BsFillGearFill, BsChevronDown, BsChevronUp,
+  BsReceipt
 } from 'react-icons/bs';
 import '../Sidebar/sidebar.css';
 
 function Sidebar({ openSidebarToggle, OpenSidebar }) {
   const [inventoryDropdown, setInventoryDropdown] = useState(false);
-
-  const toggleInventoryDropdown = () => {
-    setInventoryDropdown(!inventoryDropdown);
-  };
+  const [salesDropdown, setSalesDropdown] = useState(false);
 
   return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>
       <div className='sidebar-title'>
         <div className='sidebar-brand'>
-          <BsCart3 className='icon_header' /> SHOP
+          <BsCart3 className='icon_header' /> SHOP POS
         </div>
         <span className='icon close_icon' onClick={OpenSidebar}>X</span>
       </div>
 
       <ul className='sidebar-list'>
         <li className='sidebar-list-item'>
-          <a href="/Homepage">
+          <Link to="/Homepage">
             <BsGrid1X2Fill className='icon' /> Dashboard
-          </a>
+          </Link>
         </li>
+
         <li className='sidebar-list-item'>
-          <a href="/users">
-            <BsPeopleFill className='icon' /> Roles
-          </a>
+          <div onClick={() => setSalesDropdown(!salesDropdown)} className='sidebar-list-item-dropdown'>
+            <BsReceipt className='icon' /> Sales / POS
+            {salesDropdown ? <BsChevronUp className='icon' /> : <BsChevronDown className='icon' />}
+          </div>
+          {salesDropdown && (
+            <ul className='sidebar-dropdown-list'>
+              <li className='sidebar-dropdown-item'>
+                <Link to="/salesorder/add">New Sale</Link>
+              </li>
+              <li className='sidebar-dropdown-item'>
+                <Link to="/salesorder/show">Sales History</Link>
+              </li>
+              <li className='sidebar-dropdown-item'>
+                <Link to="/returnshow">Returns</Link>
+              </li>
+            </ul>
+          )}
         </li>
+
         <li className='sidebar-list-item'>
-          <a href="/products">
+          <Link to="/products">
             <BsFillArchiveFill className='icon' /> Products
-          </a>
+          </Link>
         </li>
         <li className='sidebar-list-item'>
-          <a href="/categories">
+          <Link to="/categories">
             <BsFillGrid3X3GapFill className='icon' /> Categories
-          </a>
+          </Link>
         </li>
         <li className='sidebar-list-item'>
-          <a href="/customers">
+          <Link to="/customers">
             <BsPeopleFill className='icon' /> Customers
-          </a>
+          </Link>
         </li>
         <li className='sidebar-list-item'>
-          <a href="/salesorder/show">
-            <BsPeopleFill className='icon' /> Create Bill
-          </a>
-        </li>
-        <li className='sidebar-list-item'>
-          <div onClick={toggleInventoryDropdown} className='sidebar-list-item-dropdown'>
+          <div onClick={() => setInventoryDropdown(!inventoryDropdown)} className='sidebar-list-item-dropdown'>
             <BsListCheck className='icon' /> Stocks
             {inventoryDropdown ? <BsChevronUp className='icon' /> : <BsChevronDown className='icon' />}
           </div>
           {inventoryDropdown && (
             <ul className='sidebar-dropdown-list'>
               <li className='sidebar-dropdown-item'>
-                <a href="/stocks">Stock Details</a>
+                <Link to="/stocks">Stock Details</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <a href="/purchaseorder">Add Stock</a>
+                <Link to="/purchaseorder">Add Stock</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <a href="/inventory/reports">Stock Reports</a>
+                <Link to="/report">Stock Reports</Link>
               </li>
             </ul>
           )}
         </li>
         <li className='sidebar-list-item'>
-          <a href="/suppliers">
+          <Link to="/suppliers">
             <BsPeopleFill className='icon' /> Suppliers
-          </a>
+          </Link>
         </li>
         <li className='sidebar-list-item'>
-          <a href="/report">
+          <Link to="/users">
+            <BsPeopleFill className='icon' /> Users
+          </Link>
+        </li>
+        <li className='sidebar-list-item'>
+          <Link to="/report">
             <BsMenuButtonWideFill className='icon' /> Reports
-          </a>
+          </Link>
         </li>
         <li className='sidebar-list-item'>
-          <a href="">
-            <BsFillGearFill className='icon' /> Setting
-          </a>
+          <Link to="/customerpayment/overdue">
+            <BsFillGearFill className='icon' /> Overdue Payments
+          </Link>
         </li>
       </ul>
     </aside>

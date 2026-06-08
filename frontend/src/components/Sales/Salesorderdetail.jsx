@@ -6,6 +6,8 @@ import "./Salesorderdetail.css";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { get, post, delete_ } from "../../service/apiClient";
+import OrderPrintButtons from "./OrderPrintButtons";
+import "./sales.css";
 
 const { sellQuantity } = conversionService;
 
@@ -602,6 +604,11 @@ function AddSalesOrderDetail() {
           </div>
 
           <div className="action-buttons">
+            <OrderPrintButtons
+              orderId={SalesOrderID}
+              localEntries={entries}
+              products={products}
+            />
             <button type="button" className="btn btn-primary" onClick={addEntry}>
               <i className="fas fa-plus"></i>
               Add Entry

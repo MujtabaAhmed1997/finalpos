@@ -1,6 +1,58 @@
 const express = require('express');
 const router = express.Router();
 const { Product, ProductVariation, PriceHistory } = require('../models/index');
+const { Op } = require('sequelize');
+
+const slugify = (value) =>
+  String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'STD';
+
+async function generateSKU(ProductID, Size) {
+  const product = await Product.findByPk(ProductID);
+  const productPrefix = slugify(
+    product?.ProductName?.slice(0, 6) || `P${ProductID}`
+  );
+  const sizeSlug = slugify(Size);
+  const count = await ProductVariation.count({ where: { ProductID } });
+  let candidate = `${productPrefix}-${ProductID}-${sizeSlug}-${String(count + 1).padStart(3, '0')}`;
+  let suffix = 0;
+
+  while (await ProductVariation.findOne({ where: { SKU: candidate } })) {
+    suffix += 1;
+    candidate = `${productPrefix}-${ProductID}-${sizeSlug}-${String(count + 1 + suffix).padStart(3, '0')}`;
+  }
+
+  return candidate;
+}
+
+async function validateVariationUniqueness({ ProductID, SKU, Size, excludeId }) {
+  if (SKU) {
+    const skuWhere = { SKU };
+    if (excludeId) {
+      skuWhere.VariationID = { [Op.ne]: excludeId };
+    }
+    const existingSKU = await ProductVariation.findOne({ where: skuWhere });
+    if (existingSKU) {
+      return { error: 'SKU must be unique' };
+    }
+  }
+
+  if (ProductID && Size) {
+    const sizeWhere = { ProductID, Size };
+    if (excludeId) {
+      sizeWhere.VariationID = { [Op.ne]: excludeId };
+    }
+    const existingSize = await ProductVariation.findOne({ where: sizeWhere });
+    if (existingSize) {
+      return { error: 'Size must be unique for the given product' };
+    }
+  }
+
+  return null;
+}
 
 //getting by foriegn key
 router.get('/products/:ProductID/variations', async (req, res) => {
@@ -11,11 +63,7 @@ router.get('/products/:ProductID/variations', async (req, res) => {
       include: [Product] // Include associated Product model if needed
     });
 
-    if (productVariations.length > 0) {
-      res.status(200).json(productVariations);
-    } else {
-      res.status(404).json({ message: 'No variations found for this product' });
-    }
+    res.status(200).json(productVariations);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -49,8 +97,9 @@ router.post('/productVariations', async (req, res) => {
 
     // Field validations
     if (!ProductID) return res.status(400).json({ error: 'ProductID is required' });
-    if (!SKU) return res.status(400).json({ error: 'SKU is required' });
     if (!Size) return res.status(400).json({ error: 'Size is required' });
+
+    const resolvedSKU = SKU || (await generateSKU(ProductID, Size));
     // if (Price === undefined || isNaN(Price)) return res.status(400).json({ error: 'Valid Price is required' });
     if (SellingPrice === undefined || isNaN(SellingPrice)) return res.status(400).json({ error: 'Valid SellingPrice is required' });
     // if (QuantityInStock === undefined || !Number.isInteger(QuantityInStock)) return res.status(400).json({ error: 'Valid QuantityInStock is required' });
@@ -59,23 +108,17 @@ router.post('/productVariations', async (req, res) => {
     console.log(typeof (UnitsPerPackage))
     if (UnitsPerPackage === undefined || !Number.isInteger(UnitsPerPackage)) return res.status(400).json({ error: 'Valid UnitsPerPackage is required' });
 
-    // Check for unique SKU
-    const existingSKU = await ProductVariation.findOne({ where: { SKU } });
-    if (existingSKU) return res.status(400).json({ error: 'SKU must be unique' });
-    console.log("existingsku", existingSKU)
-    // Check for unique Size per ProductID
-    const existingSize = await ProductVariation.findOne({
-      where: {
-        ProductID,
-        Size
-      }
+    const uniquenessError = await validateVariationUniqueness({
+      ProductID,
+      SKU: resolvedSKU,
+      Size,
     });
-    if (existingSize) return res.status(400).json({ error: 'Size must be unique for the given product' });
+    if (uniquenessError) return res.status(400).json(uniquenessError);
 
     // Create the variation
     const productVariation = await ProductVariation.create({
       ProductID,
-      SKU,
+      SKU: resolvedSKU,
       Size,
       Color,
       // Price,
@@ -102,7 +145,21 @@ router.get('/productVariations', async (req, res) => {
 });
 
 
-const { Op } = require("sequelize");
+router.get('/products/:ProductID/generate-sku', async (req, res) => {
+  try {
+    const { ProductID } = req.params;
+    const { Size } = req.query;
+
+    if (!Size) {
+      return res.status(400).json({ error: 'Size is required to generate SKU' });
+    }
+
+    const sku = await generateSKU(ProductID, Size);
+    return res.status(200).json({ SKU: sku });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 // GET /api/product-variations?page=1&limit=10&search=abc
 // router.get("/productVariations", async (req, res) => {
@@ -226,7 +283,7 @@ router.get('/productVariations/:id/with-product', async (req, res) => {
 router.put('/productVariations/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { Price, SellingPrice, ...otherFields } = req.body;
+    const { Price, SellingPrice, SKU, Size, ProductID, ...otherFields } = req.body;
 
     const existingVariation = await ProductVariation.findByPk(id);
 
@@ -234,11 +291,30 @@ router.put('/productVariations/:id', async (req, res) => {
       return res.status(404).json({ error: 'ProductVariation not found' });
     }
 
+    const nextProductID = ProductID ?? existingVariation.ProductID;
+    const nextSize = Size ?? existingVariation.Size;
+    const nextSKU = SKU ?? existingVariation.SKU;
+
+    const uniquenessError = await validateVariationUniqueness({
+      ProductID: nextProductID,
+      SKU: nextSKU,
+      Size: nextSize,
+      excludeId: id,
+    });
+    if (uniquenessError) return res.status(400).json(uniquenessError);
+
     const previousPrice = existingVariation.Price;
     const previousSellingPrice = existingVariation.SellingPrice;
 
     const updated = await ProductVariation.update(
-      { Price, SellingPrice, ...otherFields },
+      {
+        Price,
+        SellingPrice,
+        SKU: nextSKU,
+        Size: nextSize,
+        ProductID: nextProductID,
+        ...otherFields,
+      },
       { where: { VariationID: id } }
     );
 
@@ -271,7 +347,10 @@ router.put('/productVariations/:id', async (req, res) => {
     }
   } catch (error) {
     console.error('Error updating product variation:', error);
-    res.status(500).json({ error: 'An error occurred while updating the product variation.' });
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ error: 'SKU or Size must be unique' });
+    }
+    res.status(500).json({ error: error.message || 'An error occurred while updating the product variation.' });
   }
 });
 // Delete a ProductVariation by ID

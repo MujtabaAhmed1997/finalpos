@@ -120,7 +120,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './Sorderdeaillist.css';
 import { get } from "../../service/apiClient";
 
@@ -202,8 +202,13 @@ function SaleOrderDetailList() {
                     <i className='fas fa-list-alt me-2'></i>
                     Sales Order Details
                   </h2>
-                  <div className='badge order-badge fs-6 px-3 py-2'>
-                    Order #{saleorderid}
+                  <div className='d-flex align-items-center gap-2 flex-wrap'>
+                    <div className='badge order-badge fs-6 px-3 py-2'>
+                      Order #{saleorderid}
+                    </div>
+                    <Link to={`/salesorderdetail/${saleorderid}`} className='btn btn-sm btn-primary'>Add Items</Link>
+                    <Link to={`/salesorder/update/${saleorderid}`} className='btn btn-sm btn-success'>Payment</Link>
+                    <Link to={`/salesorder/receipt/${saleorderid}`} className='btn btn-sm btn-outline-secondary'>Receipt</Link>
                   </div>
                 </div>
               </div>

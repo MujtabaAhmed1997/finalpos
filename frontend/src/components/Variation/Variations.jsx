@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import debounce from "lodash.debounce";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
+import { useInvalidate } from "../../context/DataRefreshContext";
+import { useListRefresh } from "../../hooks/useListRefresh";
 
 function Variations() {
+  const { id: productId } = useParams();
   const [variations, setVariations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,32 +16,51 @@ function Variations() {
   const [limit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [productName, setProductName] = useState("");
   const { confirm } = useConfirm();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
-  // Fetch variations (either all or filtered)
   const fetchVariations = async (page, search = "") => {
     try {
       setLoading(true);
-      const endpoint = search
-        ? `/productVariations/search?search=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
-        : `/productVariations/all?page=${page}&limit=${limit}`;
 
-      const response = await get(endpoint);
-      
-      if (response.data.variations) {
-        setVariations(response.data.variations);
-        setTotalPages(response.data.totalPages || 1);
-      } else {
-        // Fallback for different API response structure
-        setVariations(response.data || []);
+      if (productId) {
+        const [varRes, prodRes] = await Promise.all([
+          get(`/products/${productId}/variations`),
+          get(`/products/${productId}`),
+        ]);
+        const rows = Array.isArray(varRes.data) ? varRes.data : varRes.data?.variations || [];
+        const filtered = search.trim()
+          ? rows.filter(v =>
+              v.SKU?.toLowerCase().includes(search.toLowerCase()) ||
+              v.Size?.toLowerCase().includes(search.toLowerCase())
+            )
+          : rows;
+        setVariations(filtered);
         setTotalPages(1);
+        const prod = prodRes.data?.product || prodRes.data;
+        setProductName(prod?.ProductName || "");
+      } else {
+        const endpoint = search
+          ? `/productVariations/search?search=${encodeURIComponent(search)}&page=${page}&limit=${limit}`
+          : `/productVariations/all?page=${page}&limit=${limit}`;
+        const response = await get(endpoint);
+        if (response.data.variations) {
+          setVariations(response.data.variations);
+          setTotalPages(response.data.totalPages || 1);
+        } else {
+          setVariations(response.data || []);
+          setTotalPages(1);
+        }
+        setProductName("");
       }
-      
+
       setError(null);
-    } catch (error) {
-      console.error("Error fetching variations:", error);
+    } catch (err) {
+      console.error("Error fetching variations:", err);
       setError("Failed to load variations");
+      setVariations([]);
     } finally {
       setLoading(false);
     }
@@ -52,13 +74,13 @@ function Variations() {
     []
   );
 
-  useEffect(() => {
+  useListRefresh('variations', () => {
     if (searchTerm.trim()) {
       debouncedSearch(searchTerm, currentPage);
     } else {
       fetchVariations(currentPage);
     }
-  }, [searchTerm, currentPage]);
+  });
 
   const handleDelete = async (variationId) => {
     const ok = await confirm({
@@ -73,6 +95,7 @@ function Variations() {
     try {
       await delete_(`/productVariations/${variationId}`);
       toast.success("Variation deleted.");
+      invalidate(['variations', 'products']);
       fetchVariations(currentPage, searchTerm);
     } catch (err) {
       console.error("Error deleting variation:", err);
@@ -93,7 +116,9 @@ function Variations() {
     >
       <div className="col-12 col-md-10 col-lg-8 bg-white rounded p-4 shadow-sm">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-3">
-          <h2 className="mb-0">Product Variations</h2>
+          <h2 className="mb-0">
+            Product Variations{productName ? ` — ${productName}` : ""}
+          </h2>
           <input
             type="text"
             className="form-control w-100 w-md-50"
@@ -104,7 +129,10 @@ function Variations() {
               setCurrentPage(1); // reset to page 1 on search
             }}
           />
-          <Link to="/variations/add" className="btn btn-success">
+          <Link
+            to={productId ? `/variations/add/${productId}` : "/variations/add"}
+            className="btn btn-success"
+          >
             Add +
           </Link>
         </div>

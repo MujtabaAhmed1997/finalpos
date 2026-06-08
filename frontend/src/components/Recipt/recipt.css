@@ -997,6 +997,11 @@
 
 /* Print styles */
 @media print {
+  .app-nav-bar,
+  .no-print {
+    display: none !important;
+  }
+
   .receipt-container {
     background: white;
     padding: 0;

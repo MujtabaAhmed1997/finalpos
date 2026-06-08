@@ -1,6 +1,8 @@
 import React from 'react'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { DataRefreshProvider } from './context/DataRefreshContext'
+import AppNavBar from './components/Layout/AppNavBar'
 import Login from './pages/Login'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Signup from './pages/Signup'
 import Homepage from './pages/Homepage/Homepage'
 import Categories from './pages/Categories/Categories'
@@ -62,136 +64,113 @@ import DisplayReminderComponent from './components/Reminder/DisplayReminderCompo
 import ViewReminders from './components/Reminder/ViewReminders'
 import NotificationsPage from './components/NotificationBell'
 import AllVariation from './components/Variation/AllVariation'
-//import Home from './pages/Home'
 
+function AppRoutes() {
+  const location = useLocation();
+  const hideNav = ['/', '/signup', '/Homepage'].includes(location.pathname);
 
+  return (
+    <>
+      {!hideNav && <AppNavBar />}
+      <Routes>
+        <Route path='/' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
+        <Route path='/Homepage' element={<Homepage />} />
+        <Route path='/categories' element={<Categories />} />
+        <Route path='/categories/add' element={<AddCategory />} />
+        <Route path='/categories/update/:id' element={<UpdateCategory />} />
+
+        <Route path='/users' element={<Userpage />} />
+        <Route path='/users/add' element={<Addcomponent />} />
+        <Route path='/users/read/:id' element={<Read />} />
+        <Route path='/users/update/:id' element={<Update />} />
+
+        <Route path='/suppliers' element={<Supplier />} />
+        <Route path='/suppliers/add' element={<AddSupplier />} />
+        <Route path='/suppliers/read/:id' element={<Readsupplier />} />
+        <Route path='/suppliers/update/:id' element={<UpdateSupplier />} />
+
+        <Route path='/customers' element={<CustomerComponent />} />
+        <Route path='/customers/add' element={<AddCustomer />} />
+        <Route path='/customers/update/:id' element={<UpdateCustomer />} />
+
+        <Route path='/variations/all' element={<AllVariation />} />
+        <Route path='/variations/add/:productId' element={<AddVariation />} />
+        <Route path='/variations/add' element={<AddVariation />} />
+        <Route path='/variations/update/:id' element={<UpdateVariations />} />
+        <Route path='/variations/:id' element={<Variations />} />
+
+        <Route path='/products' element={<Products />} />
+        <Route path='/products/add' element={<AddProduct />} />
+        <Route path='/products/update/:id' element={<UpdateProduct />} />
+
+        <Route path='/purchaseorder' element={<PurchaseOrderlist />} />
+        <Route path='/purchaseorders/add' element={<PurchaseOrder />} />
+        <Route path='/purchaseorder/update/:id' element={<UpdatePurchaseOrderForm />} />
+        <Route path='/purchaseorderdetail/:id' element={<AddPurchaseOrderDetail />} />
+        <Route path='/orderdetail/:id' element={<PurchaseOrderDetailList />} />
+
+        <Route path='/supplierpayment/add' element={<AddPayment />} />
+        <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} />
+
+        <Route path='/customerpayment/add/:customerId' element={<AddCustomerPayment />} />
+        <Route path='/customerpayment/list' element={<CustomerPaymentsList />} />
+        <Route path='/customerpayment/add' element={<AddHomeCustomerPayment />} />
+        <Route path='/customerpayment/:customerId' element={<EachCustomerPaymentsList />} />
+        <Route path='/customerpayment/overdue' element={<OverdueCustomers />} />
+
+        <Route path='/salesorder/show' element={<Sales />} />
+        <Route path='/salesorder/add' element={<SalesOrderFormPage />} />
+        <Route path='/salesorder/update/:id' element={<UpdateSalesOrderPage />} />
+        <Route path='/salesorders/update/:id' element={<UpdateSalesOrderPage />} />
+
+        <Route path="/salesorder/receipt/:id" element={<GenericReceipt orderType="sales" />} />
+        <Route path="/purchaseorder/receipt/:id" element={<GenericReceipt orderType="purchase" />} />
+
+        <Route path='/salesorderdetail/:id' element={<SalesOrderDetailPage />} />
+        <Route path='/salesorderdetaillist/:id' element={<SaleOrderDetailListPage />} />
+
+        <Route path='/stocks' element={<StockComponent />} />
+        <Route path="/stock/read/:variationID" element={<StockDetail />} />
+        <Route path='/priceHistory/:id' element={<PriceHistory />} />
+        <Route path='/report' element={<ReportComponent />} />
+
+        <Route path='/customerleisure' element={<CustomerLeisureShow />} />
+        <Route path='/supplierleisure' element={<SupplierLeisureShow />} />
+
+        <Route path='/returnshow' element={<ReturnOrderShow />} />
+        <Route path='/addreturn' element={<ReturnOrderForm />} />
+        <Route path='/addreturndetails/:id' element={<AddReturnOrderDetail />} />
+        <Route path='/updatereturnorder/:id' element={<UpdateReturnOrderForm />} />
+
+        <Route path='/pricerule/add' element={<PriceRuleForm />} />
+        <Route path='/pricerule/show' element={<PriceRuleList />} />
+        <Route path='/pricerule/edit/:id' element={<EditPriceRuleForm />} />
+
+        <Route path='/expense/addExpense' element={<AddExpense />} />
+        <Route path='/expense/read' element={<ViewAllExpenses />} />
+        <Route path='/profit-loss' element={<ProfitLossScreen />} />
+
+        <Route path='/reminder/add' element={<AddReminder />} />
+        <Route path='/reminder/display' element={<DisplayReminderComponent />} />
+        <Route path='/reminder/view' element={<ViewReminders />} />
+
+        <Route path='/notification' element={<NotificationsPage />} />
+
+        <Route path='*' element={<Navigate to='/Homepage' replace />} />
+      </Routes>
+    </>
+  );
+}
 
 function App() {
-   return (
-      <BrowserRouter>
-         <Routes>
-            <Route path='/' element={<Login />}></Route>
-            <Route path='/signup' element={<Signup />}></Route>
-            <Route path='/Homepage' element={<Homepage />}></Route>
-            <Route path='/categories' element={<Categories />}></Route>
-            <Route path='/categories/add' element={<AddCategory />}></Route>
-            <Route path='/categories/update/:id' element={<UpdateCategory />}></Route>
-
-
-            <Route path='/users' element={<Userpage />}></Route>
-            <Route path='/users/add' element={<Addcomponent />}></Route>
-            <Route path='/users/read/:id' element={<Read />}></Route>
-            <Route path='/users/update/:id' element={<Update />}></Route>
-
-            <Route path='/suppliers' element={<Supplier />} />
-            <Route path='/suppliers/add' element={<AddSupplier />} />
-            <Route path='/suppliers/read/:id' element={<Readsupplier />}></Route>
-            <Route path='/suppliers/update/:id' element={<UpdateSupplier />}></Route>
-
-            <Route path='/customers' element={<CustomerComponent />} />
-            <Route path='/customers/add' element={<AddCustomer />} />
-            <Route path='/customers/update/:id' element={<UpdateCustomer />}></Route>
-
-            <Route path='/variations/:id' element={<Variations />} />
-            {/* <Route path='/variations/all' element={<ProductVariationList />} /> */}
-            <Route path='/variations/all' element={<AllVariation />} />
-
-
-            <Route path='/variations/add' element={<AddVariation />}></Route>
-            <Route path='/variations/update/:id' element={<UpdateVariations />}></Route>
-
-            <Route path='/products' element={<Products />} />
-            <Route path='/products/add' element={<AddProduct />}></Route>
-            <Route path='/products/update/:id' element={<UpdateProduct />}></Route>
-
-            <Route path='/purchaseorder' element={<PurchaseOrderlist />} />
-            <Route path='/purchaseorders/add' element={<PurchaseOrder />} />
-            <Route path='/purchaseorder/update/:id' element={<UpdatePurchaseOrderForm />}></Route>
-            {/* <Route path='/purchaseorder/recipt/:id' element={<Receipt/>}></Route> */}
-
-
-
-
-            <Route path='/purchaseorderdetail/:id' element={<AddPurchaseOrderDetail />} />
-            <Route path='/orderdetail/:id' element={<PurchaseOrderDetailList />} />
-
-
-            <Route path='/supplierpayment/add' element={<AddPayment />} />
-            <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} />
-//:id was changed to :customerId
-            <Route path='/customerpayment/add/:customerId' element={<AddCustomerPayment />} />
-            <Route path='/customerpayment/list' element={<CustomerPaymentsList />} />
-            <Route path='/customerpayment/add' element={<AddHomeCustomerPayment />} />
-
-
-            <Route path='/customerpayment/:customerId' element={<EachCustomerPaymentsList />} />
-
-            <Route path='/customerpayment/overdue' element={<OverdueCustomers />} />
-
-            {/* <Route path='/supplierpayment/list' element={<SupplierPaymentsList />} /> */}
-
-            <Route path='/salesorder/show' element={<Sales />} />
-            <Route path='/salesorder/add' element={<SalesOrderFormPage />} />
-            <Route path='/salesorders/update/:id' element={<UpdateSalesOrderPage />} />
-
-            <Route path="/salesorder/receipt/:id" element={<GenericReceipt orderType="sales" />} />
-            <Route path="/purchaseorder/receipt/:id" element={<GenericReceipt orderType="purchase" />} />
-
-
-            <Route path='/salesorderdetail/:id' element={<SalesOrderDetailPage />} />
-            <Route path='/salesorderdetaillist/:id' element={<SaleOrderDetailListPage />} />
-
-
-
-            <Route path='/stocks' element={<StockComponent />} />
-            <Route path="/stock/read/:variationID" element={<StockDetail />} />
-
-
-            <Route path='/priceHistory/:id' element={<PriceHistory />} />
-
-            <Route path='/report' element={<ReportComponent />} />
-
-
-            <Route path='/customerleisure' element={<CustomerLeisureShow />} />
-            <Route path='/supplierleisure' element={<SupplierLeisureShow />} />
-
-            <Route path='/returnshow' element={<ReturnOrderShow />} />
-            <Route path='/addreturn' element={<ReturnOrderForm />} />
-            <Route path='/addreturndetails/:id' element={<AddReturnOrderDetail />} />
-            <Route path='/updatereturnorder/:id' element={<UpdateReturnOrderForm />} />
-
-            <Route path='/pricerule/add' element={<PriceRuleForm />} />
-            <Route path='/pricerule/show' element={<PriceRuleList />} />
-            <Route path='/pricerule/edit/:id' element={<EditPriceRuleForm />} />
-
-
-
-            <Route path='/expense/addExpense' element={<AddExpense />} />
-            <Route path='/expense/read' element={<ViewAllExpenses />} />
-
-            <Route path='/profit-loss' element={<ProfitLossScreen />} />
-
-            <Route path='/reminder/add' element={<AddReminder />} />
-            <Route path='/reminder/display' element={<DisplayReminderComponent />} />
-            <Route path='/reminder/view' element={<ViewReminders />} />
-
-
-
-            <Route path='/notification' element={<NotificationsPage />} />
-
-
-
-
-
-
-
-
-
-
-         </Routes>
-      </BrowserRouter>
-
-   )
+  return (
+    <BrowserRouter>
+      <DataRefreshProvider>
+        <AppRoutes />
+      </DataRefreshProvider>
+    </BrowserRouter>
+  );
 }
 
 export default App

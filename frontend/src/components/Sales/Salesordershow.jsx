@@ -1,9 +1,13 @@
-import { Link, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
 import './Salesordershow.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
+import { useInvalidate } from '../../context/DataRefreshContext';
+import { useListRefresh } from '../../hooks/useListRefresh';
+import OrderPrintButtons from './OrderPrintButtons';
+import './sales.css';
 
 function SalesOrdershow() {
   const [data, setData] = useState([]);
@@ -11,16 +15,12 @@ function SalesOrdershow() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const pageSize = 10; // Define the number of records per page
+  const pageSize = 10;
   const { confirm } = useConfirm();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
-  useEffect(() => {
-    fetchSalesOrders(currentPage);
-  }, [currentPage]);
-
-  const fetchSalesOrders = (page) => {
+  const fetchSalesOrders = useCallback((page) => {
     setLoading(true);
     get(`/sales-orders?page=${page}&limit=${pageSize}`)
       .then(res => {
@@ -34,7 +34,9 @@ function SalesOrdershow() {
         console.log(err);
         setLoading(false);
       });
-  };
+  }, [pageSize]);
+
+  useListRefresh('salesOrders', () => fetchSalesOrders(currentPage));
 
   const handleDelete = async (SalesOrderID) => {
     const ok = await confirm({
@@ -49,6 +51,7 @@ function SalesOrdershow() {
     try {
       await delete_(`/sales-orders/${SalesOrderID}`);
       toast.success("Sales order deleted.");
+      invalidate('salesOrders');
       fetchSalesOrders(currentPage);
     } catch (err) {
       console.log(err);
@@ -188,20 +191,36 @@ function SalesOrdershow() {
                       </td>
                       <td>
                         <div className="action-buttons">
-                          <Link 
-                            to={`/salesorderdetaillist/${order.SalesOrderID}`} 
+                          <Link
+                            to={`/salesorder/receipt/${order.SalesOrderID}`}
                             className='btn-action btn-read'
                           >
-                            View
+                            Receipt
                           </Link>
-                          <Link 
-                            to={`/salesorders/update/${order.SalesOrderID}`} 
+                          <Link
+                            to={`/salesorderdetail/${order.SalesOrderID}`}
+                            className='btn-action btn-read'
+                          >
+                            Open
+                          </Link>
+                          <Link
+                            to={`/salesorder/update/${order.SalesOrderID}`}
                             className='btn-action btn-edit'
                           >
-                            Edit
+                            Pay
                           </Link>
-                          <button 
-                            onClick={() => handleDelete(order.SalesOrderID)} 
+                          <Link
+                            to={`/salesorderdetaillist/${order.SalesOrderID}`}
+                            className='btn-action btn-read'
+                          >
+                            Items
+                          </Link>
+                          <OrderPrintButtons
+                            orderId={order.SalesOrderID}
+                            compact
+                          />
+                          <button
+                            onClick={() => handleDelete(order.SalesOrderID)}
                             className='btn-action btn-delete'
                           >
                             Delete

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill } from 'react-icons/bs';
-import './Productcomp.css'; // Import the CSS file for this component
+import './Productcomp.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
+import { useInvalidate } from '../../context/DataRefreshContext';
+import { useListRefresh } from '../../hooks/useListRefresh';
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -12,14 +14,9 @@ function Product() {
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
-  // Function to fetch products
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await get('/products');
       
@@ -42,10 +39,9 @@ function Product() {
     } catch (error) {
       console.error('Error fetching products:', error);
     }
-  };
+  }, []);
 
-  // Function to fetch categories
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await get('/product-categories');
       
@@ -59,7 +55,12 @@ function Product() {
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
-  };
+  }, []);
+
+  useListRefresh('products', () => {
+    fetchProducts();
+    fetchCategories();
+  });
 
   // Function to get category name by ID
   const getCategoryName = (categoryId) => {
@@ -102,6 +103,7 @@ function Product() {
       if (response.data.success) {
         // Remove the deleted product from state
         setProducts(prevProducts => prevProducts.filter(product => product.ProductID !== productId));
+        invalidate(['products', 'variations']);
         toast.success("Product deleted.");
       } else {
         toast.error(response.data.message || "Failed to delete product");

@@ -1,0 +1,75 @@
+.app-nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #1d2634;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-nav-bar__group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.app-nav-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #e8edf5;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.app-nav-bar__btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.app-nav-bar__pos {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  font-weight: 600;
+}
+
+.app-nav-bar__pos:hover {
+  background: #1b5e20;
+  color: #fff;
+}
+
+.app-nav-bar__home {
+  background: #2962ff;
+  border-color: #2962ff;
+}
+
+.app-nav-bar__home:hover {
+  background: #1e4fd6;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .app-nav-bar {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .app-nav-bar__label {
+    display: none;
+  }
+
+  .app-nav-bar__btn {
+    padding: 0.45rem 0.6rem;
+  }
+}
