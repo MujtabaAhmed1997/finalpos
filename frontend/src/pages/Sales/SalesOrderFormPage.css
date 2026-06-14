@@ -3,6 +3,8 @@
   background-color: #f8f9fa;
   min-height: calc(100vh - 120px);
   overflow-x: hidden;
+  grid-area: main;
+  min-width: 0;
 }
 
 @media (max-width: 768px) {

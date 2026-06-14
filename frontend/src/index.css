@@ -53,3 +53,29 @@ body {
   background: linear-gradient(135deg, #263043 0%, #1a2332 100%);
 }
 
+/* Grid layout — keep main content out of sidebar column */
+.grid-container {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.grid-container > .header {
+  grid-area: header;
+}
+
+.grid-container > #sidebar {
+  grid-area: sidebar;
+}
+
+.grid-container > *:not(#sidebar):not(.header) {
+  grid-area: main;
+  min-width: 0;
+}
+

@@ -11,8 +11,21 @@ function Sidebar({ openSidebarToggle, OpenSidebar }) {
   const [inventoryDropdown, setInventoryDropdown] = useState(false);
   const [salesDropdown, setSalesDropdown] = useState(false);
 
+  const closeMobileSidebar = () => {
+    if (openSidebarToggle) OpenSidebar();
+  };
+
   return (
-    <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>
+    <>
+      {openSidebarToggle && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          onClick={OpenSidebar}
+          aria-label="Close menu"
+        />
+      )}
+      <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>
       <div className='sidebar-title'>
         <div className='sidebar-brand'>
           <BsCart3 className='icon_header' /> SHOP POS
@@ -22,7 +35,7 @@ function Sidebar({ openSidebarToggle, OpenSidebar }) {
 
       <ul className='sidebar-list'>
         <li className='sidebar-list-item'>
-          <Link to="/Homepage">
+          <Link to="/Homepage" onClick={closeMobileSidebar}>
             <BsGrid1X2Fill className='icon' /> Dashboard
           </Link>
         </li>
@@ -35,30 +48,30 @@ function Sidebar({ openSidebarToggle, OpenSidebar }) {
           {salesDropdown && (
             <ul className='sidebar-dropdown-list'>
               <li className='sidebar-dropdown-item'>
-                <Link to="/salesorder/add">New Sale</Link>
+                <Link to="/salesorder/add" onClick={closeMobileSidebar}>New Sale</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <Link to="/salesorder/show">Sales History</Link>
+                <Link to="/salesorder/show" onClick={closeMobileSidebar}>Sales History</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <Link to="/returnshow">Returns</Link>
+                <Link to="/returnshow" onClick={closeMobileSidebar}>Returns</Link>
               </li>
             </ul>
           )}
         </li>
 
         <li className='sidebar-list-item'>
-          <Link to="/products">
+          <Link to="/products" onClick={closeMobileSidebar}>
             <BsFillArchiveFill className='icon' /> Products
           </Link>
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/categories">
+          <Link to="/categories" onClick={closeMobileSidebar}>
             <BsFillGrid3X3GapFill className='icon' /> Categories
           </Link>
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/customers">
+          <Link to="/customers" onClick={closeMobileSidebar}>
             <BsPeopleFill className='icon' /> Customers
           </Link>
         </li>
@@ -70,39 +83,40 @@ function Sidebar({ openSidebarToggle, OpenSidebar }) {
           {inventoryDropdown && (
             <ul className='sidebar-dropdown-list'>
               <li className='sidebar-dropdown-item'>
-                <Link to="/stocks">Stock Details</Link>
+                <Link to="/stocks" onClick={closeMobileSidebar}>Stock Details</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <Link to="/purchaseorder">Add Stock</Link>
+                <Link to="/purchaseorder" onClick={closeMobileSidebar}>Add Stock</Link>
               </li>
               <li className='sidebar-dropdown-item'>
-                <Link to="/report">Stock Reports</Link>
+                <Link to="/report" onClick={closeMobileSidebar}>Stock Reports</Link>
               </li>
             </ul>
           )}
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/suppliers">
+          <Link to="/suppliers" onClick={closeMobileSidebar}>
             <BsPeopleFill className='icon' /> Suppliers
           </Link>
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/users">
+          <Link to="/users" onClick={closeMobileSidebar}>
             <BsPeopleFill className='icon' /> Users
           </Link>
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/report">
+          <Link to="/report" onClick={closeMobileSidebar}>
             <BsMenuButtonWideFill className='icon' /> Reports
           </Link>
         </li>
         <li className='sidebar-list-item'>
-          <Link to="/customerpayment/overdue">
+          <Link to="/customerpayment/overdue" onClick={closeMobileSidebar}>
             <BsFillGearFill className='icon' /> Overdue Payments
           </Link>
         </li>
       </ul>
     </aside>
+    </>
   );
 }
 

@@ -150,20 +150,8 @@ body {
     left: 0 !important;
     height: 100vh !important;
     width: 280px !important;
-    z-index: 1000 !important;
+    z-index: 1001 !important;
     grid-area: unset !important;
-  }
-  
-  /* Add overlay when sidebar is open */
-  .sidebar-responsive::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 280px;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
   }
 }
 

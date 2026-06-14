@@ -2,6 +2,8 @@
   padding: 20px;
   background-color: #f8f9fa;
   min-height: calc(100vh - 60px);
+  grid-area: main;
+  min-width: 0;
 }
 
 .sales-container .sales-orders-container {
