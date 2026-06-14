@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { useToast } from "../../ui/toast/ToastProvider";
+import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, put } from "../../service/apiClient";
 
 function UpdateProduct() {
@@ -18,6 +19,7 @@ function UpdateProduct() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
   const handleInput = (event) => {
     setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -68,6 +70,7 @@ function UpdateProduct() {
       
       if (response.data.success) {
         toast.success("Product updated successfully!");
+        invalidate('products');
         navigate("/products");
       } else {
         toast.error(response.data.message || "Failed to update product");

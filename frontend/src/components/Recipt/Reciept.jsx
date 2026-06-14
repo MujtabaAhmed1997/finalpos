@@ -3,9 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import './recipt.css';
-import '../Sales/sales.css';
 import { get } from "../../service/apiClient";
-import OrderPrintButtons from "../Sales/OrderPrintButtons";
 
 const GenericReceipt = ({ orderType }) => {
   console.log("GenericReceipt component rendered with orderType:", orderType);
@@ -429,13 +427,10 @@ const GenericReceipt = ({ orderType }) => {
         {/* Actions */}
         <div className="receipt-actions no-print">
           {orderType === "sales" && (
-            <>
-              <button className="action-button print-button" onClick={() => navigate("/salesorder/add")}>
-                <FaReceipt />
-                New Sale
-              </button>
-              <OrderPrintButtons orderId={OrderID} className="receipt-print-extra" />
-            </>
+            <button className="action-button print-button" onClick={() => navigate("/salesorder/add")}>
+              <FaReceipt />
+              New Sale
+            </button>
           )}
           <button className="action-button print-button" onClick={handlePrint}>
             <FaPrint />

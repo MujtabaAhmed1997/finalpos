@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './Salesordershow.css';
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
 import { useInvalidate } from '../../context/DataRefreshContext';
 import { useListRefresh } from '../../hooks/useListRefresh';
-import OrderPrintButtons from './OrderPrintButtons';
 import './sales.css';
 
 function SalesOrdershow() {
@@ -37,6 +36,10 @@ function SalesOrdershow() {
   }, [pageSize]);
 
   useListRefresh('salesOrders', () => fetchSalesOrders(currentPage));
+
+  useEffect(() => {
+    fetchSalesOrders(currentPage);
+  }, [currentPage, fetchSalesOrders]);
 
   const handleDelete = async (SalesOrderID) => {
     const ok = await confirm({
@@ -215,10 +218,12 @@ function SalesOrdershow() {
                           >
                             Items
                           </Link>
-                          <OrderPrintButtons
-                            orderId={order.SalesOrderID}
-                            compact
-                          />
+                          <Link
+                            to={`/salesorder/receipt/${order.SalesOrderID}`}
+                            className='btn-action btn-read'
+                          >
+                            Receipt
+                          </Link>
                           <button
                             onClick={() => handleDelete(order.SalesOrderID)}
                             className='btn-action btn-delete'

@@ -1,13 +1,12 @@
 .sales-order-form-container {
-  padding: 20px;
+  padding: 0.75rem;
   background-color: #f8f9fa;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 120px);
+  overflow-x: hidden;
 }
 
-.sales-order-form-container .sales-order-form {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin: 0;
+@media (max-width: 768px) {
+  .sales-order-form-container {
+    padding: 0.5rem;
+  }
 }

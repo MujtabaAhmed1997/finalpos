@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { SalesOrderDetailvalidator } from "../../controllers/Sorderdeatil";
-import conversionService from "../../service/Conversionservice";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./Salesorderdetail.css";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
+import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, post, delete_ } from "../../service/apiClient";
-import OrderPrintButtons from "./OrderPrintButtons";
 import "./sales.css";
-
-const { sellQuantity } = conversionService;
 
 function AddSalesOrderDetail() {
   const { id: SalesOrderID } = useParams();
@@ -40,6 +36,7 @@ function AddSalesOrderDetail() {
   const navigate = useNavigate();
   const toast = useToast();
   const { confirm } = useConfirm();
+  const invalidate = useInvalidate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -119,13 +116,17 @@ function AddSalesOrderDetail() {
   };
 
   const fetchVariationByBarcode = async (barcode, index) => {
+    if (!barcode?.trim()) return;
     try {
-      const response = await get(`/productVariations/barcode/${barcode}`);
+      const response = await get(`/productVariations/barcode/${encodeURIComponent(barcode.trim())}`);
       const variation = response.data;
       const stockResponse = await get(`/stocktransaction/get-stock/${variation.VariationID}`);
+      const variationsRes = await get(`/products/${variation.ProductID}/variations`);
+      setVariations((prev) => ({ ...prev, [index]: variationsRes.data }));
       setEntries((prevEntries) => {
         const newEntries = [...prevEntries];
         newEntries[index].VariationID = variation.VariationID;
+        newEntries[index].Barcode = variation.Barcode || barcode.trim();
         newEntries[index].UnitPrice = variation.SellingPrice;
         newEntries[index].UnitPerPackage = variation.UnitsPerPackage;
         newEntries[index].ContainerStock = stockResponse.data.stock.Container;
@@ -136,6 +137,7 @@ function AddSalesOrderDetail() {
       });
     } catch (error) {
       console.error("Error fetching variation by barcode:", error);
+      toast.error("Barcode not found. Check SKU/barcode or select product manually.");
     }
   };
 
@@ -275,6 +277,8 @@ function AddSalesOrderDetail() {
 
   const validateEntry = (entry) => {
     const errors = {};
+    const qty = Number(entry.Quantity) || 0;
+    const looseQty = Number(entry.LooseQuantity) || 0;
     
     if (!entry.ProductID) {
       errors.ProductID = "Product is required";
@@ -284,15 +288,15 @@ function AddSalesOrderDetail() {
       errors.VariationID = "Variation is required";
     }
     
-    if (!entry.Quantity && !entry.LooseQuantity) {
+    if (qty <= 0 && looseQty <= 0) {
       errors.Quantity = "At least one quantity is required";
     }
     
-    if (entry.Quantity && entry.Quantity > entry.ContainerStock) {
+    if (qty > 0 && qty > Number(entry.ContainerStock)) {
       errors.Quantity = `Only ${entry.ContainerStock} containers available`;
     }
     
-    if (entry.LooseQuantity && entry.LooseQuantity > entry.LooseStock) {
+    if (looseQty > 0 && looseQty > Number(entry.LooseStock)) {
       errors.LooseQuantity = `Only ${entry.LooseStock} loose items available`;
     }
     
@@ -336,6 +340,7 @@ function AddSalesOrderDetail() {
       }
 
       toast.success("Sales order submitted successfully!");
+      invalidate(["salesOrders", "products"]);
       navigate(`/salesorder/update/${SalesOrderID}`);
     } catch (error) {
       console.error("Error submitting sales order:", error);
@@ -369,6 +374,13 @@ function AddSalesOrderDetail() {
     <div className="sales-order-container">
       <div className="sales-order-card">
         <div className="form-header">
+          <div className="form-header-nav">
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => navigate(-1)}>
+              ← Back
+            </button>
+            <Link to="/Homepage" className="btn btn-secondary btn-sm">Home</Link>
+            <Link to="/salesorder/show" className="btn btn-secondary btn-sm">Sales List</Link>
+          </div>
           <h2>Sales Order Details</h2>
           <p>Add products and quantities to your sales order</p>
         </div>
@@ -460,7 +472,7 @@ function AddSalesOrderDetail() {
                           key={variation.VariationID}
                           value={variation.VariationID}
                         >
-                          {variation.SKU}
+                          {variation.SKU || variation.Size || `Var #${variation.VariationID}`}
                         </option>
                       ))}
                     </select>
@@ -604,11 +616,6 @@ function AddSalesOrderDetail() {
           </div>
 
           <div className="action-buttons">
-            <OrderPrintButtons
-              orderId={SalesOrderID}
-              localEntries={entries}
-              products={products}
-            />
             <button type="button" className="btn btn-primary" onClick={addEntry}>
               <i className="fas fa-plus"></i>
               Add Entry

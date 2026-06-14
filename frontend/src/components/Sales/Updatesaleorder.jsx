@@ -3,8 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { validateSalesOrder } from '../../controllers/salesvalidator';
 import { FaEdit, FaCreditCard, FaTimes } from 'react-icons/fa';
 import { useToast } from "../../ui/toast/ToastProvider";
+import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, post, put } from "../../service/apiClient";
-import OrderPrintButtons from "./OrderPrintButtons";
 import "./sales.css";
 
 function UpdateSalesOrderForm() {
@@ -31,6 +31,7 @@ function UpdateSalesOrderForm() {
 
   const navigate = useNavigate();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
   useEffect(() => {
     get(`/sales-orders/${id}`)
@@ -142,6 +143,8 @@ function UpdateSalesOrderForm() {
         })
         .then(res => {
           console.log('CustomerLeisure entry created:', res.data);
+          invalidate('salesOrders');
+          toast.success("Sales order updated!");
           navigate(`/salesorder/receipt/${id}`);
         })
         .catch(err => {
@@ -180,10 +183,11 @@ function UpdateSalesOrderForm() {
         };
 
         await put(`/sales-orders/${id}`, updatedValues);
+        setValues(updatedValues);
+        invalidate('salesOrders');
 
         toast.success("Payment processed successfully!");
         setShowPaymentModal(false);
-        window.location.reload();
       } catch (error) {
         console.error('Error processing payment:', error);
         toast.error("Error processing payment. Please try again.");
@@ -396,7 +400,12 @@ function UpdateSalesOrderForm() {
             </div>
 
             <div className="mb-3">
-              <OrderPrintButtons orderId={id} />
+              <Link
+                to={`/salesorder/receipt/${id}`}
+                className="btn btn-outline-primary w-100"
+              >
+                View Receipt
+              </Link>
             </div>
 
             <div className="d-grid gap-2">

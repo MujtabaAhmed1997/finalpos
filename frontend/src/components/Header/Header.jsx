@@ -5,6 +5,7 @@ import {
   BsPersonCircle,
   BsSearch,
   BsJustify,
+  BsHouse,
 } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import "../Header/Header.css";
@@ -103,6 +104,17 @@ function Header({ OpenSidebar }) {
       </div>
       
       <div className="header-right">
+        <div
+          className="icon-container home-btn"
+          onClick={() => navigate("/Homepage")}
+          data-tooltip="Home"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && navigate("/Homepage")}
+        >
+          <BsHouse className="icon" />
+        </div>
+
         <div 
           className="icon-container relative" 
           onClick={handleBellClick}

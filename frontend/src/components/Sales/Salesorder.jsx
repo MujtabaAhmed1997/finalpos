@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import { validateSalesOrder } from "../../controllers/salesvalidator";
 import { FaShoppingCart, FaUser, FaCalendar, FaPlusCircle } from "react-icons/fa";
@@ -702,6 +702,18 @@ function SalesOrderForm() {
              <FaShoppingCart className="me-2 mb-1" />
              {isSubmitting ? "Creating..." : "Create Sales Order"}
            </button>
+
+          <div className="d-flex flex-wrap gap-2 mt-3 justify-content-center">
+            <button type="button" className="btn btn-outline-secondary flex-fill" onClick={() => navigate(-1)}>
+              ← Back
+            </button>
+            <Link to="/Homepage" className="btn btn-outline-primary flex-fill text-center">
+              Home
+            </Link>
+            <Link to="/salesorder/show" className="btn btn-outline-secondary flex-fill text-center">
+              Sales List
+            </Link>
+          </div>
         </form>
       </div>
     </div>

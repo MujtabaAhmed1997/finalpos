@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { get, put } from "../../service/apiClient";
+import { useInvalidate } from "../../context/DataRefreshContext";
 
 function UpdateVariations() {
   const { id } = useParams();
@@ -19,6 +20,7 @@ function UpdateVariations() {
   const [products, setProducts] = useState([]);
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
+  const invalidate = useInvalidate();
 
   useEffect(() => {
     fetchProducts();
@@ -111,7 +113,7 @@ function UpdateVariations() {
       newErrors.ProductID = "Please select a product";
     }
 
-    if (!values.Barcode) {
+    if (!values.Barcode?.trim()) {
       newErrors.Barcode = "Barcode is required";
     }
 
@@ -131,7 +133,8 @@ function UpdateVariations() {
     try {
       const response = await put(`/productVariations/${id}`, values);
       console.log("Variation updated:", response.data);
-      navigate("/variations/all");
+      invalidate(['variations', 'products']);
+      navigate(values.ProductID ? `/variations/${values.ProductID}` : "/variations/all");
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
         setServerError(err.response.data.message);

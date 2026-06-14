@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaPlusCircle } from "react-icons/fa";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get, post } from "../../service/apiClient";
+import { useInvalidate } from "../../context/DataRefreshContext";
 
 function AddProduct() {
   const [values, setValues] = useState({
@@ -17,6 +18,7 @@ function AddProduct() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const toast = useToast();
+  const invalidate = useInvalidate();
 
   const handleInput = (event) => {
     setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -52,6 +54,7 @@ function AddProduct() {
       
       if (response.data.success) {
         toast.success("Product created successfully!");
+        invalidate('products');
         navigate("/products");
       } else {
         toast.error(response.data.message || "Failed to create product");

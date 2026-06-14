@@ -114,59 +114,6 @@
 .status-badge--partial { background: #cce5ff; color: #004085; }
 .status-badge--advance { background: #e2d5f5; color: #4a235a; }
 
-.order-print-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.btn-pos-print {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.85rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  color: #fff;
-  transition: opacity 0.2s, transform 0.15s;
-}
-
-.btn-pos-print:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.btn-pos-print--compact {
-  padding: 0.35rem 0.55rem;
-  font-size: 0.72rem;
-}
-
-.btn-kitchen {
-  background: #e67e22;
-}
-
-.btn-kitchen:hover:not(:disabled) {
-  background: #d35400;
-}
-
-.btn-delivery {
-  background: #2980b9;
-}
-
-.btn-delivery:hover:not(:disabled) {
-  background: #1f6dad;
-}
-
-.receipt-actions .btn-kitchen,
-.receipt-actions .btn-delivery {
-  min-width: 140px;
-  justify-content: center;
-}
-
 @media (max-width: 768px) {
   .sales-page {
     padding: 0.5rem;

@@ -1,13 +1,28 @@
 .sales-order-detail-container {
-  padding: 20px;
+  padding: 0.75rem;
   background-color: #f8f9fa;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 120px);
+  overflow-x: hidden;
 }
 
 .sales-order-detail-container .sales-order-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin: 0;
+  min-height: auto;
+  padding: 0.5rem;
+  background: transparent;
+  align-items: stretch;
+}
+
+.sales-order-detail-container .sales-order-card {
+  max-height: none;
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .sales-order-detail-container {
+    padding: 0.5rem;
+  }
+
+  .sales-order-detail-container .sales-order-card {
+    padding: 0.75rem;
+  }
 }
