@@ -79,3 +79,42 @@ body {
   min-width: 0;
 }
 
+/* Global readability */
+input,
+select,
+textarea,
+.form-control,
+.form-select {
+  color: #1d2634;
+  font-size: 0.95rem;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8a96a8;
+}
+
+label,
+.form-label {
+  color: #1d2634;
+  font-weight: 600;
+}
+
+.table {
+  color: #1d2634;
+}
+
+.table thead th {
+  color: #fff;
+  background: #263043;
+}
+
+.table tbody td {
+  color: #1d2634;
+  vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: #1d2634;
+}
+

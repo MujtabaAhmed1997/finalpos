@@ -6,7 +6,6 @@ import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
 import { useInvalidate } from '../../context/DataRefreshContext';
 import { useListRefresh } from '../../hooks/useListRefresh';
-import './sales.css';
 
 function SalesOrdershow() {
   const [data, setData] = useState([]);
@@ -23,17 +22,17 @@ function SalesOrdershow() {
     setLoading(true);
     get(`/sales-orders?page=${page}&limit=${pageSize}`)
       .then(res => {
-        console.log('Sales Orders API Response:', res.data);
-        setData(res.data.salesOrders);
-        setTotalPages(res.data.totalPages);
+        setData(res.data.salesOrders || []);
+        setTotalPages(res.data.totalPages || 1);
         setTotalRecords(res.data.totalRecords || 0);
         setLoading(false);
       })
       .catch(err => {
         console.log(err);
+        toast.error("Could not load sales orders.");
         setLoading(false);
       });
-  }, [pageSize]);
+  }, [pageSize, toast]);
 
   useListRefresh('salesOrders', () => fetchSalesOrders(currentPage));
 
@@ -44,7 +43,7 @@ function SalesOrdershow() {
   const handleDelete = async (SalesOrderID) => {
     const ok = await confirm({
       title: "Delete sales order?",
-      description: "This will permanently remove the sales order (and may remove its details depending on backend rules).",
+      description: "This will permanently remove the sales order.",
       confirmText: "Delete",
       cancelText: "Cancel",
       tone: "danger",
@@ -71,35 +70,38 @@ function SalesOrdershow() {
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case 'paid':
-        return 'status-badge status-paid';
-      case 'pending':
-        return 'status-badge status-pending';
+        return 'so-status so-status--paid';
+      case 'partial':
+        return 'so-status so-status--partial';
+      case 'advance':
+        return 'so-status so-status--advance';
       case 'overdue':
-        return 'status-badge status-overdue';
+        return 'so-status so-status--overdue';
       default:
-        return 'status-badge status-pending';
+        return 'so-status so-status--pending';
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat('en-PK', {
       style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
+      currency: 'PKR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount || 0);
-  };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return '—';
+    return new Date(dateString).toLocaleDateString('en-PK', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  // Calculate pagination range
   const getPaginationRange = () => {
-    const delta = 2; // Number of pages to show on each side of current page
+    if (totalPages <= 1) return [1];
+    const delta = 2;
     const range = [];
     const rangeWithDots = [];
 
@@ -117,169 +119,145 @@ function SalesOrdershow() {
 
     if (currentPage + delta < totalPages - 1) {
       rangeWithDots.push('...', totalPages);
-    } else {
+    } else if (totalPages > 1) {
       rangeWithDots.push(totalPages);
     }
 
-    return rangeWithDots;
+    return [...new Set(rangeWithDots)];
   };
 
-  // Calculate start and end record numbers
-  const startRecord = (currentPage - 1) * pageSize + 1;
+  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endRecord = Math.min(currentPage * pageSize, totalRecords);
 
   return (
-    <div className="sales-orders-container">
-      <div className="sales-content-wrapper">
-        <div className="sales-header">
-          <h2>Sales Orders</h2>
-          <Link to={'/salesorder/add'} className='add-button'>Add New Order</Link>
+    <div className="sales-orders-page">
+      <div className="sales-orders-page__inner">
+        <div className="sales-orders-page__header">
+          <div>
+            <h2>Sales Orders</h2>
+            <p>Manage bills, payments, and receipts</p>
+          </div>
+          <Link to="/salesorder/add" className="sales-orders-page__add-btn">
+            + New Sale
+          </Link>
         </div>
-        
-        <div className="sales-table-container">
+
+        <div className="sales-orders-page__body">
           {loading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <div className="loading-text">Loading sales orders...</div>
+            <div className="sales-orders-page__state">
+              <div className="sales-orders-page__spinner" />
+              <span>Loading sales orders…</span>
             </div>
           ) : data.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">📋</div>
-              <div className="empty-state-text">No sales orders found</div>
-              <Link to={'/salesorder/add'} className='add-button'>Create Your First Order</Link>
+            <div className="sales-orders-page__state">
+              <span className="sales-orders-page__state-icon">📋</span>
+              <p>No sales orders found</p>
+              <Link to="/salesorder/add" className="sales-orders-page__add-btn">
+                Create First Sale
+              </Link>
             </div>
           ) : (
             <>
-              <table className='sales-table'>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Order Date</th>
-                    <th>Total Amount</th>
-                    <th>Amount Paid</th>
-                    <th>Remaining</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((order, index) => (
-                    <tr key={index}>
-                      <td>
-                        <strong>#{order.SalesOrderID}</strong>
-                      </td>
-                      <td>
-                        <div>
-                          <strong>{order.Customer ? order.Customer.CustomerName : 'N/A'}</strong>
-                        </div>
-                      </td>
-                      <td>{formatDate(order.OrderDate)}</td>
-                      <td>
-                        <strong>{formatCurrency(order.TotalAmount)}</strong>
-                      </td>
-                      <td>{formatCurrency(order.AmountPaid)}</td>
-                      <td>
-                        <span style={{ 
-                          color: order.RemainingAmount > 0 ? '#ffc107' : '#28a745',
-                          fontWeight: '600'
-                        }}>
-                          {formatCurrency(order.RemainingAmount)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={getStatusBadgeClass(order.PaymentStatus)}>
-                          {order.PaymentStatus || 'Pending'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <Link
-                            to={`/salesorder/receipt/${order.SalesOrderID}`}
-                            className='btn-action btn-read'
-                          >
-                            Receipt
-                          </Link>
-                          <Link
-                            to={`/salesorderdetail/${order.SalesOrderID}`}
-                            className='btn-action btn-read'
-                          >
-                            Open
-                          </Link>
-                          <Link
-                            to={`/salesorder/update/${order.SalesOrderID}`}
-                            className='btn-action btn-edit'
-                          >
-                            Pay
-                          </Link>
-                          <Link
-                            to={`/salesorderdetaillist/${order.SalesOrderID}`}
-                            className='btn-action btn-read'
-                          >
-                            Items
-                          </Link>
-                          <Link
-                            to={`/salesorder/receipt/${order.SalesOrderID}`}
-                            className='btn-action btn-read'
-                          >
-                            Receipt
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(order.SalesOrderID)}
-                            className='btn-action btn-delete'
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+              <div className="sales-orders-table-wrap">
+                <table className="sales-orders-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Paid</th>
+                      <th>Remaining</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              
-              {data.length > 0 && (
-                <div className='pagination-container'>
-                  {/* Page Info */}
-                  <div className="pagination-info">
-                    Showing {startRecord} to {endRecord} of {totalRecords} entries
+                  </thead>
+                  <tbody>
+                    {data.map((order) => (
+                      <tr key={order.SalesOrderID}>
+                        <td data-label="Order ID">
+                          <strong>#{order.SalesOrderID}</strong>
+                        </td>
+                        <td data-label="Customer">
+                          {order.Customer?.CustomerName || 'Walk-in'}
+                        </td>
+                        <td data-label="Date">{formatDate(order.OrderDate)}</td>
+                        <td data-label="Total">
+                          <strong>{formatCurrency(order.TotalAmount)}</strong>
+                        </td>
+                        <td data-label="Paid">{formatCurrency(order.AmountPaid)}</td>
+                        <td data-label="Remaining">
+                          <span className={order.RemainingAmount > 0 ? 'so-remaining--due' : 'so-remaining--clear'}>
+                            {formatCurrency(order.RemainingAmount)}
+                          </span>
+                        </td>
+                        <td data-label="Status">
+                          <span className={getStatusBadgeClass(order.PaymentStatus)}>
+                            {order.PaymentStatus || 'Pending'}
+                          </span>
+                        </td>
+                        <td data-label="Actions">
+                          <div className="so-actions">
+                            <Link to={`/salesorder/receipt/${order.SalesOrderID}`} className="so-btn so-btn--view">
+                              Receipt
+                            </Link>
+                            <Link to={`/salesorder/update/${order.SalesOrderID}`} className="so-btn so-btn--pay">
+                              Pay
+                            </Link>
+                            <Link to={`/salesorderdetaillist/${order.SalesOrderID}`} className="so-btn so-btn--items">
+                              Items
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(order.SalesOrderID)}
+                              className="so-btn so-btn--delete"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="sales-orders-page__footer">
+                <p className="sales-orders-page__info">
+                  Showing {startRecord}–{endRecord} of {totalRecords} orders
+                </p>
+                {totalPages > 1 && (
+                  <div className="sales-orders-page__pagination">
+                    <button
+                      type="button"
+                      className="so-page-btn"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      ← Prev
+                    </button>
+                    {getPaginationRange().map((page, index) => (
+                      <button
+                        key={`${page}-${index}`}
+                        type="button"
+                        className={`so-page-btn ${page === currentPage ? 'so-page-btn--active' : ''} ${page === '...' ? 'so-page-btn--dots' : ''}`}
+                        onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
+                        disabled={page === '...'}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className="so-page-btn"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next →
+                    </button>
                   </div>
-                  
-                  {/* Pagination Controls */}
-                  {totalPages > 1 && (
-                    <div className="pagination-controls">
-                      {/* Previous Button */}
-                      <button
-                        className={`page-link page-nav ${currentPage === 1 ? 'disabled' : ''}`}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        ← Previous
-                      </button>
-                      
-                      {/* Page Numbers */}
-                      {getPaginationRange().map((page, index) => (
-                        <button
-                          key={index}
-                          className={`page-link ${page === '...' ? 'dots' : ''} ${currentPage === page ? 'active' : ''}`}
-                          onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
-                          disabled={page === '...'}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                      
-                      {/* Next Button */}
-                      <button
-                        className={`page-link page-nav ${currentPage === totalPages ? 'disabled' : ''}`}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        Next →
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>

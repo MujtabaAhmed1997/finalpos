@@ -191,7 +191,7 @@ function SaleOrderDetailList() {
   };
 
   return (
-    <div className='sales-order-detail-container'>
+    <div className='sales-order-detail-container sales-order-detail-list'>
       <div className='container-fluid'>
         <div className='row justify-content-center'>
           <div className='col-12 col-lg-10 col-xl-8'>

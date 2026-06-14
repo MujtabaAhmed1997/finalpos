@@ -37,11 +37,11 @@
   border-radius: 0;
 }
 
-.sales-table {
+.sales-order-detail-list .sales-table {
   margin: 0;
 }
 
-.sales-table thead th {
+.sales-order-detail-list .sales-table thead th {
   background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
   color: #ffffff;
   font-weight: 600;
@@ -52,18 +52,18 @@
   letter-spacing: 0.5px;
 }
 
-.sales-table tbody tr {
+.sales-order-detail-list .sales-table tbody tr {
   transition: all 0.3s ease;
   border: none;
 }
 
-.sales-table tbody tr:hover {
+.sales-order-detail-list .sales-table tbody tr:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #374151 0%, #4a5568 100%) !important;
 }
 
-.sales-table tbody td {
+.sales-order-detail-list .sales-table tbody td {
   border: none;
   padding: 15px 20px;
   vertical-align: middle;
@@ -176,12 +176,12 @@
     font-size: 1.25rem;
   }
   
-  .sales-table thead th {
+  .sales-order-detail-list .sales-table thead th {
     padding: 10px 15px;
     font-size: 0.8rem;
   }
   
-  .sales-table tbody td {
+  .sales-order-detail-list .sales-table tbody td {
     padding: 10px 15px;
     font-size: 0.85rem;
   }
@@ -199,12 +199,12 @@
     text-align: center;
   }
   
-  .sales-table thead th {
+  .sales-order-detail-list .sales-table thead th {
     padding: 8px 10px;
     font-size: 0.75rem;
   }
   
-  .sales-table tbody td {
+  .sales-order-detail-list .sales-table tbody td {
     padding: 8px 10px;
     font-size: 0.8rem;
   }
@@ -227,15 +227,15 @@
   }
 }
 
-.sales-table tbody tr {
+.sales-order-detail-list .sales-table tbody tr {
   animation: fadeInUp 0.5s ease forwards;
 }
 
-.sales-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.sales-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-.sales-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-.sales-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
-.sales-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+.sales-order-detail-list .sales-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.sales-order-detail-list .sales-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.sales-order-detail-list .sales-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.sales-order-detail-list .sales-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.sales-order-detail-list .sales-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
 
 /* Custom scrollbar for table */
 .table-responsive::-webkit-scrollbar {
