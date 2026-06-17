@@ -5,7 +5,9 @@ import { FaEdit, FaCreditCard, FaTimes } from 'react-icons/fa';
 import { useToast } from "../../ui/toast/ToastProvider";
 import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, post, put } from "../../service/apiClient";
+import { formatCurrency } from "../../utils/formatCurrency";
 import "./sales.css";
+import "./Salesorder.css";
 
 function UpdateSalesOrderForm() {
   const { id } = useParams();
@@ -218,33 +220,10 @@ function UpdateSalesOrderForm() {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
-
   return (
     <>
-      <div
-        className="d-flex vh-100 justify-content-center align-items-center"
-        style={{
-          backgroundColor: "#263043",
-        }}
-      >
-        <div
-          className="rounded-4 shadow-lg p-5"
-          style={{
-            minWidth: 500,
-            maxWidth: 600,
-            width: "100%",
-            border: "1px solid #404040",
-            background: "rgba(255,255,255,0.95)",
-            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
-          }}
-        >
+      <div className="update-sales-page">
+        <div className="update-sales-card rounded-4 shadow-lg">
           <div className="text-center mb-4">
             <FaEdit size={40} color="#263043" />
             <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>

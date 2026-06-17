@@ -21,10 +21,15 @@
 
 @media (max-width: 768px) {
   .sales-order-detail-container {
-    padding: 0.5rem;
+    padding: 0.35rem;
+    min-height: calc(100vh - 80px);
+  }
+
+  .sales-order-detail-container .sales-order-container {
+    padding: 0.25rem;
   }
 
   .sales-order-detail-container .sales-order-card {
-    padding: 0.75rem;
+    padding: 0.65rem;
   }
 }

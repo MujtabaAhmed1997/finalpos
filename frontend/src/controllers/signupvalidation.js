@@ -3,7 +3,7 @@ function signupvalidtion(values){
     let error={};
     const email_pattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
     const password_pattern=/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/
-    const name_pattern=/^[a-zA-Z]+(?: [a-zA-Z]+)*$/
+    const name_pattern=/^[a-zA-Z][a-zA-Z0-9.'\-\s]*$/
 
     
       
@@ -20,7 +20,7 @@ function signupvalidtion(values){
     {
         error.email="Email shouldn't be empty";
     }else if(!email_pattern.test(values.email)){
-        error.email="Email didn't match";
+        error.email="Please enter a valid email address";
     }else{
         error.email="";
     }
@@ -29,7 +29,7 @@ function signupvalidtion(values){
     {
         error.password="Password shouldn't be empty";
     }else if(!password_pattern.test(values.password)){
-        error.password="Password didn't match";
+        error.password="Password must be at least 8 characters with one capital letter (A-Z), lowercase and a number";
     }else{
         error.password="";
     }

@@ -128,3 +128,57 @@
     min-width: 600px;
   }
 }
+
+/* Update sales order / payment page */
+.update-sales-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #263043;
+}
+
+.update-sales-card {
+  width: 100%;
+  max-width: 36rem;
+  border: 1px solid #404040;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+@media (min-width: 576px) {
+  .update-sales-card {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .update-sales-page {
+    align-items: flex-start;
+    padding: 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .update-sales-card {
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+
+  .update-sales-card .form-control {
+    font-size: 16px;
+  }
+
+  .update-sales-card .row > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .update-sales-card .d-grid .btn {
+    font-size: 0.95rem;
+    padding: 0.65rem 1rem;
+  }
+}

@@ -6,6 +6,7 @@ import { useToast } from "../../ui/toast/ToastProvider";
 import { get, delete_ } from "../../service/apiClient";
 import { useInvalidate } from '../../context/DataRefreshContext';
 import { useListRefresh } from '../../hooks/useListRefresh';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 function SalesOrdershow() {
   const [data, setData] = useState([]);
@@ -81,14 +82,6 @@ function SalesOrdershow() {
         return 'so-status so-status--pending';
     }
   };
-
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount || 0);
 
   const formatDate = (dateString) => {
     if (!dateString) return '—';

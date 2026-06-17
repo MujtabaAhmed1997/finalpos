@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signupvalidtion } from '../controllers/signupvalidation';
 import { authAPI } from '../service/apiClient';
 import { FaUserPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Signup.css';
 
 function Signup() {
     const [values, setValues] = useState({
@@ -59,29 +60,16 @@ function Signup() {
     };
 
     return (
-        <div
-            className="d-flex vh-100 justify-content-center align-items-center"
-            style={{
-                backgroundColor: "#263043",
-            }}
-        >
-            <div
-                className="rounded-4 shadow-lg p-5"
-                style={{
-                    minWidth: 400,
-                    maxWidth: 450,
-                    width: "100%",
-                    border: "1px solid #404040",
-                    background: "rgba(255,255,255,0.95)",
-                    boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
-                }}
-            >
+        <div className="signup-page">
+            <div className="signup-card">
                 <div className="text-center mb-4">
-                    <FaUserPlus size={40} color="#263043" />
-                    <h3 className="fw-bold mt-2" style={{ color: "#263043" }}>
+                    <div className="signup-brand-icon">
+                        <FaUserPlus size={28} />
+                    </div>
+                    <h3 className="fw-bold signup-title" style={{ color: "#263043" }}>
                         Create Account
                     </h3>
-                    <p className="text-muted" style={{ fontSize: 15 }}>
+                    <p className="text-muted mb-0" style={{ fontSize: 15 }}>
                         Join us and start managing your inventory
                     </p>
                 </div>
@@ -94,30 +82,16 @@ function Signup() {
                     )}
 
                     <div className="mb-3">
-                        <label htmlFor="name" className="form-label fw-semibold" style={{ color: "#263043" }}>
+                        <label htmlFor="name" className="signup-label">
                             Full Name
                         </label>
                         <input
                             type="text"
-                            className="form-control rounded-3"
+                            className="form-control signup-input"
                             name="name"
                             placeholder="Enter your full name"
                             value={values.name}
                             onChange={onhandleInput}
-                            style={{
-                                background: "#f8f9fa",
-                                border: "1px solid #dee2e6",
-                                transition: "all 0.2s",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                            }}
-                            onFocus={e => {
-                                e.target.style.borderColor = "#263043";
-                                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                            }}
-                            onBlur={e => {
-                                e.target.style.borderColor = "#dee2e6";
-                                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                            }}
                         />
                         {errors.name && (
                             <span className="text-danger small">{errors.name}</span>
@@ -125,30 +99,16 @@ function Signup() {
                     </div>
 
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label fw-semibold" style={{ color: "#263043" }}>
+                        <label htmlFor="email" className="signup-label">
                             Email Address
                         </label>
                         <input
                             type="email"
-                            className="form-control rounded-3"
+                            className="form-control signup-input"
                             name="email"
                             placeholder="Enter your email address"
                             value={values.email}
                             onChange={onhandleInput}
-                            style={{
-                                background: "#f8f9fa",
-                                border: "1px solid #dee2e6",
-                                transition: "all 0.2s",
-                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                            }}
-                            onFocus={e => {
-                                e.target.style.borderColor = "#263043";
-                                e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                            }}
-                            onBlur={e => {
-                                e.target.style.borderColor = "#dee2e6";
-                                e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                            }}
                         />
                         {errors.email && (
                             <span className="text-danger small">{errors.email}</span>
@@ -156,51 +116,33 @@ function Signup() {
                     </div>
 
                     <div className="mb-4">
-                        <label htmlFor="password" className="form-label fw-semibold" style={{ color: "#263043" }}>
+                        <label htmlFor="password" className="signup-label">
                             Password
                         </label>
-                        <div className="position-relative">
+                        <div className="signup-password-field">
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="form-control rounded-3"
+                                className="form-control signup-input"
                                 name="password"
                                 placeholder="Create a strong password"
                                 value={values.password}
                                 onChange={onhandleInput}
-                                style={{
-                                    background: "#f8f9fa",
-                                    border: "1px solid #dee2e6",
-                                    transition: "all 0.2s",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                                    paddingRight: "40px"
-                                }}
-                                onFocus={e => {
-                                    e.target.style.borderColor = "#263043";
-                                    e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
-                                }}
-                                onBlur={e => {
-                                    e.target.style.borderColor = "#dee2e6";
-                                    e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                                }}
                             />
                             <button
                                 type="button"
-                                className="btn position-absolute"
-                                style={{
-                                    right: "10px",
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    background: "none",
-                                    border: "none",
-                                    color: "#6c757d"
-                                }}
+                                className="signup-password-toggle"
                                 onClick={togglePasswordVisibility}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
                             >
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
                         </div>
+                        <small className="signup-password-hint">
+                            Minimum 8 characters with <strong>one capital letter (A-Z)</strong>, lowercase, and a number.
+                            Example: <strong>Pakbrotherz123</strong>
+                        </small>
                         {errors.password && (
-                            <span className="text-danger small">{errors.password}</span>
+                            <span className="text-danger small d-block mt-1">{errors.password}</span>
                         )}
                     </div>
 
@@ -220,31 +162,8 @@ function Signup() {
 
                     <button
                         type="submit"
-                        className="btn w-100 rounded-3 fw-bold mb-3"
+                        className="btn w-100 signup-submit mb-3"
                         disabled={isLoading}
-                        style={{
-                            background: "#263043",
-                            border: "none",
-                            fontSize: 18,
-                            letterSpacing: 1,
-                            boxShadow: "0 4px 12px rgba(38, 48, 67, 0.3)",
-                            transition: "all 0.3s",
-                            color: "white",
-                        }}
-                        onMouseOver={e => {
-                            if (!isLoading) {
-                                e.target.style.background = "#1a2332";
-                                e.target.style.transform = "translateY(-2px)";
-                                e.target.style.boxShadow = "0 6px 20px rgba(38, 48, 67, 0.4)";
-                            }
-                        }}
-                        onMouseOut={e => {
-                            if (!isLoading) {
-                                e.target.style.background = "#263043";
-                                e.target.style.transform = "translateY(0)";
-                                e.target.style.boxShadow = "0 4px 12px rgba(38, 48, 67, 0.3)";
-                            }
-                        }}
                     >
                         {isLoading ? (
                             <span>

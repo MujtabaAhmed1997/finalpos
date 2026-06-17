@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaPrint, FaArrowLeft, FaReceipt, FaCalendarAlt, FaUser, FaClock, FaBox, FaTag, FaHashtag, FaDollarSign, FaListAlt, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import './recipt.css';
 import { get } from "../../service/apiClient";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const GenericReceipt = ({ orderType }) => {
   console.log("GenericReceipt component rendered with orderType:", orderType);
@@ -133,13 +134,6 @@ const GenericReceipt = ({ orderType }) => {
     } else {
       navigate("/purchaseorder");
     }
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount || 0);
   };
 
   const formatDate = (dateString) => {

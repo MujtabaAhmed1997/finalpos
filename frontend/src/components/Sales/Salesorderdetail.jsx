@@ -5,6 +5,7 @@ import { useToast } from "../../ui/toast/ToastProvider";
 import { useConfirm } from "../../ui/confirm/ConfirmProvider";
 import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, post, delete_ } from "../../service/apiClient";
+import { formatCurrency } from "../../utils/formatCurrency";
 import "./sales.css";
 
 function AddSalesOrderDetail() {
@@ -265,14 +266,6 @@ function AddSalesOrderDetail() {
     if (stock > 10) return "In Stock";
     if (stock > 0) return "Low Stock";
     return "Out of Stock";
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 2
-    }).format(amount);
   };
 
   const validateEntry = (entry) => {

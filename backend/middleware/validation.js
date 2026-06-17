@@ -33,8 +33,8 @@ const validateUserSignup = [
         .trim()
         .isLength({ min: 2 })
         .withMessage('Name must be at least 2 characters')
-        .matches(/^[a-zA-Z\s]+$/)
-        .withMessage('Name can only contain letters and spaces'),
+        .matches(/^[a-zA-Z][a-zA-Z0-9.'\-\s]*$/)
+        .withMessage('Name can only contain letters, spaces, dots and hyphens'),
     handleValidationErrors
 ];
 
