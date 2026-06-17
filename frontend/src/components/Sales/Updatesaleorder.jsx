@@ -36,14 +36,15 @@ function UpdateSalesOrderForm() {
   useEffect(() => {
     get(`/sales-orders/${id}`)
       .then(res => {
+        const order = res.data;
         setValues(prev => ({
           ...prev,
-          ...res.data
+          ...order
         }));
-        fetchSalesOrderDetails(res.data.SalesOrderID);
+        fetchSalesOrderDetails(order.SalesOrderID, order.AmountPaid);
         setPaymentData(prev => ({
           ...prev,
-          PaymentAmount: res.data.RemainingAmount || 0
+          PaymentAmount: order.RemainingAmount || 0
         }));
       })
       .catch(err => {
@@ -62,18 +63,19 @@ function UpdateSalesOrderForm() {
       });
   }, []);
 
-  const fetchSalesOrderDetails = (salesOrderId) => {
+  const fetchSalesOrderDetails = (salesOrderId, amountPaid = 0) => {
+    const paid = parseFloat(amountPaid) || 0;
     get(`/salesordersdetails/salesOrder/${salesOrderId}/total`)
       .then(res => {
-        const totalAmount = res.data.total;
+        const totalAmount = parseFloat(res.data.total) || 0;
         setValues(prev => ({
           ...prev,
           TotalAmount: totalAmount,
-          RemainingAmount: totalAmount - prev.AmountPaid
+          RemainingAmount: totalAmount - paid
         }));
         setPaymentData(prev => ({
           ...prev,
-          PaymentAmount: totalAmount - prev.AmountPaid
+          PaymentAmount: Math.max(0, totalAmount - paid)
         }));
       })
       .catch(err => {
@@ -83,10 +85,24 @@ function UpdateSalesOrderForm() {
 
   const handleInput = (event) => {
     const { name, value } = event.target;
-    setValues(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setValues(prev => {
+      const next = { ...prev, [name]: value };
+      if (name === 'AmountPaid') {
+        const totalAmount = parseFloat(prev.TotalAmount) || 0;
+        const paid = parseFloat(value) || 0;
+        next.RemainingAmount = Math.max(0, totalAmount - paid);
+        if (totalAmount > 0) {
+          if (paid >= totalAmount) {
+            next.PaymentStatus = 'Paid';
+          } else if (paid > 0) {
+            next.PaymentStatus = 'Partial';
+          } else {
+            next.PaymentStatus = 'Pending';
+          }
+        }
+      }
+      return next;
+    });
   };
 
   const handlePaymentInput = (event) => {
@@ -128,7 +144,14 @@ function UpdateSalesOrderForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
 
-      put(`/sales-orders/${id}`, values)
+      const payload = {
+        ...values,
+        TotalAmount: parseFloat(values.TotalAmount) || 0,
+        AmountPaid: parseFloat(values.AmountPaid) || 0,
+        RemainingAmount: parseFloat(values.RemainingAmount) || 0,
+      };
+
+      put(`/sales-orders/${id}`, payload)
         .then(res => {
           console.log('Sales order updated:', res.data);
 
@@ -334,11 +357,22 @@ function UpdateSalesOrderForm() {
                   className="form-control rounded-3"
                   name="AmountPaid"
                   value={values.AmountPaid}
-                  readOnly
+                  min="0"
+                  step="0.01"
                   style={{
-                    background: "#e9ecef",
+                    background: "#f8f9fa",
                     border: "1px solid #dee2e6",
-                    color: "#6c757d",
+                    transition: "all 0.2s",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    color: "#000000",
+                  }}
+                  onFocus={e => {
+                    e.target.style.borderColor = "#263043";
+                    e.target.style.boxShadow = "0 0 0 0.2rem rgba(38, 48, 67, 0.25)";
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = "#dee2e6";
+                    e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
                   }}
                 />
                 {errors.AmountPaid && <span className="text-danger small">{errors.AmountPaid}</span>}

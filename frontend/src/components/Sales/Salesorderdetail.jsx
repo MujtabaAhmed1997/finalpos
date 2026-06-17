@@ -299,6 +299,11 @@ function AddSalesOrderDetail() {
     if (looseQty > 0 && looseQty > Number(entry.LooseStock)) {
       errors.LooseQuantity = `Only ${entry.LooseStock} loose items available`;
     }
+
+    const unitPrice = Number(entry.UnitPrice);
+    if (!unitPrice || unitPrice <= 0) {
+      errors.UnitPrice = "Unit price must be greater than 0";
+    }
     
     return errors;
   };
@@ -328,7 +333,7 @@ function AddSalesOrderDetail() {
             containerQuantity: entry.Quantity,
             looseQuantity: entry.LooseQuantity,
             unitType: entry.UnitType,
-            UnitPrice: entry.UnitPrice,
+            UnitPrice: parseFloat(entry.UnitPrice) || 0,
             LooseQuantityPrice: entry.LooseQuantityPrice,
             Discount: entry.Discount,
           }
@@ -555,14 +560,22 @@ function AddSalesOrderDetail() {
                       Unit Price
                     </label>
                     <input
+                      onChange={(event) => handleInput(index, event)}
                       type="number"
-                      placeholder="Unit price"
+                      placeholder="Enter unit price"
                       className="form-control"
                       name="UnitPrice"
                       value={entry.UnitPrice}
-                      readOnly
+                      min="0"
+                      step="0.01"
                       id={`UnitPrice-${index}`}
                     />
+                    {errors[index]?.UnitPrice && (
+                      <div className="error-message">
+                        <i className="fas fa-exclamation-circle"></i>
+                        {errors[index].UnitPrice}
+                      </div>
+                    )}
                   </div>
                 </div>
 
