@@ -37,12 +37,41 @@ router.post('/create', async (req, res) => {
     let debit = 0;
     let credit = 0;
 
+    // Prevent duplicate ledger entries for the same transaction
+    const existingEntry = await CustomerLeisure.findOne({
+      where: { CustomerID, TransactionType, TransactionID },
+      transaction: t
+    });
+    if (existingEntry) {
+      await t.commit();
+      return res.status(200).json(existingEntry);
+    }
+
     // Determine Credit/Debit based on TransactionType
     if (TransactionType === 'SalesOrder') {
       const salesOrder = await SalesOrder.findByPk(TransactionID, { transaction: t });
       if (!salesOrder) throw new Error('SalesOrder not found');
 
-      credit = salesOrder.TotalAmount;
+      credit = parseFloat(salesOrder.TotalAmount) || 0;
+      if (credit <= 0) {
+        const details = await SalesOrderDetail.findAll({
+          where: { SalesOrderID: TransactionID },
+          transaction: t
+        });
+        credit = details.reduce((sum, detail) => {
+          const qty = parseFloat(detail.Quantity) || 0;
+          const loose = parseFloat(detail.LooseQuantity) || 0;
+          const price = parseFloat(detail.UnitPrice) || 0;
+          const discount = parseFloat(detail.Discount) || 0;
+          const loosePrice = parseFloat(detail.LooseQuantityPrice) || 0;
+          return sum + qty * (price - discount) + loose * loosePrice;
+        }, 0);
+        const amountPaid = parseFloat(salesOrder.AmountPaid) || 0;
+        await salesOrder.update({
+          TotalAmount: credit,
+          RemainingAmount: Math.max(0, credit - amountPaid)
+        }, { transaction: t });
+      }
     } else if (TransactionType === 'Payment') {
       const customerPayment = await CustomerPayment.findByPk(TransactionID, { transaction: t });
       if (!customerPayment) throw new Error('CustomerPayment not found');
@@ -128,7 +157,7 @@ router.get('/customer/:customerid', async (req, res) => {
 
     // If no leisure records found, return 404
     if (leisureRecords.length === 0) {
-      return res.status(404).json({ message: 'No leisure records found' });
+      return res.status(200).json([]);
     }
 
     // Enrich leisure records with related sales order details if applicable
@@ -183,7 +212,7 @@ router.get('/customer/:customerid', async (req, res) => {
             return { ...record.toJSON(), ReturnOrder: null }; // Return record with null SalesOrder
           }
         } else {
-          return record; // Return record as is if not SalesOrder
+          return record.toJSON ? record.toJSON() : record;
         }
       })
     );
@@ -219,7 +248,7 @@ router.get('/customerss/:customerid', async (req, res) => {
 
     // If no leisure records found, return 404
     if (leisureRecords.length === 0) {
-      return res.status(404).json({ message: 'No leisure records found' });
+      return res.status(200).json([]);
     }
 
     // Enrich leisure records with related sales order details if applicable
@@ -243,7 +272,7 @@ router.get('/customerss/:customerid', async (req, res) => {
             return { ...record.toJSON(), SalesOrder: null }; // Return record with null SalesOrder
           }
         } else {
-          return record; // Return record as is if not SalesOrder
+          return record.toJSON ? record.toJSON() : record;
         }
       })
     );

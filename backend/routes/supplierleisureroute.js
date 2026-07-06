@@ -38,6 +38,15 @@ router.post('/create', async (req, res) => {
     let debit = 0;
     let credit = 0;
 
+    const existingEntry = await SupplierLeisure.findOne({
+      where: { SupplierID, TransactionType, TransactionID },
+      transaction: t
+    });
+    if (existingEntry) {
+      await t.commit();
+      return res.status(200).json(existingEntry);
+    }
+
     // Determine Credit/Debit based on TransactionType
     if (TransactionType === 'PurchaseOrder') {
       const purchaseorder = await PurchaseOrder.findByPk(TransactionID, { transaction: t });
@@ -81,7 +90,7 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.get('/supplier/:supplierid',authMiddleware,adminAuth, async (req, res) => {
+router.get('/supplier/:supplierid', authMiddleware, async (req, res) => {
   const supplierid = req.params.supplierid;
   
 
@@ -96,7 +105,7 @@ router.get('/supplier/:supplierid',authMiddleware,adminAuth, async (req, res) =>
 
     // If no leisure records found, return 404
     if (leisureRecords.length === 0) {
-      return res.status(404).json({ message: 'No leisure records found' });
+      return res.status(200).json([]);
     }
 
     // Enrich leisure records with related sales order details if applicable

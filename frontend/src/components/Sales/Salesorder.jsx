@@ -5,6 +5,7 @@ import { validateSalesOrder } from "../../controllers/salesvalidator";
 import { FaShoppingCart, FaUser, FaCalendar, FaPlusCircle } from "react-icons/fa";
 import "./Salesorder.css";
 import { get, post } from "../../service/apiClient";
+import { fetchAllCustomers } from "../../utils/apiHelpers";
 
 function SalesOrderForm() {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -45,11 +46,9 @@ function SalesOrderForm() {
 
   useEffect(() => {
     console.log("Fetching customers...");
-    get("/customers")
-      .then((res) => {
-        console.log("Customers fetched:", res.data);
-        // Handle paginated response structure
-        const customersData = res.data.data || res.data;
+    fetchAllCustomers(get)
+      .then((customersData) => {
+        console.log("Customers fetched:", customersData);
         const formattedCustomers = customersData.map((customer) => ({
           value: customer.CustomerID,
           label: customer.CustomerName,

@@ -27,8 +27,8 @@ export function validateSalesOrder(values) {
   
     if (!values.PaymentStatus) {
       errors.PaymentStatus = 'Payment Status is required';
-    } else if (!['Pending', 'Paid', 'Partial'].includes(values.PaymentStatus)) {
-      errors.PaymentStatus = 'Payment Status must be one of: Pending, Paid, Partial';
+    } else if (!['Pending', 'Paid', 'Partial', 'Advance'].includes(values.PaymentStatus)) {
+      errors.PaymentStatus = 'Payment Status must be one of: Pending, Paid, Partial, Advance';
     }
   
     return errors;

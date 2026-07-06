@@ -6,6 +6,7 @@ import { useToast } from "../../ui/toast/ToastProvider";
 import { useInvalidate } from "../../context/DataRefreshContext";
 import { get, post, put } from "../../service/apiClient";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { formatDateForInput, fetchAllCustomers } from "../../utils/apiHelpers";
 import "./sales.css";
 import "./Salesorder.css";
 
@@ -39,14 +40,20 @@ function UpdateSalesOrderForm() {
     get(`/sales-orders/${id}`)
       .then(res => {
         const order = res.data;
+        const orderDate = formatDateForInput(order.OrderDate);
+        const amountPaid = parseFloat(order.AmountPaid) || 0;
+
         setValues(prev => ({
           ...prev,
-          ...order
+          ...order,
+          OrderDate: orderDate,
+          CustomerID: order.CustomerID || '',
+          AmountPaid: amountPaid,
         }));
-        fetchSalesOrderDetails(order.SalesOrderID, order.AmountPaid);
+        fetchSalesOrderDetails(order.SalesOrderID, amountPaid);
         setPaymentData(prev => ({
           ...prev,
-          PaymentAmount: order.RemainingAmount || 0
+          PaymentAmount: Math.max(0, (parseFloat(order.RemainingAmount) || 0))
         }));
       })
       .catch(err => {
@@ -55,10 +62,8 @@ function UpdateSalesOrderForm() {
   }, [id]);
 
   useEffect(() => {
-    get('/customers')
-      .then(res => {
-        setCustomers(Array.isArray(res.data) ? res.data : []);
-      })
+    fetchAllCustomers(get)
+      .then(setCustomers)
       .catch(err => {
         console.error('Error fetching customers:', err);
         setCustomers([]);
@@ -148,6 +153,7 @@ function UpdateSalesOrderForm() {
 
       const payload = {
         ...values,
+        OrderDate: formatDateForInput(values.OrderDate) || values.OrderDate,
         TotalAmount: parseFloat(values.TotalAmount) || 0,
         AmountPaid: parseFloat(values.AmountPaid) || 0,
         RemainingAmount: parseFloat(values.RemainingAmount) || 0,
@@ -160,7 +166,6 @@ function UpdateSalesOrderForm() {
           const leisureEntry = {
             CustomerID: values.CustomerID,
             TransactionType: 'SalesOrder',
-            TransactionDate: values.OrderDate,
             TransactionID: id,
           };
 
@@ -197,7 +202,13 @@ function UpdateSalesOrderForm() {
           Notes: paymentData.Notes
         };
 
-        await post('/customerpayments', paymentPayload);
+        const paymentRes = await post('/customerpayments', paymentPayload);
+
+        await post('/customerleisure/create', {
+          CustomerID: values.CustomerID,
+          TransactionType: 'Payment',
+          TransactionID: paymentRes.data.CustomerPaymentID,
+        });
 
         const newAmountPaid = values.AmountPaid + parseFloat(paymentData.PaymentAmount);
         const updatedValues = {

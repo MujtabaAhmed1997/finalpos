@@ -765,10 +765,10 @@
 // export default SupplierLeisureShow;
 
 
-import {jwtDecode }from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import apiClient, { get } from "../../service/apiClient";
+import { get } from "../../service/apiClient";
+import { fetchAllSuppliers } from "../../utils/apiHelpers";
+
 function SupplierLeisureShow() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -778,54 +778,27 @@ function SupplierLeisureShow() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
-  const [userRole, setUserRole] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log('Decoded JWT:', decoded);
-        const role = decoded.role; // Replace 'role' with the actual key in your payload
-        setUserRole(role);
-        if (role !== 'admin') {
-          console.log("Unauthorized");
-          navigate('/unauthorized'); // Redirect to an unauthorized page or another action
-        }
-      } catch (error) {
-        console.error('Token decoding failed:', error);
-        navigate('/login'); // Redirect to login if the token is invalid
-      }
-    } else {
-      navigate('/login'); // Redirect to login if no token is present
-    }
-  }, [navigate]);
+    fetchSuppliers();
+  }, []);
 
   useEffect(() => {
-    if (userRole === 'admin') {
-      fetchSuppliers();
-    }
-  }, [userRole]);
-
-  useEffect(() => {
-    if (selectedSupplier && userRole === 'admin') {
+    if (selectedSupplier) {
       fetchSupplierLeisureById(selectedSupplier);
     } else {
       setData([]);
     }
-  }, [selectedSupplier, userRole]);
+  }, [selectedSupplier]);
 
   const fetchSupplierLeisureById = async (supplierId) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const res = await apiClient.get(`/supplierleisure/supplier/${supplierId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      setData(res.data || []);
+      const res = await get(`/supplierleisure/supplier/${supplierId}`);
+      setData(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch supplier leisure records:', err);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -833,11 +806,13 @@ function SupplierLeisureShow() {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await get('/suppliers');
-      setSuppliers(res.data || []);
-      setFilteredSuppliers(res.data || []);
+      const list = await fetchAllSuppliers(get);
+      setSuppliers(list);
+      setFilteredSuppliers(list);
     } catch (err) {
       console.error('Failed to fetch suppliers:', err);
+      setSuppliers([]);
+      setFilteredSuppliers([]);
     }
   };
 
@@ -873,20 +848,6 @@ function SupplierLeisureShow() {
   const calculateTotal = (quantity, unitPrice) => {
     return Math.floor((quantity * unitPrice));
   };
-
-  if (userRole !== 'admin') {
-    return (
-      <div
-        className='d-flex vh-100 justify-content-center align-items-center'
-        style={{ backgroundColor: '#1d2634' }}
-      >
-        <div className='w-100 w-md-50 bg-white rounded p-3'>
-          <h2>Unauthorized Access</h2>
-          <p>You are unauthorized to view this page. Only admins can access this section.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div

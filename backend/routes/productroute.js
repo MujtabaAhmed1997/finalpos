@@ -17,10 +17,10 @@ router.post('/', async (req, res) => {
     if (!Unit || Unit.trim() === '') {
       validationErrors.Unit = 'Unit is required';
     } else {
-      // Validate Unit enum values
-      const validUnits = ["Container", "Sack"];
-      if (!validUnits.includes(Unit.trim())) {
-        validationErrors.Unit = `Unit must be one of: ${validUnits.join(', ')}`;
+      // Allow standard and custom unit names (2-30 chars)
+      const unit = Unit.trim();
+      if (unit.length < 2 || unit.length > 30) {
+        validationErrors.Unit = 'Unit must be between 2 and 30 characters';
       }
     }
     

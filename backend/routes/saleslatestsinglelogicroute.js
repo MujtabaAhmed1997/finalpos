@@ -179,6 +179,7 @@ const { Op } = require('sequelize');
 const StockTransaction = require('../models/stockstranscation');
 const ProductVariation = require('../models/productvariation');
 const SalesOrderDetail = require('../models/salesorderdetail');
+const SalesOrder = require('../models/salesorder');
 const SalesBatchAllocation = require('../models/salesbatchallocationmodel');
 
 async function getFIFOStock(VariationID, unitType) {
@@ -351,6 +352,28 @@ router.post('/sell-quantity', async (req, res) => {
                 UnitType: batch.UnitType,
                 UnitPrice: UnitPrice,  // Check this value
 
+            }, { transaction });
+        }
+
+        const allDetails = await SalesOrderDetail.findAll({
+            where: { SalesOrderID },
+            transaction
+        });
+        const orderTotal = allDetails.reduce((sum, detail) => {
+            const qty = parseFloat(detail.Quantity) || 0;
+            const loose = parseFloat(detail.LooseQuantity) || 0;
+            const price = parseFloat(detail.UnitPrice) || 0;
+            const discount = parseFloat(detail.Discount) || 0;
+            const loosePrice = parseFloat(detail.LooseQuantityPrice) || 0;
+            return sum + qty * (price - discount) + loose * loosePrice;
+        }, 0);
+
+        const salesOrder = await SalesOrder.findByPk(SalesOrderID, { transaction });
+        if (salesOrder) {
+            const amountPaid = parseFloat(salesOrder.AmountPaid) || 0;
+            await salesOrder.update({
+                TotalAmount: orderTotal,
+                RemainingAmount: Math.max(0, orderTotal - amountPaid)
             }, { transaction });
         }
 

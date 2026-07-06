@@ -226,6 +226,24 @@ router.get("/productVariations/all", async (req, res) => {
 
 
 
+// Get ProductVariation by barcode (must be before /:id route)
+router.get('/productVariations/barcode/:barcode', async (req, res) => {
+  const { barcode } = req.params;
+
+  try {
+    const variation = await ProductVariation.findOne({ where: { Barcode: barcode } });
+
+    if (!variation) {
+      return res.status(404).json({ message: 'Product variation not found' });
+    }
+
+    res.json(variation);
+  } catch (error) {
+    console.error('Error fetching product variation by barcode:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Get a ProductVariation by ID
 router.get('/productVariations/:id', async (req, res) => {
   try {
@@ -366,25 +384,6 @@ router.delete('/productVariations/:id', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/productVariations/barcode/:barcode', async (req, res) => {
-  const { barcode } = req.params;
-
-  try {
-    // Find the product variation by barcode
-    const variation = await ProductVariation.findOne({ where: { Barcode: barcode } });
-
-    if (!variation) {
-      return res.status(404).json({ message: 'Product variation not found' });
-    }
-
-    // Respond with the found variation
-    res.json(variation);
-  } catch (error) {
-    console.error('Error fetching product variation by barcode:', error);
-    res.status(500).json({ message: 'Server error' });
   }
 });
 

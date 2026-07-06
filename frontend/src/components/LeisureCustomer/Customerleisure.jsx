@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./Customerleisure.css";
 import { useToast } from "../../ui/toast/ToastProvider";
 import { get } from "../../service/apiClient";
+import { fetchAllCustomers } from "../../utils/apiHelpers";
 
 function CustomerLeisureShow() {
   const [data, setData] = useState([]);
@@ -40,19 +41,19 @@ function CustomerLeisureShow() {
     setLoading(true);
     get(`/customerleisure/customer/${customerId}`)
       .then((res) => {
-        setData(res.data || []);
+        setData(Array.isArray(res.data) ? res.data : []);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to fetch customer leisure records:", err);
+        setData([]);
         setLoading(false);
       });
   };
 
   const fetchCustomers = () => {
-    get("/customers")
-      .then((res) => {
-        const customersData = res.data?.data || [];
+    fetchAllCustomers(get)
+      .then((customersData) => {
         setCustomers(customersData);
         setFilteredCustomers(customersData);
       })

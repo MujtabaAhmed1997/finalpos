@@ -11,6 +11,7 @@ function UpdateProduct() {
     ProductName: "",
     Description: "",
     Unit: "",
+    CustomUnit: "",
     ReorderLevel: "",
     CategoryID: "",
   });
@@ -30,12 +31,29 @@ function UpdateProduct() {
     fetchCategories();
   }, [id]);
 
+  const presetUnits = ["Container", "Sack", "Piece", "KG", "Box", "Liter"];
+
+  const getUnitValue = () => {
+    if (values.Unit === "Other") {
+      return values.CustomUnit?.trim() || "";
+    }
+    return values.Unit;
+  };
+
   const fetchProduct = async () => {
     try {
       const response = await get(`/products/${id}`);
       
       if (response.data.success) {
-        setValues(response.data.product);
+        const product = response.data.product;
+        const unit = product.Unit || "";
+        if (presetUnits.includes(unit)) {
+          setValues({ ...product, Unit: unit, CustomUnit: "" });
+        } else if (unit) {
+          setValues({ ...product, Unit: "Other", CustomUnit: unit });
+        } else {
+          setValues({ ...product, CustomUnit: "" });
+        }
       } else {
         console.error("Failed to fetch product:", response.data.message);
       }
@@ -66,7 +84,7 @@ function UpdateProduct() {
     setErrors({});
 
     try {
-      const response = await put(`/products/${id}`, values);
+      const response = await put(`/products/${id}`, { ...values, Unit: getUnitValue() });
       
       if (response.data.success) {
         toast.success("Product updated successfully!");
@@ -229,7 +247,22 @@ function UpdateProduct() {
               <option value="">Select Unit</option>
               <option value="Container">Container</option>
               <option value="Sack">Sack</option>
+              <option value="Piece">Piece</option>
+              <option value="KG">KG</option>
+              <option value="Box">Box</option>
+              <option value="Liter">Liter</option>
+              <option value="Other">Other (custom)</option>
             </select>
+            {values.Unit === "Other" && (
+              <input
+                type="text"
+                className="form-control rounded-3 mt-2"
+                name="CustomUnit"
+                placeholder="Enter custom unit name"
+                value={values.CustomUnit}
+                onChange={handleInput}
+              />
+            )}
             {errors.Unit && <span className="text-danger small">{errors.Unit}</span>}
           </div>
 

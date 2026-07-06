@@ -34,10 +34,10 @@ function UpdatePurchaseOrderForm() {
         const purchaseOrder = purchaseOrderRes.data;
         setValues({
           SupplierID: purchaseOrder.SupplierID,
-          OrderDate: purchaseOrder.OrderDate,
-          TotalAmount: 0,
-          AmountPaid: 0,
-          RemainingAmount: 0,
+          OrderDate: purchaseOrder.OrderDate ? String(purchaseOrder.OrderDate).split('T')[0] : '',
+          TotalAmount: parseFloat(purchaseOrder.TotalAmount) || 0,
+          AmountPaid: parseFloat(purchaseOrder.AmountPaid) || 0,
+          RemainingAmount: parseFloat(purchaseOrder.RemainingAmount) || 0,
           PaymentStatus: purchaseOrder.PaymentStatus || 'Pending'
         });
 

@@ -290,28 +290,35 @@ router.get('/stk/all', async (req, res) => {
 
 router.get('/get-stock/:variationId', async (req, res) => {
   const { variationId } = req.params;
-  
 
   try {
-
+    const { ProductVariation, Product } = require('../models');
+    const variation = await ProductVariation.findByPk(variationId, {
+      include: [{ model: Product, attributes: ['Unit'] }],
+    });
 
     const stocks = await StockTransaction.findOne({
-      where: { variationId: variationId },
-      attributes: [ 'UnitType'], // Include UnitType in the response
+      where: { VariationID: variationId },
+      attributes: ['UnitType'],
     });
-    console.log(stocks);
+
+    let unitType = stocks?.UnitType || variation?.Product?.Unit || 'Container';
+    if (!['Container', 'Sack'].includes(unitType)) {
+      const sackUnits = ['Sack', 'KG', 'Kg', 'kg'];
+      unitType = sackUnits.includes(unitType) ? 'Sack' : 'Container';
+    }
+
     const totalContainerQuantity = await getContainerOrSackStock(variationId, 'Container');
     const totalSackQuantity = await getContainerOrSackStock(variationId, 'Sack');
     const totalLooseLQuantity = await getLooseStock(variationId, 'L');
-    const totalLooseKgQuantity = await getLooseStock(variationId, 'kg');
-      
-     let containersStock = (totalContainerQuantity > 0) ? totalContainerQuantity : (totalSackQuantity > 0) ? totalSackQuantity : 0;
-     let looseStockquantity = (totalLooseLQuantity > 0) ? totalLooseLQuantity : (totalLooseKgQuantity > 0) ? totalLooseKgQuantity : 0;
+    const totalLooseKgQuantity = await getLooseStock(variationId, 'KG');
+
+    const containersStock = totalContainerQuantity > 0 ? totalContainerQuantity : (totalSackQuantity > 0 ? totalSackQuantity : 0);
+    const looseStockquantity = totalLooseLQuantity > 0 ? totalLooseLQuantity : (totalLooseKgQuantity > 0 ? totalLooseKgQuantity : 0);
     const stock = {
       Container: containersStock,
-      UnitType:stocks.UnitType,
+      UnitType: unitType,
       LooseStock: looseStockquantity,
-     
     };
 
     res.status(200).json({ message: 'Stock fetched successfully', stock });

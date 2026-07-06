@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { validatePayment } from '../../controllers/spaymentvalidator';
 import { FaPlusCircle, FaUser, FaCalendarAlt, FaMoneyBillWave, FaCreditCard } from "react-icons/fa";
 import { get, post } from "../../service/apiClient";
+import { fetchAllSuppliers } from "../../utils/apiHelpers";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 function AddPayment() {
   const todayDate = new Date().toISOString().split("T")[0];
@@ -22,12 +24,13 @@ function AddPayment() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
+  const [outstandingBalance, setOutstandingBalance] = useState(0);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const res = await get('/suppliers');
-        setSuppliers(res.data);
+        const list = await fetchAllSuppliers(get);
+        setSuppliers(list);
       } catch (err) {
         console.error('Error fetching suppliers:', err);
         setFetchError("Failed to load suppliers.");
@@ -37,6 +40,20 @@ function AddPayment() {
     };
     fetchSuppliers();
   }, []);
+
+  useEffect(() => {
+    if (!values.SupplierID) {
+      setOutstandingBalance(0);
+      return;
+    }
+    get(`/supplierleisure/supplier/${values.SupplierID}`)
+      .then((res) => {
+        const records = Array.isArray(res.data) ? res.data : [];
+        const sorted = [...records].sort((a, b) => new Date(b.TransactionDate) - new Date(a.TransactionDate));
+        setOutstandingBalance(parseFloat(sorted[0]?.Balance) || 0);
+      })
+      .catch(() => setOutstandingBalance(0));
+  }, [values.SupplierID]);
 
   const handleInput = (event) => {
     const { name, value } = event.target;
@@ -79,7 +96,7 @@ function AddPayment() {
         await post('/supplierleisure/create', leisureEntry);
 
         console.log("Leisure entry added, navigating to payment list...");
-        navigate("/supplierpayments/list");
+        navigate("/supplierpayment/list");
       } catch (err) {
         console.error("Error processing payment:", err);
         if (err.response && err.response.data && err.response.data.message) {
@@ -164,6 +181,16 @@ function AddPayment() {
                 </option>
               ))}
             </select>
+            {values.SupplierID && (
+              <div className="mt-2 p-2 rounded-3" style={{ background: '#fff3cd', fontSize: '0.9rem' }}>
+                <strong>Outstanding (Debit):</strong> {formatCurrency(outstandingBalance)}
+                {values.PaymentAmount && (
+                  <span className="ms-2">
+                    | <strong>After payment:</strong> {formatCurrency(Math.max(0, outstandingBalance - (parseFloat(values.PaymentAmount) || 0)))}
+                  </span>
+                )}
+              </div>
+            )}
             {errors.SupplierID && (
               <span className="text-danger small">{errors.SupplierID}</span>
             )}

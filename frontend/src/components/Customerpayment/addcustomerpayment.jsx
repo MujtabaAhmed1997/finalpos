@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { validatePayment } from "../../controllers/cpaymentvalidator";
 import { FaPlusCircle, FaUser, FaCalendarAlt, FaMoneyBillWave, FaCreditCard } from "react-icons/fa";
 import { get, post } from "../../service/apiClient";
+import { fetchAllCustomers } from "../../utils/apiHelpers";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 function AddHomeCustomerPayment() {
   const todayDate = new Date().toISOString().split("T")[0];
@@ -22,13 +24,13 @@ function AddHomeCustomerPayment() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
+  const [outstandingBalance, setOutstandingBalance] = useState(0);
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await get("/customers");
-        setCustomers(res.data);
-        console.log(res.data);
+        const list = await fetchAllCustomers(get);
+        setCustomers(list);
       } catch (err) {
         console.error("Error fetching customers:", err);
         setFetchError("Failed to load customers.");
@@ -38,6 +40,16 @@ function AddHomeCustomerPayment() {
     };
     fetchCustomers();
   }, []);
+
+  useEffect(() => {
+    if (!values.CustomerID) {
+      setOutstandingBalance(0);
+      return;
+    }
+    get(`/customers/customerleisure/lastbalance/${values.CustomerID}`)
+      .then((res) => setOutstandingBalance(parseFloat(res.data?.Balance) || 0))
+      .catch(() => setOutstandingBalance(0));
+  }, [values.CustomerID]);
 
   const handleInput = (event) => {
     const { name, value } = event.target;
@@ -159,12 +171,22 @@ function AddHomeCustomerPayment() {
               <option value="">
                 {isLoading ? "Loading customers..." : "Select Customer"}
               </option>
-              {customers?.data?.length > 0 && customers?.data?.map((customer) => (
+              {customers.length > 0 && customers.map((customer) => (
                 <option key={customer.CustomerID} value={customer.CustomerID}>
                   {customer.CustomerName}
                 </option>
               ))}
             </select>
+            {values.CustomerID && (
+              <div className="mt-2 p-2 rounded-3" style={{ background: '#fff3cd', fontSize: '0.9rem' }}>
+                <strong>Outstanding (Credit):</strong> {formatCurrency(outstandingBalance)}
+                {values.PaymentAmount && (
+                  <span className="ms-2">
+                    | <strong>After payment:</strong> {formatCurrency(Math.max(0, outstandingBalance - (parseFloat(values.PaymentAmount) || 0)))}
+                  </span>
+                )}
+              </div>
+            )}
             {errors.CustomerID && (
               <span className="text-danger small">{errors.CustomerID}</span>
             )}

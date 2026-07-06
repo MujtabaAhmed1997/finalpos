@@ -10,6 +10,7 @@ function AddProduct() {
     ProductName: "",
     Description: "",
     Unit: "",
+    CustomUnit: "",
     ReorderLevel: "",
     CategoryID: "",
   });
@@ -21,7 +22,15 @@ function AddProduct() {
   const invalidate = useInvalidate();
 
   const handleInput = (event) => {
-    setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+    const { name, value } = event.target;
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const getUnitValue = () => {
+    if (values.Unit === "Other") {
+      return values.CustomUnit?.trim() || "";
+    }
+    return values.Unit;
   };
 
   useEffect(() => {
@@ -50,7 +59,10 @@ function AddProduct() {
     setErrors({});
 
     try {
-      const response = await post("/products", values);
+      const response = await post("/products", {
+        ...values,
+        Unit: getUnitValue(),
+      });
       
       if (response.data.success) {
         toast.success("Product created successfully!");
@@ -211,7 +223,22 @@ function AddProduct() {
               <option value="">Select Unit</option>
               <option value="Container">Container</option>
               <option value="Sack">Sack</option>
+              <option value="Piece">Piece</option>
+              <option value="KG">KG</option>
+              <option value="Box">Box</option>
+              <option value="Liter">Liter</option>
+              <option value="Other">Other (custom)</option>
             </select>
+            {values.Unit === "Other" && (
+              <input
+                type="text"
+                className="form-control rounded-3 mt-2"
+                name="CustomUnit"
+                placeholder="Enter custom unit name"
+                value={values.CustomUnit}
+                onChange={handleInput}
+              />
+            )}
             {errors.Unit && <span className="text-danger small">{errors.Unit}</span>}
           </div>
 

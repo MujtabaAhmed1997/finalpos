@@ -107,7 +107,7 @@ router.get('/customer/:customerId', async (req, res) => {
 
   try {
     const { rows: payments, count } = await CustomerPayment.findAndCountAll({
-       where: { CustomerId: customerId }, // Ensure the filter is applied here
+       where: { CustomerID: customerId }, // Ensure the filter is applied here
       offset,
       limit,
       include: [{
@@ -256,7 +256,7 @@ router.get('/today/:customerId', async (req, res) => {
 
     const todayPayments = await CustomerPayment.findAll({
       where: {
-        CustomerId: customerId,
+        CustomerID: customerId,
         PaymentDate: {
           [Op.gte]: startOfDay,
           [Op.lt]: endOfDay
